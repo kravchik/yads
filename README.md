@@ -1,6 +1,58 @@
 YADS - Yads Abstract Data Syntax
 =======
 
+**Parsing, serialization, deserialization - currently available in Java only. I am open to collaboration for other languages.**
+
+### Why yet another data syntax?
+
+* no white-space indentation and mandatory new lines like in YAML
+* no mandatory "" like in json and yml
+* can use ""  and '' interchangeably
+* can use new-lines in "" or '' strings
+* no commas
+* not verbose like xml with the same capabilities
+* built-in serialization/deserialization
+* serialization to beutifuly formatted text
+* comments (both one-liners and multi-liners)  
+
+
+
+
+#### no white-space indentation and mandatory new lines like in YAML
+Same as in JSON. One can write the whole file in one line. It is very useful when you want to write your data in a string inside your code or in the command line. Also, very convenient if you want to include parts of the config in some input field, or in an Excel table.
+
+In all these cases, white-space indentation would be a pain.
+
+#### no mandatory "" like in json
+  though you'd need "" or '' if a string should include spaces (in constrast with YAML)
+  example with simple keys and values
+  example with escapes in Java strings for jsons and ymls
+#### can use ""  and '' interchangeably
+#### can use new-lines in "" or '' strings
+  like in YML
+  example with Java strings
+#### no commas (remember those additions of an element in json?)
+#### not verbose like xml with the same capabilities
+#### built-in serialization/deserialization
+  currently - Java only, but syntax provides ways to other languages be included
+#### serialization to beutifuly formatted text
+  1. convenient to read and edit
+  1. can be used for reporting of data (tests)
+#### comments (both one-liners and multi-liners)  
+
+
+
+todo code examples
+
+
+config (s12/des12), no need to map, no need to parse, no need of annotations
+  because of built-in ser/deser - config not only readable, but also generatable! (example)
+simple properties file
+can write in one line (profit when script goes in one-liner, excel, other?)
+example: can use for UI layouts instead of XML
+imports can be defined as default in ser/deser, instead of a text itself
+
+
 **yk.lang.yads**
 
 Yet Another Data Syntax (the perfect one actually).
