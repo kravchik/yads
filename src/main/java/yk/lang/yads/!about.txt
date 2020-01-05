@@ -1,0 +1,8 @@
+
+
+
+
+New, genious design:
+  (foo(bar)) - is an array with a function/class
+  (foo (bar)) - is an array with two elements!
+  This space - matters
