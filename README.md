@@ -1,10 +1,9 @@
-YADS - Yads Abstract Data Syntax
+YADS
 =======
 
-**Parsing, serialization, deserialization - currently available in Java only. I am open to collaboration for other languages.**
+**YADS** - Yads Abstract Data Syntax
 
-### little description
-
+Mark-up language like JSON and YAML, but better, and with builtin serialization.
 
 ### several self explanatory examples
 
@@ -32,12 +31,10 @@ greeting = 'Hello traveller!'
 signature = 'Have a nice day,
 travaller'
 ```
-
-
 ### Why yet another data syntax?
 
 * no white-space indentation and mandatory new lines like in YAML
-* no mandatory "" like in json and yml
+* no mandatory "" like in json and
 * can use ""  and '' interchangeably
 * can use new-lines in "" or '' strings
 * no commas
@@ -52,20 +49,20 @@ Same as in JSON. One can write the whole file in one line. It is very useful whe
 In all these cases, white-space indentation would be a pain.
 
 #### no mandatory "" like in json
-  though you'd need "" or '' if a string should include spaces (in constrast with YAML)
+  though you'd need "" or '' if a string should include spaces
   example with simple keys and values
   example with escapes in Java strings for jsons and ymls
 #### can use ""  and '' interchangeably
 #### can use new-lines in "" or '' strings
   like in YML
-  example with Java strings
-#### no commas (remember those additions of an element in json?)
+#### no commas
 #### not verbose like xml with the same capabilities
 #### built-in serialization/deserialization
   currently - Java only, but syntax provides ways to other languages be included
 #### serialization to beutifuly formatted text
   1. convenient to read and edit
   1. can be used for reporting of data (tests)
+  1. can be used to generate configs, not only read them
 #### comments (both one-liners and multi-liners)  
 
 
@@ -144,7 +141,8 @@ super server"
 * maps, lists, arrays, objects with class preservation
 * if a type is unknown - array, map, or special class is constructed
 
-[more on wiki](https://github.com/kravchik/jcommon/wiki/YADS-instead-of-.properties-syntax-example)
+*Parsing, serialization, deserialization - currently available in Java only. I am open to collaboration for other languages.*
+
 
 ## mvn artifact
 ```xml
@@ -155,9 +153,9 @@ super server"
 
 <dependency>
     <groupId>yk</groupId>
-    <artifactId>yincubator</artifactId>
-    <version>0.02</version>
+    <artifactId>yads</artifactId>
+    <version>0.01-SNAPSHOT</version>
 </dependency>
 ```
-(current dev version is 0.120-SNAPSHOT)
+(current dev version is 0.01-SNAPSHOT)
 
