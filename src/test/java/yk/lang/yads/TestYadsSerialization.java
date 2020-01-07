@@ -21,7 +21,8 @@ public class TestYadsSerialization {
     //TODO implement/test array with numbers of different types
     //TODO simple convertions for constructor/function
     //TODO get rid of commons.lang3
-    //TODO compile on the empty .m2
+
+    //TODO readme
 
     @Test
     public void someTest() {
@@ -218,6 +219,11 @@ public class TestYadsSerialization {
 
         assertS12(al(true), "(true)");
         assertS12(al(false), "(false)");
+
+        //TODO fix after simple constructors cast
+        //assertS12(al((short) 5), "import java.lang.Short\n(Short(5))", "(Short(value=5))");
+        //TODO Byte
+
     }
 
     @Test

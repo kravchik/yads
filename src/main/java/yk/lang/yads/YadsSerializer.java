@@ -97,6 +97,9 @@ public class YadsSerializer {
             return node(YADS_MAP, NAMED_ARGS, result);
         } else if (object instanceof String) {
             return node(CONST, VALUE, object);
+        } else if (object instanceof Short && !(knownType == Short.class || knownType == short.class)) {
+            imports.add("java.lang.Short");
+            return node(YADS_NAMED, NAME, "Short", ARGS, al(constNode(object)));
         } else if (object instanceof Number) {
             return node(CONST, VALUE, object);
         } else if (object instanceof Character) {
