@@ -2,15 +2,10 @@ package yk.lang.yads;
 
 import org.junit.Test;
 import yk.jcommon.collections.YList;
-import yk.jcommon.collections.YMap;
-import yk.jcommon.match2.Matcher;
-import yk.yast.common.YastNode;
 
 import java.time.LocalDateTime;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.*;
 import static yk.jcommon.collections.YArrayList.al;
 import static yk.jcommon.collections.YHashMap.hm;
 import static yk.lang.yads.Yads.deserialize;
@@ -353,16 +348,16 @@ public class TestYadsSerialization {
         }
     }
 
-    public static void assertPattern(Object expected, YastNode actual) {
-        Matcher matcher = new Matcher();
-        matcher.classMatchers.put(YastNode.class, (matcher1, data, pattern, cur) -> {
-            YMap<String, Object> d = ((YastNode) data).map;
-            Object p = pattern instanceof YastNode ? (((YastNode) pattern).map) : pattern;
-            return matcher1.match(d, p, cur);
-        });
-        assertTrue(matcher.match(actual, expected).notEmpty());
-
-        //TODO system out
-    }
+    //public static void assertPattern(Object expected, YastNode actual) {
+    //    Matcher matcher = new Matcher();
+    //    matcher.classMatchers.put(YastNode.class, (matcher1, data, pattern, cur) -> {
+    //        YMap<String, Object> d = ((YastNode) data).map;
+    //        Object p = pattern instanceof YastNode ? (((YastNode) pattern).map) : pattern;
+    //        return matcher1.match(d, p, cur);
+    //    });
+    //    assertTrue(matcher.match(actual, expected).notEmpty());
+    //
+    //    //TODO system out
+    //}
 
 }

@@ -114,11 +114,6 @@
             <artifactId>jcommon</artifactId>
             <version>0.123</version>
         </dependency>
-        <dependency>
-            <groupId>yk.yast</groupId>
-            <artifactId>common</artifactId>
-            <version>0.1-SNAPSHOT</version>
-        </dependency>
     </dependencies>
 
     <repositories>

@@ -1,15 +1,6 @@
 package yk.lang.yads;
 
 import org.junit.Test;
-import yk.jcommon.collections.YMap;
-import yk.jcommon.match2.Matcher;
-import yk.yast.common.YastNode;
-
-import static org.junit.Assert.*;
-import static yk.jcommon.collections.YArrayList.al;
-import static yk.jcommon.collections.YHashMap.hm;
-import static yk.lang.yads.YadsShorts.*;
-import static yk.yast.common.Words.*;
 
 public class TestResolveMap {
 
