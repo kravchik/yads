@@ -9,6 +9,13 @@ public class TestClassNumbers {
     public Long L;
     public double d;
     public Double D;
+    public byte b;
+    public Byte B;
+    public short s;
+    public Short S;
+
+    public char c;
+    public Character C;
 
     public TestClassNumbers setI(int i) {
         this.i = i;
@@ -47,6 +54,36 @@ public class TestClassNumbers {
 
     public TestClassNumbers setD(Double d) {
         D = d;
+        return this;
+    }
+
+    public TestClassNumbers setS(short s) {
+        this.s = s;
+        return this;
+    }
+
+    public TestClassNumbers setS(Short s) {
+        S = s;
+        return this;
+    }
+
+    public TestClassNumbers setB(byte b) {
+        this.b = b;
+        return this;
+    }
+
+    public TestClassNumbers setB(Byte b) {
+        B = b;
+        return this;
+    }
+
+    public TestClassNumbers setC(char c) {
+        this.c = c;
+        return this;
+    }
+
+    public TestClassNumbers setC(Character c) {
+        C = c;
         return this;
     }
 

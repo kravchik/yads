@@ -3,6 +3,37 @@ YADS - Yads Abstract Data Syntax
 
 **Parsing, serialization, deserialization - currently available in Java only. I am open to collaboration for other languages.**
 
+### little description
+
+### several self explanatory examples
+
+*Example of using YADS for UI definition*
+```
+import=ui
+HBox (
+  pos=(100 200)
+  VBox(
+    Input(hint='...input here')
+    Button(text='Send')
+  )
+)
+```
+*Example of using YADS as simple config*
+```
+serverType = node
+port = 8080
+//port = 80
+data = (info = "Awesome super server" author = "John Doe")
+services = (AuthService() AdminService())
+```
+*Example of using YADS as properties*
+```
+greeting = 'Hello traveller!'
+signature = 'Have a nice day,
+travaller'
+```
+
+
 ### Why yet another data syntax?
 
 * no white-space indentation and mandatory new lines like in YAML
@@ -14,9 +45,6 @@ YADS - Yads Abstract Data Syntax
 * built-in serialization/deserialization
 * serialization to beutifuly formatted text
 * comments (both one-liners and multi-liners)  
-
-
-
 
 #### no white-space indentation and mandatory new lines like in YAML
 Same as in JSON. One can write the whole file in one line. It is very useful when you want to write your data in a string inside your code or in the command line. Also, very convenient if you want to include parts of the config in some input field, or in an Excel table.

@@ -8,6 +8,7 @@ import yk.jcommon.utils.Reflector;
 import yk.yast.common.YastNode;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
 import java.util.Collection;
 import java.util.IdentityHashMap;
 import java.util.List;
@@ -17,6 +18,7 @@ import static yk.jcommon.collections.YArrayList.al;
 import static yk.jcommon.collections.YArrayList.toYList;
 import static yk.jcommon.collections.YHashMap.hm;
 import static yk.jcommon.collections.YHashSet.hs;
+import static yk.jcommon.utils.Reflector.newInstanceArgless;
 import static yk.lang.yads.YadsShorts.*;
 import static yk.yast.common.Words.*;
 import static yk.yast.common.YastNode.node;
@@ -97,23 +99,25 @@ public class YadsSerializer {
             return node(CONST, VALUE, object);
         } else if (object instanceof Number) {
             return node(CONST, VALUE, object);
+        } else if (object instanceof Character) {
+            return node(CONST, VALUE, object);
         } else if (object instanceof Boolean) {
             return node(CONST, VALUE, object);
         } else {
             //TO DO use constructor ?
             if (object.getClass() != knownType) imports.add(object.getClass().getCanonicalName());
             YMap<YastNode, YastNode> fields = hm();
-
-            // это хорошее ограничение, тк хорошо не мочь в конструкторе иметь сайдэффекты
-            // хорошо вообще мочь легко конструировать
-            Object defaults = Reflector.newInstance(object.getClass());
+            Object defaults = newInstanceArgless(object.getClass());
             for (Field field : Reflector.getAllFieldsInHierarchy(object.getClass())) {
                 field.setAccessible(true);
+                if (Modifier.isStatic(field.getModifiers())) continue;
                 Object value = Reflector.get(object, field);
-                Object defaultValue = Reflector.get(defaults, field);
-                if (value == defaultValue) continue;
-                if (value != null) {
-                    if (value.equals(defaultValue)) continue;
+                if (defaults != null) {
+                    Object defaultValue = Reflector.get(defaults, field);
+                    if (value == defaultValue) continue;
+                    if (value != null) {
+                        if (value.equals(defaultValue)) continue;
+                    }
                 }
                 fields.put(node(CONST, VALUE, field.getName()), serializeImpl(value, field.getType()));
             }

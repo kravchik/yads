@@ -7,6 +7,7 @@ import yk.jcommon.collections.YList;
 import java.util.List;
 
 public class TestClass {
+    public static String staticField = "Static field";
     public YArrayList someList;
     public YList someList2;
     public List someList3;

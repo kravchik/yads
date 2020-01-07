@@ -93,13 +93,6 @@
         </testResources>
     </build>
 
-    <repositories>
-        <repository>
-            <id>yk.jcommon</id>
-            <url>https://github.com/kravchik/mvn-repo/raw/master</url>
-        </repository>
-    </repositories>
-
     <dependencies>
 
         <!--TODO remove-->
@@ -127,6 +120,13 @@
             <version>0.1-SNAPSHOT</version>
         </dependency>
     </dependencies>
+
+    <repositories>
+        <repository>
+            <id>yk</id>
+            <url>https://github.com/kravchik/mvn-repo/raw/master</url>
+        </repository>
+    </repositories>
 
     <!--<distributionManagement>-->
         <!--<downloadUrl>https://github.com/kravchik/mvn-repo/raw/master</downloadUrl>-->

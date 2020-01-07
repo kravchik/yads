@@ -14,8 +14,7 @@ import static yk.yast.common.Words.*;
 
 public class NodesToString {
     private int maxWidth = 100;
-    private String incer = "  ";
-    private Tab tab = new Tab(incer);
+    private Tab tab = new Tab("  ");
 
     public String toString(YList<YastNode> nodes) {
         return nodes.map(n -> toString(0, n).toString("\n")).toString("\n");
@@ -49,28 +48,39 @@ public class NodesToString {
             String value;
             if (valObj == null) {
                 value = "null";
-            } else if (valObj instanceof String) {
-                value = (String) valObj;
+            } else if (valObj instanceof String || valObj instanceof Character) {
+                value = valObj.toString();
                 boolean simple = false;
                 try {
                     ByteArrayInputStream bis = new ByteArrayInputStream(value.getBytes("UTF-8"));
                     Object would = new YadsParser(bis).parseRawElement();
                     if (value.equals(would)) simple = true;
-                }
-                catch (Exception ignore) {}
+                } catch (Exception | TokenMgrError ignore) {}
                 if (!simple) {
                     if (value.contains("'")) value = "\"" + ESCAPE_YADS_DOUBLE_QUOTES.translate(value) + "\"";
                     else value = "'" + ESCAPE_YADS_SINGLE_QUOTES.translate(value) + "'";
                 }
 
-            } else if (valObj instanceof Float) {
-                value = String.format("%.0ff", valObj);
-            } else if (valObj instanceof Double) {
-                value = String.format("%.0fd", valObj);
-            } else if (valObj instanceof Integer) {
-                value = valObj.toString();
-            } else if (valObj instanceof Long) {
-                value = valObj.toString() + "l";
+            } else if (valObj instanceof Number) {
+                if (valObj instanceof Byte) {
+                    int i = ((Byte) valObj).intValue();
+                    if (i < 0) i = i + 256;
+                    valObj = i;
+                }
+                String space = ((Number) valObj).intValue() < 0 ? " " : "";
+                if (valObj instanceof Float) {
+                    value = String.format(space + "%.0ff", valObj);
+                } else if (valObj instanceof Double) {
+                    value = String.format(space + "%.0fd", valObj);
+                } else if (valObj instanceof Long) {
+                    value = space + valObj.toString() + "l";
+                } else if (valObj instanceof Integer) {
+                    value = space + valObj.toString();
+                } else if (valObj instanceof Short) {
+                    value = space + valObj.toString();
+                } else {
+                    throw new RuntimeException("Should never reach here");
+                }
             } else if (valObj instanceof Boolean) {
                 value = valObj.toString();
             } else {
@@ -144,8 +154,8 @@ public class NodesToString {
             if (ss.size() > 1) possibleMerge = false;
             YList<String> children = compact(keyPrefix.length(), ss);
             for (int i = 0; i < children.size(); i++) {
-                if (i == 0) result.add(incer + keyPrefix + children.get(i));
-                else result.add(incer + children.get(i));
+                if (i == 0) result.add(keyPrefix + children.get(i));
+                else result.add(children.get(i));
             }
             //TODO fix for (=== = +++)
         }
@@ -163,7 +173,7 @@ public class NodesToString {
             s = s.replaceAll("(.) \\)", "$1)");
             //s = s.replaceAll("(.) \\{", "$1{");
         }
-        return s.trim();
+        return s;
     }
 
     private YList<String> compact(int width, YList<String> ss) {

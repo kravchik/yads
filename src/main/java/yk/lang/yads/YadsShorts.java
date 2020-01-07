@@ -61,7 +61,13 @@ public class YadsShorts {
                             })
             );
 
-    public static final AggregateTranslator ESCAPE_YADS_SINGLE_QUOTES = new AggregateTranslator(new LookupTranslator(new String[][]{{"'", "\\'"}, {"\\", "\\\\"}}), new LookupTranslator(EntityArrays.JAVA_CTRL_CHARS_ESCAPE()));
-    public static final AggregateTranslator ESCAPE_YADS_DOUBLE_QUOTES = new AggregateTranslator(new LookupTranslator(new String[][]{{"\"", "\\\""}, {"\\", "\\\\"}}), new LookupTranslator(EntityArrays.JAVA_CTRL_CHARS_ESCAPE()));
+    public static final AggregateTranslator ESCAPE_YADS_SINGLE_QUOTES = new AggregateTranslator(
+            UnicodeEscaper.outsideOf(' ', '~'),
+            new LookupTranslator(new String[][]{{"'", "\\'"}, {"\\", "\\\\"}}),
+            new LookupTranslator(EntityArrays.JAVA_CTRL_CHARS_ESCAPE()));
+    public static final AggregateTranslator ESCAPE_YADS_DOUBLE_QUOTES = new AggregateTranslator(
+            UnicodeEscaper.outsideOf(' ', '~'),
+            new LookupTranslator(new String[][]{{"\"", "\\\""}, {"\\", "\\\\"}}),
+            new LookupTranslator(EntityArrays.JAVA_CTRL_CHARS_ESCAPE()));
 
 }

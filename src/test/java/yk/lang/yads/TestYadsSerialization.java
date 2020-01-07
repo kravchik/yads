@@ -6,6 +6,8 @@ import yk.jcommon.collections.YMap;
 import yk.jcommon.match2.Matcher;
 import yk.yast.common.YastNode;
 
+import java.time.LocalDateTime;
+
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
@@ -18,10 +20,17 @@ public class TestYadsSerialization {
     //TODO typed array
     //TODO typed map
     //TODO called constructor for List<String> but we have List<Int>
-    //TODO should be able to call float with int arg
-
     //TODO common words instead of YADS_*
-    //TODO move and commit
+    //TODO cast tests (fields)
+    //TODO implement/test array with numbers of different types
+    //TODO simple convertions for constructor/function
+    //TODO custom serializers
+
+    @Test
+    public void someTest() {
+        System.out.println(Yads.serialize(LocalDateTime.now()));
+        System.out.println(Yads.deserialize("import java.time.LocalDateTime LocalDateTime(date=(year=2020 month=1 day=6) time=(hour=17 minute=26 second=35 nano=401000000))"));
+    }
 
     @Test
     public void testS12() {
@@ -81,7 +90,7 @@ public class TestYadsSerialization {
                 "Error at 1:11, Class 'class yk.lang.yads.TestClass' has no field 'asdf'");
 
         assertException("TestClass(tc2 = 1f)", al("yk.lang.yads.TestClass"),
-                "Error at 1:17, Can not set yk.lang.yads.TestClass2 field yk.lang.yads.TestClass.tc2 to java.lang.Float");
+                "Error at 1:17, Expected type class yk.lang.yads.TestClass2, but was class java.lang.Float");
     }
 
     @Test
@@ -151,11 +160,13 @@ public class TestYadsSerialization {
         assertS12(new TestClassNumbers(),
                 "import yk.lang.yads.TestClassNumbers\nTestClassNumbers()");
         assertS12(new TestClassNumbers().setI(1),
-                "import yk.lang.yads.TestClassNumbers\nTestClassNumbers(i=1)");
+                "import yk.lang.yads.TestClassNumbers\nTestClassNumbers(i=1)",
+                "import yk.lang.yads.TestClassNumbers\nTestClassNumbers(i=1f)");
         assertS12(new TestClassNumbers().setI((Integer)1),
                 "import yk.lang.yads.TestClassNumbers\nTestClassNumbers(I=1)");
         assertS12(new TestClassNumbers().setF(1),
-                "import yk.lang.yads.TestClassNumbers\nTestClassNumbers(f=1f)");
+                "import yk.lang.yads.TestClassNumbers\nTestClassNumbers(f=1f)",
+                "import yk.lang.yads.TestClassNumbers\nTestClassNumbers(f=1)");
         assertS12(new TestClassNumbers().setF((Float)1f),
                 "import yk.lang.yads.TestClassNumbers\nTestClassNumbers(F=1f)");
         assertS12(new TestClassNumbers().setL(1),
@@ -166,6 +177,37 @@ public class TestYadsSerialization {
                 "import yk.lang.yads.TestClassNumbers\nTestClassNumbers(d=1d)");
         assertS12(new TestClassNumbers().setD((Double)1.),
                 "import yk.lang.yads.TestClassNumbers\nTestClassNumbers(D=1d)");
+
+        assertS12(new TestClassNumbers().setS((short)1),
+                "import yk.lang.yads.TestClassNumbers\nTestClassNumbers(s=1)");
+        assertS12(new TestClassNumbers().setS((Short)(short)1),
+                "import yk.lang.yads.TestClassNumbers\nTestClassNumbers(S=1)");
+
+        assertS12(new TestClassNumbers().setB((byte)0),
+                "import yk.lang.yads.TestClassNumbers\nTestClassNumbers()");
+        assertS12(new TestClassNumbers().setB((byte)1),
+                "import yk.lang.yads.TestClassNumbers\nTestClassNumbers(b=1)");
+        assertS12(new TestClassNumbers().setB((byte)255),
+                "import yk.lang.yads.TestClassNumbers\nTestClassNumbers(b=255)");
+        assertException("import yk.lang.yads.TestClassNumbers\nTestClassNumbers(b= -1)",
+                "Error at 2:21, Can't properly convert class java.lang.Integer type to byte type, value -1 becomes 255");
+
+        assertException("import yk.lang.yads.TestClassNumbers\nTestClassNumbers(b=256)",
+                "Error at 2:20, Can't properly convert class java.lang.Integer type to byte type, value 256 becomes 0");
+        assertS12(new TestClassNumbers().setB((Byte)(byte)1),
+                "import yk.lang.yads.TestClassNumbers\nTestClassNumbers(B=1)");
+
+        assertS12(new TestClassNumbers().setC(' '),
+                "import yk.lang.yads.TestClassNumbers\nTestClassNumbers(c=' ')");
+        assertS12(new TestClassNumbers().setC((Character)' '),
+                "import yk.lang.yads.TestClassNumbers\nTestClassNumbers(C=' ')");
+        assertException("import yk.lang.yads.TestClassNumbers\nTestClassNumbers(C='  ')",
+                "Error at 2:20, Expected string with one symbol to convert it to char, but was'  '");
+
+        assertS12(new TestClassNumbers().setC((char)0), "import yk.lang.yads.TestClassNumbers\nTestClassNumbers()",
+                "import yk.lang.yads.TestClassNumbers\nTestClassNumbers(c='\\u0000')");
+        assertS12(new TestClassNumbers().setC((char)1), "import yk.lang.yads.TestClassNumbers\nTestClassNumbers(c='\\u0001')");
+        assertS12(new TestClassNumbers().setC((char)13), "import yk.lang.yads.TestClassNumbers\nTestClassNumbers(c='\\u000D')");
 
 
         assertS12(al("true"), "('true')");
@@ -257,7 +299,10 @@ public class TestYadsSerialization {
             Yads.deserialize(imports, text);
             fail();
         } catch (RuntimeException re) {
-            assertEquals(exceptionText, re.getMessage());
+            if (!exceptionText.equals(re.getMessage())) {
+                re.printStackTrace();
+                assertEquals(exceptionText, re.getMessage());
+            }
         }
     }
 

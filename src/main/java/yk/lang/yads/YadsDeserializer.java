@@ -110,8 +110,26 @@ public class YadsDeserializer {
         } else if (knownType == null && (node.isType(YADS_MAP) || node.isType(YADS_UNNAMED))) {
             result = deserializeNodeMap(node, refIndex);
         } else if (node.isType(CONST)) {
-            //TODO simple casts
             result = node.map.get(VALUE);
+            if (knownType != null && result instanceof Number) {
+                if (!Number.class.isAssignableFrom(knownType) && !knownType.isPrimitive()) throw new RuntimeException(String.format("Expected type %s, but was %s", knownType, result.getClass()));
+
+                Number newNumber = convert(knownType, (Number) result);
+                Number newNewNumber = convert(result.getClass(), newNumber);
+
+                if (!newNewNumber.equals(result)) {
+                    throw new RuntimeException(String.format("Can't properly convert %s type to %s type, value %s becomes %s", result.getClass(), knownType, result, newNewNumber));
+                }
+                result = newNumber;
+            }
+            if (knownType == Character.class || knownType == char.class) {
+                if (result instanceof Number) result = (char)((Number) result).intValue();
+                else if (result instanceof String) {
+                    String s = (String) result;
+                    if (s.length() != 1) throw new RuntimeException("Expected string with one symbol to convert it to char, but was'" + s + "'");
+                    result = s.charAt(0);
+                }
+            }
             if (refIndex > 0) refs.put(refIndex, result);
         } else {
             if (knownType == null) throw new RuntimeException("Can't continue, type is still unknown");
@@ -119,6 +137,24 @@ public class YadsDeserializer {
         }
         popCaret();
         return result;
+    }
+
+    private Number convert(Class knownType, Number result) {
+        Number newNumber = null;
+        //TO DO assert ranges? only precision upscale?
+        if (result instanceof Byte) {
+            int i = result.intValue();
+            if (i < 0) i = i + 256;
+            result = i;
+        }
+        if (knownType == double.class || knownType == Double.class) newNumber = result.doubleValue();
+        if (knownType == float.class || knownType == Float.class) newNumber = result.floatValue();
+        if (knownType == long.class || knownType == Long.class) newNumber = result.longValue();
+        if (knownType == int.class || knownType == Integer.class) newNumber = result.intValue();
+        if (knownType == short.class || knownType == Short.class) newNumber = result.shortValue();
+        if (knownType == byte.class || knownType == Byte.class) newNumber = result.byteValue();
+        if (newNumber == null) throw new RuntimeException("Should never reach here");
+        return newNumber;
     }
 
     private Class resolveName(Class knownType, YastNode node) {
