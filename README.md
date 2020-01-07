@@ -5,11 +5,11 @@ YADS - Yads Abstract Data Syntax
 
 ### little description
 
+
 ### several self explanatory examples
 
 *Example of using YADS for UI definition*
 ```
-import=ui
 HBox (
   pos=(100 200)
   VBox(
@@ -118,11 +118,11 @@ super server"
 ```
 
 ### API
-    String serialized = YadsSerializer.serializeMap(someMap);
-    Map deserialized = YadsSerializer.deserializeMap("hello=world");
+    String serialized = Yads.serializeBody(someMap);
+    Map deserialized = Yads.deserializeBody("hello=world");
     ...
-    String serialized = YadsSerializer.serialize(yourInstance);
-    YourClass y = (YourClass)YadsSerializer.deserialize("import=(your.package) YourClass(field1=value1 field2=value2)");
+    String serialized = Yads.serialize(yourInstance);
+    YourClass y = (YourClass)Yads.deserialize("import=(your.package) YourClass(field1=value1 field2=value2)");
     ...
     etc
 

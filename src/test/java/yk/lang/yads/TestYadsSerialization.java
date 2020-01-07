@@ -21,10 +21,12 @@ public class TestYadsSerialization {
     //TODO typed map
     //TODO called constructor for List<String> but we have List<Int>
     //TODO common words instead of YADS_*
-    //TODO cast tests (fields)
+
+    //TODO custom serializers
     //TODO implement/test array with numbers of different types
     //TODO simple convertions for constructor/function
-    //TODO custom serializers
+    //TODO get rid of commons.lang3
+    //TODO compile on the empty .m2
 
     @Test
     public void someTest() {
@@ -172,11 +174,13 @@ public class TestYadsSerialization {
         assertS12(new TestClassNumbers().setL(1),
                 "import yk.lang.yads.TestClassNumbers\nTestClassNumbers(l=1l)");
         assertS12(new TestClassNumbers().setL((Long)1L),
-                "import yk.lang.yads.TestClassNumbers\nTestClassNumbers(L=1l)");
+                "import yk.lang.yads.TestClassNumbers\nTestClassNumbers(L=1l)",
+                "import yk.lang.yads.TestClassNumbers\nTestClassNumbers(L=1)");
         assertS12(new TestClassNumbers().setD(1),
                 "import yk.lang.yads.TestClassNumbers\nTestClassNumbers(d=1d)");
         assertS12(new TestClassNumbers().setD((Double)1.),
-                "import yk.lang.yads.TestClassNumbers\nTestClassNumbers(D=1d)");
+                "import yk.lang.yads.TestClassNumbers\nTestClassNumbers(D=1d)",
+                "import yk.lang.yads.TestClassNumbers\nTestClassNumbers(D=1)");
 
         assertS12(new TestClassNumbers().setS((short)1),
                 "import yk.lang.yads.TestClassNumbers\nTestClassNumbers(s=1)");
