@@ -1,11 +1,16 @@
 YADS
 =======
 
-**YADS** - Yads Abstract Data Syntax
+**YADS**
+
+**Y**ads **A**bstract **D**ata **S**yntax
+
+**Y**et **A**nother **D**ata **S**yntax (the perfect one actually).
+
 
 Mark-up language like JSON and YAML, but better, and with builtin serialization.
 
-### several self explanatory examples
+### Several self explanatory examples
 
 *Example of using YADS for UI definition*
 ```
@@ -48,26 +53,59 @@ Same as in JSON. One can write the whole file in one line. It is very useful whe
 
 In all these cases, white-space indentation would be a pain.
 
+You can wright in both ways:
+```
+    (a b c)
+    
+    (
+        a
+        b
+        c
+    )
+```
+
 #### no mandatory "" like in json
-  though you'd need "" or '' if a string should include spaces
-  example with simple keys and values
-  example with escapes in Java strings for jsons and ymls
+  Though you'd need `""` or `''` if a string should include spaces.
+  Also much simpler to define part of the config in the Java String as don't need to constantly escape those quotes.
+
 #### can use ""  and '' interchangeably
+  First of all, it is slightly simpler to use `'` instead of `"`. Second - in Java you don't need to escape `'` in strings. Third - you can choose `'` when `"` prevails in your text and vice versa (You'd have to escape `"` symbol in a string like `"quote: \" "`).
 #### can use new-lines in "" or '' strings
-  like in YML
+  Like in YML
 #### no commas
+  So you don't need to bother about them when adding or removing elements.
 #### not verbose like xml with the same capabilities
+  So you can write like:
+```Java
+HBox (
+  pos=(100 200)
+  VBox(
+    Input(hint='...input here')
+    Button(text='Send')
+  )
+)
+```
+  Instead of something like:
+```XML
+<HBox pos="100 200">
+  <VBox>
+    <Input hint="...input here"/>
+    <Button text="Send"/>
+  </VBox>
+</HBox>
+```
+
 #### built-in serialization/deserialization
-  currently - Java only, but syntax provides ways to other languages be included
+  Currently - Java only, but syntax provides ways to other languages be included.
+  
 #### serialization to beutifuly formatted text
   1. convenient to read and edit
   1. can be used for reporting of data (tests)
   1. can be used to generate configs, not only read them
+
 #### comments (both one-liners and multi-liners)  
 
 
-
-todo code examples
 
 
 config (s12/des12), no need to map, no need to parse, no need of annotations
@@ -76,43 +114,6 @@ simple properties file
 can write in one line (profit when script goes in one-liner, excel, other?)
 example: can use for UI layouts instead of XML
 imports can be defined as default in ser/deser, instead of a text itself
-
-
-**yk.lang.yads**
-
-Yet Another Data Syntax (the perfect one actually).
-Yads Abstract Data Syntax
-
-How would UI markup look like:
-
-```
-import=ui
-HBox (
-  pos=100, 200
-  VBox (
-    Input (text='input here')
-    Button (text='hello world')
-  )
-)
-```
-How would some game config look lie:
-```
-Npc (
-  name='Grumble Fingur'
-  type=Goblin
-  model=(type=AngryBastard colorScheme=red)
-  items= items.Hat(name='Hat of sun'), random(type=ring)
-  )
-)
-```
-Or just simple config file:
-```
-serverType = node
-port = 8080
-//port = 80
-description = "Awesome
-super server"
-```
 
 ### API
     String serialized = Yads.serializeBody(someMap);
