@@ -39,9 +39,9 @@ travaller'
 ### Why yet another data syntax?
 
 * no white-space indentation and mandatory new lines like in YAML
-* no mandatory "" like in json and
-* can use ""  and '' interchangeably
-* can use new-lines in "" or '' strings
+* no mandatory `""` like in json and
+* can use ""  and `''` interchangeably
+* can use new-lines in `""` or `''` strings
 * no commas
 * not verbose like xml with the same capabilities
 * built-in serialization/deserialization
@@ -64,16 +64,19 @@ You can wright in both ways:
     )
 ```
 
-#### no mandatory "" like in json
+#### no commas or semicolons
+  You don't need to bother about them when adding or removing elements.
+  And noise level is very low.
+
+#### no mandatory `""` like in json
+  Which is also reduces noise level.
   Though you'd need `""` or `''` if a string should include spaces.
   Also much simpler to define part of the config in the Java String as don't need to constantly escape those quotes.
 
-#### can use ""  and '' interchangeably
+#### can use `""`  and `''` interchangeably
   First of all, it is slightly simpler to use `'` instead of `"`. Second - in Java you don't need to escape `'` in strings. Third - you can choose `'` when `"` prevails in your text and vice versa (You'd have to escape `"` symbol in a string like `"quote: \" "`).
-#### can use new-lines in "" or '' strings
+#### can use new-lines in `""` or `''` strings
   Like in YML
-#### no commas
-  So you don't need to bother about them when adding or removing elements.
 #### not verbose like xml with the same capabilities
   So you can write like:
 ```Java
@@ -97,6 +100,8 @@ HBox(
 
 #### built-in serialization/deserialization
   Currently - Java only, but syntax provides ways to other languages be included.
+  Serialize any data to the human-readable string, and then back to the same data without any additional effort.
+  No annotations needed.
   
 #### serialization to beutifuly formatted text
   1. convenient to read and edit
@@ -105,15 +110,13 @@ HBox(
 
 #### comments (both one-liners and multi-liners)  
 
+#### Can be conviniently used for
+  1. simple properties file
+  1. config (with both read and wright)
+  1. serialization in human readable form
 
+#### UTF, symbol escaping
 
-
-config (s12/des12), no need to map, no need to parse, no need of annotations
-  because of built-in ser/deser - config not only readable, but also generatable! (example)
-simple properties file
-can write in one line (profit when script goes in one-liner, excel, other?)
-example: can use for UI layouts instead of XML
-imports can be defined as default in ser/deser, instead of a text itself
 
 ### API
 ```Java
@@ -126,25 +129,7 @@ imports can be defined as default in ser/deser, instead of a text itself
     etc
 ```
 
-### syntax
-* no commas or semicolons needed, so the noise level is very low
-* strings and keys without quotes (that also reduces noise)
-* but can use "" or '' (for strings with spaces, for example)
-* ' ' for strings - so you can include YADS in java strings without escaping
-* spaces and tabs don't have special meaning (opposite to yaml or python), so you can arrange data-text as you wish, even in one line (important for various input types: xls cells, input fields, etc)
-* multiline strings (with both "" and '' quotes)
-* numbers, booleans
-* utf8, no restriction on keys or strings
-* comments (one line // and multiline /**/)
-* carefully controlled comma, to avoid one level parentheses like in (pos=10, 10 size=100, 200)
-
-### serialization
-* serialize any data to the human-readable string, and then back to the same data without any additional effort
-* maps, lists, arrays, objects with class preservation
-* if a type is unknown - array, map, or special class is constructed
-
-*Parsing, serialization, deserialization - currently available in Java only. I am open to collaboration for other languages.*
-
+  *Parsing, serialization, deserialization - currently available in Java only. I am open to collaboration for other languages.*
 
 ## mvn artifact
 ```xml
