@@ -13,8 +13,8 @@ Mark-up language like JSON and YAML, but better, and with builtin serialization.
 ### Several self explanatory examples
 
 *Example of using YADS for UI definition*
-```
-HBox (
+```Java
+HBox(
   pos=(100 200)
   VBox(
     Input(hint='...input here')
@@ -23,7 +23,7 @@ HBox (
 )
 ```
 *Example of using YADS as simple config*
-```
+```Java
 serverType = node
 port = 8080
 //port = 80
@@ -31,7 +31,7 @@ data = (info = "Awesome super server" author = "John Doe")
 services = (AuthService() AdminService())
 ```
 *Example of using YADS as properties*
-```
+```Java
 greeting = 'Hello traveller!'
 signature = 'Have a nice day,
 travaller'
@@ -54,7 +54,7 @@ Same as in JSON. One can write the whole file in one line. It is very useful whe
 In all these cases, white-space indentation would be a pain.
 
 You can wright in both ways:
-```
+```Java
     (a b c)
     
     (
@@ -77,7 +77,7 @@ You can wright in both ways:
 #### not verbose like xml with the same capabilities
   So you can write like:
 ```Java
-HBox (
+HBox(
   pos=(100 200)
   VBox(
     Input(hint='...input here')
@@ -116,6 +116,7 @@ example: can use for UI layouts instead of XML
 imports can be defined as default in ser/deser, instead of a text itself
 
 ### API
+```Java
     String serialized = Yads.serializeBody(someMap);
     Map deserialized = Yads.deserializeBody("hello=world");
     ...
@@ -123,7 +124,7 @@ imports can be defined as default in ser/deser, instead of a text itself
     YourClass y = (YourClass)Yads.deserialize("import=(your.package) YourClass(field1=value1 field2=value2)");
     ...
     etc
-
+```
 
 ### syntax
 * no commas or semicolons needed, so the noise level is very low
