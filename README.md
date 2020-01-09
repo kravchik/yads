@@ -120,13 +120,21 @@ HBox(
 
 ### API
 ```Java
+    //serialize some instance
+    String serialized = Yads.serialize(yourInstance);
+    YourClass y = (YourClass)Yads.deserialize("import=your.package.YourClass YourClass(field1=value1 field2=value2)");
+    //or with default imports:
+    YourClass y = (YourClass)Yads.deserialize(
+            al("import=your.package.YourClass"), 
+            "YourClass(field1=value1 field2=value2)");
+
+    //serialize body of a map
     String serialized = Yads.serializeBody(someMap);
     Map deserialized = Yads.deserializeBody("hello=world");
-    ...
-    String serialized = Yads.serialize(yourInstance);
-    YourClass y = (YourClass)Yads.deserialize("import=(your.package) YourClass(field1=value1 field2=value2)");
-    ...
-    etc
+
+    //serialize body of some class
+    String serialized = Yads.serializeBody(yourInstance);
+    YourClass y = Yads.deserializeBody(YourClass.class, "field1=value1 field2=value2");
 ```
 
   *Parsing, serialization, deserialization - currently available in Java only. I am open to collaboration for other languages.*
