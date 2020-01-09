@@ -130,7 +130,7 @@ HBox(
 
     //serialize body of a map
     String serialized = Yads.serializeBody(someMap);
-    Map deserialized = Yads.deserializeBody("hello=world");
+    Map deserialized = (Map)Yads.deserializeBody("hello=world");
 
     //serialize body of some class
     String serialized = Yads.serializeBody(yourInstance);
