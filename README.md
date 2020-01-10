@@ -53,7 +53,7 @@ Same as in JSON. One can write the whole file in one line. It is very useful whe
 
 In all these cases, white-space indentation would be a pain.
 
-You can wright in both ways:
+You can write in both ways:
 ```Java
     (a b c)
     
