@@ -45,7 +45,7 @@ travaller'
 * no commas
 * not verbose like xml with the same capabilities
 * built-in serialization/deserialization
-* serialization to beutifuly formatted text
+* serialization to beautifuly formatted text
 * comments (both one-liners and multi-liners)  
 
 #### no white-space indentation and mandatory new lines like in YAML
@@ -75,6 +75,14 @@ You can write in both ways:
 
 #### can use `""`  and `''` interchangeably
   First of all, it is slightly simpler to use `'` instead of `"`. Second - in Java you don't need to escape `'` in strings. Third - you can choose `'` when `"` prevails in your text and vice versa (You'd have to escape `"` symbol in a string like `"quote: \" "`).
+
+If you need to write something in Java code (for test purposes, or to make a request, for example), YADS seems the most easily writeable and readable.
+```  
+        String exampleJson = "{\"type\":\"VBox\",\"key\":\"value\",\"name\":\"Hello World\"}";
+        String exampleYaml = "    type: VBox\n    key: value\n    name: Hello World\n";
+        String exampleYads = "(type=VBox key=value name='Hello World')";
+```
+  
 #### can use new-lines in `""` or `''` strings
   Like in YML
 #### not verbose like xml with the same capabilities
@@ -103,7 +111,7 @@ HBox(
   Serialize any data to the human-readable string, and then back to the same data without any additional effort.
   No annotations needed.
   
-#### serialization to beutifuly formatted text
+#### serialization to beautifuly formatted text
   1. convenient to read and edit
   1. can be used for reporting of data (tests)
   1. can be used to generate configs, not only read them
