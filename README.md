@@ -110,6 +110,17 @@ Or you can specify all needed imports in the serializer method so you don't need
     YourClass y = Yads.deserializeBody(YourClass.class, "field1=value1 field2=value2");
 ```
 
+### TODO
+
+* security (restrict via API classes possible to load)
+* streaming
+* all Java types serialization
+* custom serialization
+* multiline string indentation
+* typed array/map
+* get rid of commons.lang3
+
+
   *Parsing, serialization, deserialization - currently available in Java only. I am open to collaboration for other languages.*
 
 [Why yet another syntax?](why-another.md)
