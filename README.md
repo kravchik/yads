@@ -42,7 +42,7 @@ Here provided some base standings which unlikely to change. Development is in pr
 * no white-space indentation or mandatory new lines
 * no commas or semicolon
 * no mandatory `""` or `'''`
-* can use ""  and `''` interchangeably
+* can use `""`  and `''` interchangeably
 * can use new-lines in `""` or `''` strings
 * comments `//` and `/* */`  
 
@@ -57,9 +57,9 @@ Here provided some base standings which unlikely to change. Development is in pr
 * `some string` - two string elements (`some` and `string`)
 * `someString` - string or field name
 * `some-string` - three elements: `some`, `minus`, `string`
-* `Vec3(1 2)` - instantiation of class `Vec3` via constructor
-* `Vec3 (1 2)` - two elements: string `Vec3` and array of two numbers (mind this space, it is so important for the whole language, that deserves a personal name)
-* `Vec3(x=1 y=2)` - instantiation of class `Vec3` via explicit fields setting
+* `Vec2(1 2)` - instantiation of class `Vec2` via constructor
+* `Vec2 (1 2)` - two elements: string `Vec2` and array of two numbers (mind this space, it is so important for the whole language, that deserves a personal name)
+* `Vec2(x=1 y=2)` - instantiation of class `Vec2` via explicit fields setting
 
 ##### top-level structure
 Depends on the serialization/deserialization method called. Can be either with a mandatory top-level element (in this example - `HBox`):

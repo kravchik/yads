@@ -2,7 +2,7 @@
 
 * no white-space indentation and mandatory new lines like in YAML
 * no mandatory `""` like in json
-* can use ""  and `''` interchangeably
+* can use `""`  and `''` interchangeably
 * can use new-lines in `""` or `''` strings
 * no commas
 * not verbose like xml with the same capabilities
