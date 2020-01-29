@@ -7,10 +7,9 @@ YADS
 
 **Y**et **A**nother **D**ata **S**yntax (the perfect one actually).
 
-
 Mark-up language like JSON and YAML, but better, and with builtin serialization.
 
-### Several self explanatory examples
+### Several self-explanatory examples
 
 *Example of using YADS for UI definition*
 ```Java
@@ -36,57 +35,34 @@ greeting = 'Hello traveller!'
 signature = 'Have a nice day,
 travaller'
 ```
-### Why yet another data syntax?
+### Syntax
+Here provided some base standings which unlikely to change. Development is in progress so more specifics will be added later.
 
-* no white-space indentation and mandatory new lines like in YAML
-* no mandatory `""` like in json and
+##### feautes
+* no white-space indentation or mandatory new lines
+* no commas or semicolon
+* no mandatory `""` or `'''`
 * can use ""  and `''` interchangeably
 * can use new-lines in `""` or `''` strings
-* no commas
-* not verbose like xml with the same capabilities
-* built-in serialization/deserialization
-* serialization to beautifuly formatted text
-* comments (both one-liners and multi-liners)  
+* comments `//` and `/* */`  
 
-#### no white-space indentation and mandatory new lines like in YAML
-Same as in JSON. One can write the whole file in one line. It is very useful when you want to write your data in a string inside your code or in the command line. Also, very convenient if you want to include parts of the config in some input field, or in an Excel table.
+##### syntax
+* `()` - empty list
+* `(a b)` - list with two elements
+* `(=)` - empty map
+* `(k1=v1 k2=v2)` - map with several keys and values
+* `1 1f 1.0 1d 1l null true false` - numbers and other types
+* `'some string'` - string
+* `"some string"` - string
+* `some string` - two string elements (`some` and `string`)
+* `someString` - string or field name
+* `some-string` - three elements: `some`, `minus`, `string`
+* `Vec3(1 2)` - instantiation of class `Vec3` via constructor
+* `Vec3 (1 2)` - two elements: string `Vec3` and array of two numbers (mind this space, it is so important for the whole language, that deserves a personal name)
+* `Vec3(x=1 y=2)` - instantiation of class `Vec3` via explicit fields setting
 
-In all these cases, white-space indentation would be a pain.
-
-You can write in both ways:
-```Java
-    (a b c)
-    
-    (
-        a
-        b
-        c
-    )
-```
-
-#### no commas or semicolons
-  You don't need to bother about them when adding or removing elements.
-  And noise level is very low.
-
-#### no mandatory `""` like in json
-  Which is also reduces noise level.
-  Though you'd need `""` or `''` if a string should include spaces.
-  Also much simpler to define part of the config in the Java String as don't need to constantly escape those quotes.
-
-#### can use `""`  and `''` interchangeably
-  First of all, it is slightly simpler to use `'` instead of `"`. Second - in Java you don't need to escape `'` in strings. Third - you can choose `'` when `"` prevails in your text and vice versa (You'd have to escape `"` symbol in a string like `"quote: \" "`).
-
-If you need to write something in Java code (for test purposes, or to make a request, for example), YADS seems the most easily writeable and readable.
-```  
-        String exampleJson = "{\"type\":\"VBox\",\"key\":\"value\",\"name\":\"Hello World\"}";
-        String exampleYaml = "    type: VBox\n    key: value\n    name: Hello World\n";
-        String exampleYads = "(type=VBox key=value name='Hello World')";
-```
-  
-#### can use new-lines in `""` or `''` strings
-  Like in YML
-#### not verbose like xml with the same capabilities
-  So you can write like:
+##### top-level structure
+Depends on the serialization/deserialization method called. Can be either with a mandatory top-level element (in this example - `HBox`):
 ```Java
 HBox(
   pos=(100 200)
@@ -96,35 +72,24 @@ HBox(
   )
 )
 ```
-  Instead of something like:
-```XML
-<HBox pos="100 200">
-  <VBox>
-    <Input hint="...input here"/>
-    <Button text="Send"/>
-  </VBox>
-</HBox>
+Or can contain a body. In which case serialization method should be aware of a class (in this example - some config class):
+```Java
+serverType = node
+port = 8080
+//port = 80
+data = (info = "Awesome super server" author = "John Doe")
+services = (AuthService() AdminService())
 ```
 
-#### built-in serialization/deserialization
-  Currently - Java only, but syntax provides ways to other languages be included.
-  Serialize any data to the human-readable string, and then back to the same data without any additional effort.
-  No annotations needed.
-  
-#### serialization to beautifuly formatted text
-  1. convenient to read and edit
-  1. can be used for reporting of data (tests)
-  1. can be used to generate configs, not only read them
-
-#### comments (both one-liners and multi-liners)  
-
-#### Can be conviniently used for
-  1. simple properties file
-  1. config (with both read and wright)
-  1. serialization in human readable form
-
-#### UTF, symbol escaping
-
+##### importing
+Serializer should know a type of class in order to use `VBox(...)` instead of `some.kind.of.package.VBox(...)`. While both ways are available, it is more convenient to place the imports section at the beginning:
+```
+    import some.kind.of.package.VBox
+    
+    VBox(...)
+    VBox(...)
+```
+Or you can specify all needed imports in the serializer method so you don't need any mention of it in the text.
 
 ### API
 ```Java
@@ -146,6 +111,8 @@ HBox(
 ```
 
   *Parsing, serialization, deserialization - currently available in Java only. I am open to collaboration for other languages.*
+
+[Why yet another syntax?](why-another.md)
 
 ## mvn artifact
 ```xml
