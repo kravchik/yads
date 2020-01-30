@@ -1,8 +1,6 @@
 YADS
 =======
 
-**YADS**
-
 **Y**ads **A**bstract **D**ata **S**yntax
 
 **Y**et **A**nother **D**ata **S**yntax (the perfect one actually).
@@ -58,7 +56,6 @@ Here provided some base standings which unlikely to change. Development is in pr
 * `someString` - string or field name
 * `some-string` - three elements: `some`, `minus`, `string`
 * `Vec2(1 2)` - instantiation of class `Vec2` via constructor
-* `Vec2 (1 2)` - two elements: string `Vec2` and array of two numbers (mind this space, it is so important for the whole language, that deserves a personal name)
 * `Vec2(x=1 y=2)` - instantiation of class `Vec2` via explicit fields setting
 
 ##### top-level structure
