@@ -34,6 +34,22 @@ public class YadsSerializer {
     private IdentityHashMap<Object, Tuple<YastNode, Integer>> identity = new IdentityHashMap<>();
     private int nextRefId = 1;
 
+    private boolean strictReferencing = true;
+
+    public YadsSerializer() {
+    }
+
+    /**
+     * <b>strictReferencing == true</b> should be used if an exact copy of the data structure is needed. I.e. one string instance referenced in several places, should stay one string instance referenced in several places. For that purpose, references are used (ref(...)).
+     * <br><br>
+     * <b>strictReferencing == false</b> will avoid referencing String and Numbers and will duplicate them each time. This behavior is better suited for situations when you want to just print the data and study it (logging, debugging, etc).
+     * <br><br>
+     * <b>Notice</b>, that for all other objects except String and inheritors of Number - there will always be used referencing if the same instance is referenced.
+     */
+    public YadsSerializer(boolean strictReferencing) {
+        this.strictReferencing = strictReferencing;
+    }
+
     public YList<YastNode> serialize(Object object) {
         YastNode result = serializeImpl(object, null);
         imports.removeAll(defaultImports);
@@ -75,10 +91,12 @@ public class YadsSerializer {
             if (tuple.b == 0) tuple.b = nextRefId++;
             return node(YADS_NAMED, NAME, "ref", ARGS, al(constNode(tuple.b)));
         }
-        Tuple<YastNode, Integer> tuple = new Tuple<>(null, 0);//to avoid stack overflow when self-references
+        Tuple<YastNode, Integer> tuple = new Tuple<>(null, 0);
 
-        //we don't want null to be referenced everywhere (TO DO the same for constants?)
-        if (object != null) identity.put(object, tuple);
+        if (object == null || object instanceof Boolean
+                || knownType != null && knownType.isPrimitive()
+                || !strictReferencing && (object instanceof String || object instanceof Number));
+        else identity.put(object, tuple);
 
         YastNode yastNode = serializeImpl2(object, knownType);
         tuple.a = yastNode;

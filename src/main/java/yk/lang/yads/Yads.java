@@ -3,13 +3,16 @@ package yk.lang.yads;
 import yk.jcommon.collections.YList;
 import yk.yast.common.YastNode;
 
+import static yk.yast.common.Words.ARGS;
+import static yk.yast.common.Words.NAMED_ARGS;
+
 public class Yads {
     /**
      * Deserialize the only element. It is an error to have several elements in text. It is possible to have imports.
      */
     public static Object deserialize(String text) {
         YastNode parse = YadsParser.parse(text);
-        return new YadsDeserializer().deserialize(new YadsResolver().resolve(parse));
+        return deserialize(new YadsDeserializer(), new YadsResolver().resolve(parse));
     }
 
     public static Object deserialize(YList<String> imports, String text) {
@@ -18,7 +21,7 @@ public class Yads {
         for (String i : imports) deserializer.namespaces.addClass(i);
 
         YastNode parse = YadsParser.parse(text);
-        return deserializer.deserialize(new YadsResolver().resolve(parse));
+        return deserialize(deserializer, new YadsResolver().resolve(parse));
     }
 
     public static Object deserializeBody(String text) {
@@ -37,6 +40,10 @@ public class Yads {
         for (String i : imports) deserializer.namespaces.addClass(i);
         YastNode parsed = YadsParser.parse(text);
         return deserializer.deserializeConcreteType(type, new YadsResolver().resolve(parsed));
+    }
+
+    public static String print(Object someObject) {
+        return new NodesToString().toString(new YadsSerializer(false).serialize(someObject));
     }
 
     public static String serialize(Object someObject) {
@@ -59,4 +66,20 @@ public class Yads {
     public static String serializeBody(Object someObject) {
         return new NodesToString().toStringBody(new YadsSerializer().serializeBody(someObject));
     }
+
+    private static Object deserialize(YadsDeserializer des, YastNode node) {
+        try {
+            if (null != node.map.get(NAMED_ARGS)) throw new RuntimeException("Unexpected named arg at top level");
+            YList result = des.deserializeRawList(node.getNodeList(ARGS));
+            if (result.size() != 1) {
+                throw new RuntimeException("Unexpected count of elements: " + result.size() + ", expected exactly 1 element. Do you meant using deserializeBody?");
+            }
+            return result.get(0);
+        } catch (RuntimeException re) {
+            des.handleException(re);
+            return null;
+        }
+    }
+
+
 }

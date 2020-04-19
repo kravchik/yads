@@ -13,8 +13,6 @@ public class YadsShorts {
     public static final String YADS_UNNAMED = "YADS_UNNAMED";
     public static final String YADS_ARRAY = "YADS_ARRAY";
     public static final String YADS_MAP = "YADS_MAP";
-    public static final String NAMED_ARGS = "NAMED_ARGS";
-    public static final String CARET = "CARET";
 
     public static final String YADS_RAW_CLASS = "YADS_RAW_CLASS";//class with a name, but ":" isn't addressed
 

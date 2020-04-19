@@ -2,6 +2,7 @@ package yk.lang.yads;
 
 import org.junit.Test;
 import yk.jcommon.collections.YList;
+import yk.jcommon.utils.IO;
 
 import java.time.LocalDateTime;
 
@@ -82,7 +83,9 @@ public class TestYadsSerialization {
 
         assertS12(new TestClass().setTc2(new TestClass2().setA(1)), "TestClass(tc2=(a=1f))", al("yk.lang.yads.TestClass"));
 
-        assertS12(new TestClass().setTc2(new TestClass2(1, 3)), "TestClass(tc2=(a=1f b=3f))", al("yk.lang.yads.TestClass", "TestClass(tc2 = (1f b=3))"));
+        assertS12(new TestClass().setTc2(new TestClass2(1, 3)), "TestClass(tc2=(a=1f b=3f))", al("yk.lang.yads.TestClass"), "TestClass(tc2 = (1f b=3))");
+
+        assertS12(al(new TestClass(), new TestClass()), "import yk.lang.yads.TestClass\n(TestClass() TestClass())", al(), "import yk.lang.yads.TestClass\n (TestClass() TestClass())");
 
         assertException("TestClass(asdf = 1f)", al("yk.lang.yads.TestClass"),
                 "Error at 1:11, Class 'class yk.lang.yads.TestClass' has no field 'asdf'");
@@ -228,15 +231,23 @@ public class TestYadsSerialization {
 
     @Test
     public void testRefs() {
-        assertSameInstance(new TestClass2(1), "TestClass2(a=1f b=1f)");
-        assertSameInstance(al("Some text"), "('Some text')");
-        assertSameInstance(hm("key", "value"), "(key=value)");
-        assertSameInstance(1, "1");
-        assertSameInstance(1L, "1l");
-        assertSameInstance(1F, "1f");
-        assertSameInstance(1D, "1d");
-        assertSameInstance(true, "true");
-        assertSameInstance("Hello", "Hello");
+        assertRefInPrint(null, false, true);
+        assertRefInPrint(new TestClass2(1), true, true);
+        assertRefInPrint(999, 999, false, false);
+        assertRefInPrint(999, false, false);
+        assertRefInPrint(1, 1, false, true);//because of Java's Integer cache
+        assertRefInPrint("h", false, false);
+        assertRefInPrint(true, false, true);//because of Java's Boolean cache
+
+        assertRefInSerialize(null, false, true);
+        assertRefInSerialize(new TestClass2(1), true, true);
+        assertRefInSerialize(999, 999, false, false);
+        assertRefInSerialize(999, true, true);
+        assertRefInSerialize(1, 1, true, true);//because of Java's Integer cache
+        assertRefInSerialize(1, true, true);
+        assertRefInSerialize("h", "h", true, true);//because Java reuses constant strings
+        assertRefInSerialize("h", true, true);
+        assertRefInSerialize(true, false, true);//we never want ref Boolean, because it always is cached in Java
 
         {//self-reference
             TestClass testClass = new TestClass();
@@ -276,16 +287,48 @@ public class TestYadsSerialization {
         assertException("import()", "Error at 1:1, Can't use class name 'import'");
         assertException("import yk.lang.yads.TestClass()", "Error at 1:8, Element after 'import' should be a string constant");
 
-        assertException("import yk.lang.yads.TestClass TestClass(tc2 = (1f)) TestClass(tc2 = (1f))", "Error at null, Unexpected count of elements: 2, expected exactly 1 element.");
+        assertException("import yk.lang.yads.TestClass TestClass(tc2 = (1f)) TestClass(tc2 = (1f))", "Error at null, Unexpected count of elements: 2, expected exactly 1 element. Do you meant using deserializeBody?");
+    }
+
+    @Test
+    public void testTabs() {
+
+        //System.out.println(Yads.serializeBody(hm("a", "a")));
+        //System.out.println(new NodesToString().withMaxWidth(30).toString(new YadsSerializer().serialize(new TestHierarchy("key1", "value1", "key2", new TestHierarchy("key3", "value3")))));
+
+        assertEquals(IO.readResource("formatting.yads").trim(), new NodesToString().withMaxWidth(30).toString(new YadsSerializer(true).serialize(al(new TestHierarchy("key1", "value1", "key2", new TestHierarchy("key3", "value3")), new TestHierarchy("key1", "value1", "key2", new TestHierarchy("key3", "value3"))))));
+        //System.out.println(new NodesToString().withMaxWidth(3).toString(new YadsSerializer().serialize(al("hello", al("hello", al("hello"))))));
     }
 
 
 
 
+    private static void assertRefInPrint(Object a, boolean haveRef, boolean exact) {
+        assertRefInPrint(a, a, haveRef, exact);
+    }
+
+    private static void assertRefInPrint(Object a, Object b, boolean haveRef, boolean exact) {
+        String text = Yads.print(al(a, b));
+        assertTrue(text.contains("ref") == haveRef);
+        YList des12ed = (YList) Yads.deserialize(text);
+        assertTrue((des12ed.get(0) == des12ed.get(1) == exact));
+    }
+
+    private static void assertRefInSerialize(Object a, boolean haveRef, boolean exact) {
+        assertRefInSerialize(a, a, haveRef, exact);
+    }
+
+    private static void assertRefInSerialize(Object a, Object b, boolean haveRef, boolean exact) {
+        String text = Yads.serialize(al(a, b));
+        assertTrue(text.contains("ref") == haveRef);
+        YList des12ed = (YList) Yads.deserialize(text);
+        assertTrue((des12ed.get(0) == des12ed.get(1) == exact));
+    }
 
 
-    private static void assertSameInstance(Object instance, final String text) {
-        assertEquals("(ref(1 " + text + ") ref(1))", serialize(al("yk.lang.yads.TestClass2"), al(instance, instance)));
+    
+    private static void assertNotReferencing(Object instance, final String text) {
+        assertFalse(serialize(al("yk.lang.yads.TestClass2"), al(instance, instance)).contains("ref"));
         YList des12ed = (YList) Yads.deserialize(al("yk.lang.yads.TestClass2"), "(ref(1 " + text + ") ref(1))");
         assertTrue(des12ed.get(0) == des12ed.get(1));
     }

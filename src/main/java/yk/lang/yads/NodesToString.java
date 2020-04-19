@@ -129,7 +129,7 @@ public class NodesToString {
     private boolean toStringBody(YastNode node, YList<String> result) {
         YMap<YastNode, YastNode> nodes = (YMap<YastNode, YastNode>) node.map.get(NAMED_ARGS);
         boolean possibleMerge = true;
-        if (node.map.get(ARGS) != null) possibleMerge &= addList(node.getNodeList(ARGS), result);
+        if (node.map.get(ARGS) != null) possibleMerge = addList(node.getNodeList(ARGS), result);
         if (node.map.get(NAMED_ARGS) != null) possibleMerge &= addMap(nodes, result);
         return possibleMerge;
     }
@@ -139,7 +139,9 @@ public class NodesToString {
         for (YastNode n : nodes) {
             YList<String> children = toString(tab.toString().length(), n);
             if (children.size() > 1) possibleMerge = false;
-            result.addAll(children.map(s -> tab + s));
+
+            String incer = "".equals(tab.toString()) ? "" : tab.incer;
+            result.addAll(children.map(s -> incer + s));
         }
         return possibleMerge;
     }
@@ -150,12 +152,12 @@ public class NodesToString {
             YList<String> key = toString(0, entry.getKey());
             if (key.size() != 1) throw new RuntimeException("Unexpected key: " + key);
             String keyPrefix = key.first() + "=";
-            YList<String> ss = toString(keyPrefix.length(), entry.getValue());
-            if (ss.size() > 1) possibleMerge = false;
-            YList<String> children = compact(keyPrefix.length(), ss);
+            YList<String> children = toString(keyPrefix.length(), entry.getValue());
+            if (children.size() > 1) possibleMerge = false;
+            String incer = "".equals(tab.toString()) ? "" : tab.incer;
             for (int i = 0; i < children.size(); i++) {
-                if (i == 0) result.add(keyPrefix + children.get(i));
-                else result.add(children.get(i));
+                if (i == 0) result.add(incer + keyPrefix + children.get(i));
+                else result.add(incer + children.get(i));
             }
             //TODO fix for (=== = +++)
         }
@@ -181,5 +183,10 @@ public class NodesToString {
         String compacted = compact(result);
         if (width + compacted.length() <= maxWidth) return al(compacted);
         return ss;
+    }
+
+    public NodesToString withMaxWidth(int maxWidth) {
+        this.maxWidth = maxWidth;
+        return this;
     }
 }

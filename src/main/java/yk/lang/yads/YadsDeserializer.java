@@ -31,20 +31,6 @@ public class YadsDeserializer {
         caretStack.remove(caretStack.size() - 1);
     }
 
-    public Object deserialize(YastNode node) {
-        try {
-            if (null != node.map.get(NAMED_ARGS)) throw new RuntimeException("Unexpected named arg at top level");
-            YList result = deserializeRawList(node.getNodeList(ARGS));
-            if (result.size() != 1) {
-                throw new RuntimeException("Unexpected count of elements: " + result.size() + ", expected exactly 1 element.");
-            }
-            return result.get(0);
-        } catch (RuntimeException re) {
-            handleException(re);
-            return null;
-        }
-    }
-
     public <T> T deserializeConcreteType(Class<T> c, YastNode node) {
         try {
             Object result = deserialize(c, node);
@@ -58,7 +44,7 @@ public class YadsDeserializer {
         }
     }
 
-    private void handleException(RuntimeException re) {
+    void handleException(RuntimeException re) {
         if (caretStack.notEmpty()) {
             if (caretStack.last() == null) {
                 Caret atCaret = caretStack.first(c -> c != null);
@@ -267,7 +253,7 @@ public class YadsDeserializer {
         return result;
     }
 
-    private YList deserializeRawList(YList<YastNode> args) {
+    YList deserializeRawList(YList<YastNode> args) {
         return deserializeRawList(args, 0);
     }
 

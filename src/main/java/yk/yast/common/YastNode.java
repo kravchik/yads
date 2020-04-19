@@ -13,12 +13,13 @@ import static yk.yast.common.Words.*;
  * Date: 30/08/16
  * Time: 17:54
  */
-public class YastNode {//TODO move back to YAST project
+public class YastNode {//TODO rename YadsNode
     public static long NEXT_ID;
     public final long id;
     public YMap<String, Object> map;
 
     public static YastNode node(String type, String k, Object v, Object... kv) {
+        if ((kv.length % 2) != 0) BadException.die("Expected even count");
         YastNode result = new YastNode();
         result.map = hm();
         result.map.put(NODE_TYPE, type);
@@ -75,7 +76,7 @@ public class YastNode {//TODO move back to YAST project
 
     @Override
     public String toString() {
-        return "id=" + id + " " + map + "";
+        return "{" + id + " " + map.toString(" ") + "}";
     }
 
     public Long getLong(String name) {
@@ -94,8 +95,27 @@ public class YastNode {//TODO move back to YAST project
         return (String) result;
     }
 
+    public String getString(String... nn) {
+        return (String) getLast(nn);
+    }
+
     public YastNode getNode(String name) {
         return (YastNode) map.get(name);
+    }
+
+    public YastNode getNode(String... nn) {
+        return (YastNode) getLast(nn);
+    }
+
+    private Object getLast(String... nn) {
+        YastNode result = this;
+        for (int i = 0; i < nn.length - 1; i++) {
+            String n = nn[i];
+            Object cur = result.map.get(n);
+            if (!(cur instanceof YastNode)) return null;
+            result = (YastNode) cur;
+        }
+        return result.map.get(nn[nn.length - 1]);
     }
 
     public YList<YastNode> getNodeList(String name) {
@@ -104,6 +124,11 @@ public class YastNode {//TODO move back to YAST project
 
     public boolean getBoolean(String key) {
         Boolean result = (Boolean) map.get(key);
+        return result != null && result;
+    }
+
+    public boolean getBoolean(String... kk) {
+        Boolean result = (Boolean) getLast(kk);
         return result != null && result;
     }
 

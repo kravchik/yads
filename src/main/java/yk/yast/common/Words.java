@@ -16,7 +16,7 @@ import static yk.jcommon.collections.YHashMap.hm;
  * Date: 08/01/15
  * Time: 12:56
  */
-public class Words {//TODO move back to YAST project
+public class Words {
     // CLASS_DEF(NAME=World, FULL_NAME=hello.World, ...)
     //... TYPE = TYPE(NAME=World, FULL_NAME=hello.World, TYPE=TYPE(NAME=Class), RESOLVED_TYPE=^Class)
 
@@ -29,10 +29,13 @@ public class Words {//TODO move back to YAST project
 
     public static final String METHOD_REF = "METHOD_REF";
 
-    public static final String OP_ADD = "OP_ADD";
-    public static final String OP_SUB = "OP_SUB";
-    public static final String OP_MUL = "OP_MUL";
-    public static final String OP_DIV = "OP_DIV";
+    public static final String ANCHOR = "ANCHOR";
+    public static final String ANCHOR_REF = "ANCHOR_REF";
+
+    public static final String ADD = "ADD";
+    public static final String SUB = "SUB";
+    public static final String MUL = "MUL";
+    public static final String DIV = "DIV";
 
     public static final String ID = "ID";
     public static final String VALUE = "VALUE";
@@ -46,6 +49,11 @@ public class Words {//TODO move back to YAST project
     public static final String BREAK = "BREAK";
     public static final String IMPORT = "IMPORT";
     public static final String IMPORTS = "IMPORTS";
+    // node(IMPORT, IS_STATIC, true, BASE, "", NAME, "*")
+    // node(IMPORT,
+    //or
+    // node(IMPORT, EXPRESSION, DOT, etc)
+
     public static final String STATIC_IMPORTS = "STATIC_IMPORTS";
     public static final String FILE = "FILE";
     public static final String SCRIPT = "SCRIPT";
@@ -68,6 +76,8 @@ public class Words {//TODO move back to YAST project
     public static final String IS_PUBLIC = "IS_PUBLIC";
     public static final String IS_PRIVATE = "IS_PRIVATE";
     public static final String PARAMETERIZED = "PARAMETERIZED";
+    public static final String IS_PARAMETER = "IS_PARAMETER";
+    public static final String IS_PURE = "IS_PURE";//for pure functions
     public static final String MAIN_TYPE = "MAIN_TYPE";
     public static final String TYPE_ARGUMENTS = "TYPE_ARGUMENTS";
     public static final String TYPE_PARAMETER = "TYPE_PARAMETER";
@@ -77,6 +87,7 @@ public class Words {//TODO move back to YAST project
     public static final String STATEMENT = "STATEMENT";
     public static final String CAST = "CAST";//TYPE, EXPRESSION [OPERATOR]
     public static final String ARGS = "ARGS";
+    public static final String NAMED_ARGS = "NAMED_ARGS";
     public static final String PARAMETERS = "PARAMETERS";
     public static final String MEMBERS = "MEMBERS";
     public static final String LEFT = "LEFT";
@@ -135,6 +146,8 @@ public class Words {//TODO move back to YAST project
     public static final String TRY = "TRY";//body, catch[], finally?
     public static final String CATCH = "CATCH";
     public static final String FINALLY = "FINALLY";
+
+    public static final String CARET = "CARET";
 
     //public static final String TYPE_REF = "TYPE_REF";//TODO simple REF, because we can float.class, and can access static members... or TYPE_REF ok?
 
