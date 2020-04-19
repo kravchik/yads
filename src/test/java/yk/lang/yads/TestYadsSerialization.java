@@ -292,12 +292,7 @@ public class TestYadsSerialization {
 
     @Test
     public void testTabs() {
-
-        //System.out.println(Yads.serializeBody(hm("a", "a")));
-        //System.out.println(new NodesToString().withMaxWidth(30).toString(new YadsSerializer().serialize(new TestHierarchy("key1", "value1", "key2", new TestHierarchy("key3", "value3")))));
-
         assertEquals(IO.readResource("formatting.yads").trim(), new NodesToString().withMaxWidth(30).toString(new YadsSerializer(true).serialize(al(new TestHierarchy("key1", "value1", "key2", new TestHierarchy("key3", "value3")), new TestHierarchy("key1", "value1", "key2", new TestHierarchy("key3", "value3"))))));
-        //System.out.println(new NodesToString().withMaxWidth(3).toString(new YadsSerializer().serialize(al("hello", al("hello", al("hello"))))));
     }
 
 
