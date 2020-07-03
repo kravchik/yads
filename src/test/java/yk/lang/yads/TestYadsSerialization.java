@@ -43,6 +43,7 @@ public class TestYadsSerialization {
         assertS12(al("a", "b", al()), "(a b ())");
         assertS12(al(al(al())), "((()))");
         assertS12(al(al(), al()), "(() ())", "(()())");
+        assertS12(al(0.0001f), "(1.0E-4f)");
         assertS12(al(1f), "(1f)");
         assertS12(al("Hello"), "(Hello)");
 
@@ -156,6 +157,8 @@ public class TestYadsSerialization {
 
         assertS12(1L, "1l", "1L");
 
+        assertS12(al(0.00001d), "(1.0E-5d)");
+        assertS12(al(1.0d), "(1d)");
         assertS12(al(1.0d), "(1d)", "(1.0d)", "(1.0D)");
 
         assertS12(new TestClassNumbers(),

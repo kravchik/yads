@@ -34,6 +34,7 @@ public class Words {
 
     public static final String ADD = "ADD";
     public static final String SUB = "SUB";
+    public static final String UNARY_SUB = "UNARY_SUB";
     public static final String MUL = "MUL";
     public static final String DIV = "DIV";
 

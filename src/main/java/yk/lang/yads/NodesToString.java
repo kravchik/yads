@@ -69,9 +69,13 @@ public class NodesToString {
                 }
                 String space = ((Number) valObj).intValue() < 0 ? " " : "";
                 if (valObj instanceof Float) {
-                    value = String.format(space + "%.0ff", valObj);
+                    String s = valObj.toString();
+                    if (s.endsWith(".0")) s = s.substring(0, s.length() - 2);
+                    value = String.format(space + "%sf", s);
                 } else if (valObj instanceof Double) {
-                    value = String.format(space + "%.0fd", valObj);
+                    String s = valObj.toString();
+                    if (s.endsWith(".0")) s = s.substring(0, s.length() - 2);
+                    value = String.format(space + "%sd", s);
                 } else if (valObj instanceof Long) {
                     value = space + valObj.toString() + "l";
                 } else if (valObj instanceof Integer) {
