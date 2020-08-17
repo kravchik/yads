@@ -27,8 +27,9 @@ public class YadsSerializer {
     private YSet<String> imports = hs();
     private YSet<String> defaultImports = hs();
 
-    public void addDefaultImports(YList<String> imports) {
+    public YadsSerializer addDefaultImports(YList<String> imports) {
         defaultImports.addAll(imports);
+        return this;
     }
 
     private IdentityHashMap<Object, Tuple<YastNode, Integer>> identity = new IdentityHashMap<>();
