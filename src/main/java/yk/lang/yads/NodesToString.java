@@ -116,7 +116,6 @@ public class NodesToString {
     }
 
     private static boolean withoutQuotes(String value) {
-        boolean woQuotes = true;
         if (value.equals("null")) return false;
         if (value.equals("true")) return false;
         if (value.equals("false")) return false;
@@ -130,16 +129,12 @@ public class NodesToString {
                 break;
             }
         }
-        if (!onlySimpleChars) {
-            try {
-                woQuotes = false;
-                ByteArrayInputStream bis = new ByteArrayInputStream(value.getBytes("UTF-8"));
-                Object would = new YadsParser(bis).parseRawElement();
-                if (value.equals(would)) woQuotes = true;
-            } catch (Exception | Error ignore) {
-            }
-        }
-        return woQuotes;
+        if (onlySimpleChars) return true;
+        try {
+            Object would = new YadsParser(new ByteArrayInputStream(value.getBytes("UTF-8"))).parseRawElement();
+            if (value.equals(would)) return true;
+        } catch (Exception | Error ignore) {}
+        return false;
     }
 
     private YList<String> toStringMap(int width, YastNode node, String classPrefix) {
