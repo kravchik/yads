@@ -5,7 +5,7 @@ import yk.jcommon.collections.YMap;
 import yk.jcommon.utils.BadException;
 
 import static yk.jcommon.collections.YHashMap.hm;
-import static yk.yast.common.Words.*;
+import static yk.yast.common.YadsWords.*;
 
 /**
  * Created with IntelliJ IDEA.
@@ -151,4 +151,19 @@ public class YastNode {//TODO rename YadsNode
         return node(DOT, LEFT, left, NAME, right);
     }
 
+    public boolean has(String key) {
+        return !isAbsent(key);
+    }
+
+    public boolean hasNotEmptyList(String key) {
+        return !isAbsent(key);
+    }
+
+    public boolean isAbsent(String key) {
+        return map.get(key) == null;
+    }
+
+    public Object get(String key) {
+        return map.get(key);
+    }
 }

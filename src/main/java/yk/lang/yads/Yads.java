@@ -3,8 +3,8 @@ package yk.lang.yads;
 import yk.jcommon.collections.YList;
 import yk.yast.common.YastNode;
 
-import static yk.yast.common.Words.ARGS;
-import static yk.yast.common.Words.NAMED_ARGS;
+import static yk.yast.common.YadsWords.ARGS;
+import static yk.yast.common.YadsWords.NAMED_ARGS;
 
 public class Yads {
     /**

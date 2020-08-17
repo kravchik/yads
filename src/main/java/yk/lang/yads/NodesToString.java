@@ -10,7 +10,7 @@ import java.util.Map;
 
 import static yk.jcommon.collections.YArrayList.al;
 import static yk.lang.yads.YadsShorts.*;
-import static yk.yast.common.Words.*;
+import static yk.yast.common.YadsWords.*;
 
 public class NodesToString {
     private int maxWidth = 100;
@@ -50,13 +50,8 @@ public class NodesToString {
                 value = "null";
             } else if (valObj instanceof String || valObj instanceof Character) {
                 value = valObj.toString();
-                boolean simple = false;
-                try {
-                    ByteArrayInputStream bis = new ByteArrayInputStream(value.getBytes("UTF-8"));
-                    Object would = new YadsParser(bis).parseRawElement();
-                    if (value.equals(would)) simple = true;
-                } catch (Exception | TokenMgrError ignore) {}
-                if (!simple) {
+                boolean woQuotes = withoutQuotes(value);
+                if (!woQuotes) {
                     if (value.contains("'")) value = "\"" + ESCAPE_YADS_DOUBLE_QUOTES.translate(value) + "\"";
                     else value = "'" + ESCAPE_YADS_SINGLE_QUOTES.translate(value) + "'";
                 }
@@ -118,6 +113,33 @@ public class NodesToString {
         }
 
         throw new RuntimeException("Not implemented for " + node);
+    }
+
+    private static boolean withoutQuotes(String value) {
+        boolean woQuotes = true;
+        if (value.equals("null")) return false;
+        if (value.equals("true")) return false;
+        if (value.equals("false")) return false;
+
+        boolean onlySimpleChars = true;
+        for (int i = 0; i < value.length(); i++) {
+            char c = value.charAt(i);
+            if (c < '!' || c == '\\' || c == '"' || c == '\'') return false;
+            if (c > '~') {
+                onlySimpleChars = false;
+                break;
+            }
+        }
+        if (!onlySimpleChars) {
+            try {
+                woQuotes = false;
+                ByteArrayInputStream bis = new ByteArrayInputStream(value.getBytes("UTF-8"));
+                Object would = new YadsParser(bis).parseRawElement();
+                if (value.equals(would)) woQuotes = true;
+            } catch (Exception | Error ignore) {
+            }
+        }
+        return woQuotes;
     }
 
     private YList<String> toStringMap(int width, YastNode node, String classPrefix) {

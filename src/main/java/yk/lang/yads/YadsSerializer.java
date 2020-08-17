@@ -20,7 +20,7 @@ import static yk.jcommon.collections.YHashMap.hm;
 import static yk.jcommon.collections.YHashSet.hs;
 import static yk.jcommon.utils.Reflector.newInstanceArgless;
 import static yk.lang.yads.YadsShorts.*;
-import static yk.yast.common.Words.*;
+import static yk.yast.common.YadsWords.*;
 import static yk.yast.common.YastNode.node;
 
 public class YadsSerializer {

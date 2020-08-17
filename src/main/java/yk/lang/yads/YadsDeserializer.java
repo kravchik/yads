@@ -14,7 +14,7 @@ import static yk.jcommon.collections.YArrayList.al;
 import static yk.jcommon.collections.YHashMap.hm;
 import static yk.jcommon.collections.YHashSet.hs;
 import static yk.lang.yads.YadsShorts.*;
-import static yk.yast.common.Words.*;
+import static yk.yast.common.YadsWords.*;
 
 public class YadsDeserializer {
 

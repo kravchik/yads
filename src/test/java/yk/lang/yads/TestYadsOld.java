@@ -1,11 +1,8 @@
 package yk.lang.yads;
 
 import org.junit.Test;
-import yk.jcommon.collections.YList;
 import yk.yast.common.YastNode;
 
-import java.io.ByteArrayInputStream;
-import java.io.UnsupportedEncodingException;
 import java.util.Map;
 
 import static junit.framework.Assert.assertEquals;
@@ -14,8 +11,9 @@ import static junit.framework.TestCase.fail;
 import static yk.jcommon.collections.YArrayList.al;
 import static yk.jcommon.collections.YArrayList.toYList;
 import static yk.jcommon.collections.YHashMap.hm;
-import static yk.lang.yads.YadsShorts.*;
-import static yk.yast.common.Words.*;
+import static yk.lang.yads.YadsShorts.YADS_ARRAY;
+import static yk.lang.yads.YadsShorts.YADS_MAP;
+import static yk.yast.common.YadsWords.*;
 
 /**
  * Created with IntelliJ IDEA.

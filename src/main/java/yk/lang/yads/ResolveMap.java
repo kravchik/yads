@@ -7,7 +7,7 @@ import yk.yast.common.YastNode;
 import static yk.jcommon.collections.YArrayList.al;
 import static yk.jcommon.collections.YHashMap.hm;
 import static yk.lang.yads.YadsShorts.*;
-import static yk.yast.common.Words.*;
+import static yk.yast.common.YadsWords.*;
 
 public class ResolveMap {
     private static final String DELIMITER = "=";

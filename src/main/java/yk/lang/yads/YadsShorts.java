@@ -3,7 +3,7 @@ package yk.lang.yads;
 import org.apache.commons.lang3.text.translate.*;
 import yk.yast.common.YastNode;
 
-import static yk.yast.common.Words.*;
+import static yk.yast.common.YadsWords.*;
 
 public class YadsShorts {
     //TODO LIST, MAP, COMPLEX(NAME ARGS NAMED_ARGS)
@@ -15,14 +15,6 @@ public class YadsShorts {
     public static final String YADS_MAP = "YADS_MAP";
 
     public static final String YADS_RAW_CLASS = "YADS_RAW_CLASS";//class with a name, but ":" isn't addressed
-
-    public static YastNode constNode(String type, Object value) {
-        return new YastNode(NODE_TYPE, CONST, TYPE, type, VALUE, value);
-    }
-
-    public static YastNode constNode(Caret caret, Object value) {
-        return new YastNode(NODE_TYPE, CONST, VALUE, value, CARET, caret);
-    }
 
     public static YastNode constNode(Caret caret, String type, Object value) {
         return new YastNode(NODE_TYPE, CONST, TYPE, type, VALUE, value, CARET, caret);
