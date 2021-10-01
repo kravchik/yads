@@ -132,7 +132,7 @@ Or you can specify all needed imports in the serializer method so you don't need
 <dependency>
     <groupId>yk</groupId>
     <artifactId>yads</artifactId>
-    <version>0.01-SNAPSHOT</version>
+    <version>0.01</version>
 </dependency>
 ```
 (current dev version is 0.01-SNAPSHOT)

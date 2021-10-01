@@ -4,7 +4,7 @@
 
     <groupId>yk</groupId>
     <artifactId>yads</artifactId>
-    <version>0.01-SNAPSHOT</version>
+    <version>0.02-SNAPSHOT</version>
 
     <packaging>jar</packaging>
     <name>yads</name>
@@ -123,13 +123,13 @@
         </repository>
     </repositories>
 
-    <!--<distributionManagement>-->
-        <!--<downloadUrl>https://github.com/kravchik/mvn-repo/raw/master</downloadUrl>-->
+    <distributionManagement>
+        <downloadUrl>https://github.com/kravchik/mvn-repo/raw/master</downloadUrl>
 
-        <!--<repository>-->
-            <!--<id>snapshot</id>-->
-            <!--<url>file://${basedir}/../../../1/public/mvn-repo</url>-->
-        <!--</repository>-->
-    <!--</distributionManagement>-->
+        <repository>
+            <id>snapshot</id>
+            <url>file://${basedir}/../../../1/public/mvn-repo</url>
+        </repository>
+    </distributionManagement>
 
 </project>
