@@ -4,6 +4,7 @@ import yk.jcommon.collections.YList;
 import yk.jcommon.collections.YMap;
 import yk.jcommon.utils.BadException;
 
+import static yk.jcommon.collections.YArrayList.al;
 import static yk.jcommon.collections.YHashMap.hm;
 import static yk.yast.common.YadsWords.*;
 
@@ -59,6 +60,10 @@ public class YastNode {//TODO rename YadsNode
 
     public YastNode with(String k, Object v, Object... kv) {
         return new YastNode(id, map.with(k, v, kv));
+    }
+
+    public YastNode without(String... kk) {
+        return new YastNode(id, map.without(al(kk)));
     }
 
     public YastNode withRearrange(String k, Object v, Object... kv) {
@@ -118,8 +123,8 @@ public class YastNode {//TODO rename YadsNode
         return result.map.get(nn[nn.length - 1]);
     }
 
-    public YList<YastNode> getNodeList(String name) {
-        return (YList<YastNode>) map.get(name);
+    public YList<YastNode> getNodeList(String... namesPath) {
+        return (YList<YastNode>) getLast(namesPath);
     }
 
     public boolean getBoolean(String key) {
