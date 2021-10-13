@@ -95,6 +95,7 @@ travaller'
   *Parsing, serialization, deserialization - currently available in Java only. I am open to collaboration for other languages.*
 
 [Serialization](serialization.md)
+
 [Why yet another syntax?](why-another.md)
 
 ## mvn artifact
