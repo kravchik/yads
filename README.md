@@ -3,13 +3,20 @@ YADS
 
 **Y**ads **A**bstract **D**ata **S**yntax
 
-**Y**et **A**nother **D**ata **S**yntax (the perfect one actually).
+Mark-up language like JSON and YAML, but better, and with built-in serialization.
 
-Mark-up language like JSON and YAML, but better, and with builtin serialization.
+With this library, you can parse YADS data into Abstract Syntax Tree, or you can use Yads class to serialize/deserialize data directly from/to Java classes.
 
-### Several self-explanatory examples
+Yads is the next step after JSON and YAML (which were good steps after XML). It simplifies the syntax even further.
+* No commas are needed in any lists (like in Lisp)! So you no more bothering when adding or removing list elements.
+* No mandatory quotes. And you can use any of `""` or `''` if needed and escape escaping (especially cool when you need to write something like ```String expected = "('some' 'expected' 'strings')";```)
+* Newlines in strings (YAML supports it, but JSON is not)
+* No mandatory white-spacing  (JSON has no it, YAML has)
+* Comments both `//` and `/* */` (JSON has no comments at all, YAML supports only one-line comments)
 
-*Example of using YADS for UI definition*
+### Syntax examples
+
+*Some UI definition*
 ```Java
 HBox(
   pos=(100 200)
@@ -19,7 +26,7 @@ HBox(
   )
 )
 ```
-*Example of using YADS as simple config*
+*Some config*
 ```Java
 serverType = node
 port = 8080
@@ -27,22 +34,13 @@ port = 8080
 data = (info = "Awesome super server" author = "John Doe")
 services = (AuthService() AdminService())
 ```
-*Example of using YADS as properties*
+*Some properties*
 ```Java
 greeting = 'Hello traveller!'
 signature = 'Have a nice day,
 travaller'
 ```
 ### Syntax
-Here provided some base standings which unlikely to change. Development is in progress so more specifics will be added later.
-
-##### feautes
-* no white-space indentation or mandatory new lines
-* no commas or semicolon
-* no mandatory `""` or `'''`
-* can use `""`  and `''` interchangeably
-* can use new-lines in `""` or `''` strings
-* comments `//` and `/* */`  
 
 ##### syntax
 * `()` - empty list
@@ -53,40 +51,18 @@ Here provided some base standings which unlikely to change. Development is in pr
 * `'some string'` - string
 * `"some string"` - string
 * `some string` - two string elements (`some` and `string`)
-* `someString` - string or field name
+* `someString` - string or field name or class name
 * `some-string` - three elements: `some`, `minus`, `string`
 * `Vec2(1 2)` - instantiation of class `Vec2` via constructor
 * `Vec2(x=1 y=2)` - instantiation of class `Vec2` via explicit fields setting
 
-##### top-level structure
-Depends on the serialization/deserialization method called. Can be either with a mandatory top-level element (in this example - `HBox`):
-```Java
-HBox(
-  pos=(100 200)
-  VBox(
-    Input(hint='...input here')
-    Button(text='Send')
-  )
-)
-```
-Or can contain a body. In which case serialization method should be aware of a class (in this example - some config class):
-```Java
-serverType = node
-port = 8080
-//port = 80
-data = (info = "Awesome super server" author = "John Doe")
-services = (AuthService() AdminService())
-```
-
-##### importing
-Serializer should know a type of class in order to use `VBox(...)` instead of `some.kind.of.package.VBox(...)`. While both ways are available, it is more convenient to place the imports section at the beginning:
-```
-    import some.kind.of.package.VBox
-    
-    VBox(...)
-    VBox(...)
-```
-Or you can specify all needed imports in the serializer method so you don't need any mention of it in the text.
+##### feautes
+* no white-space indentation or mandatory new lines
+* no commas or semicolon
+* no mandatory `""` or `'''`
+* can use `""`  and `''` interchangeably
+* can use new-lines in `""` or `''` strings
+* comments `//` and `/* */`  
 
 ### API
 ```Java
@@ -115,11 +91,10 @@ Or you can specify all needed imports in the serializer method so you don't need
 * custom serialization
 * multiline string indentation
 * typed array/map
-* get rid of commons.lang3
-
 
   *Parsing, serialization, deserialization - currently available in Java only. I am open to collaboration for other languages.*
 
+[Serialization](serialization.md)
 [Why yet another syntax?](why-another.md)
 
 ## mvn artifact
@@ -135,5 +110,5 @@ Or you can specify all needed imports in the serializer method so you don't need
     <version>0.01</version>
 </dependency>
 ```
-(current dev version is 0.01-SNAPSHOT)
+(current dev version is 0.02-SNAPSHOT)
 
