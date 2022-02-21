@@ -5,6 +5,8 @@ import yk.jcommon.collections.YList;
 import yk.jcommon.utils.IO;
 
 import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Map;
 
 import static org.junit.Assert.*;
 import static yk.jcommon.collections.YArrayList.al;
@@ -140,6 +142,11 @@ public class TestYadsSerialization {
                 "import yk.lang.yads.TestClass\na=TestClass(tc2=(a=1f b=1f)) b=TestClass(tc2=(a=1f b=1f))",
                 "import yk.lang.yads.TestClass a = TestClass(tc2 = (1f)) b = TestClass(tc2 = (1f))");
 
+        assertBodyS12(hm("a", new TestClass().setTc2(new TestClass2(1)), "b", new TestClass().setTc2(new TestClass2(1))),
+                "a=TestClass(tc2=(a=1f b=1f)) b=TestClass(tc2=(a=1f b=1f))",
+                al("yk.lang.yads.TestClass"),
+                "import yk.lang.yads.TestClass a = TestClass(tc2 = (1f)) b = TestClass(tc2 = (1f))");
+
         //assertEquals(hm("a", new TestClass().setTc2(new TestClass25(1)), "b", new TestClass().setTc2(new TestClass25(1))),
         //        deserializeBody("a=b c d"));
     }
@@ -196,10 +203,10 @@ public class TestYadsSerialization {
         assertS12(new TestClassNumbers().setB((byte)255),
                 "import yk.lang.yads.TestClassNumbers\nTestClassNumbers(b=255)");
         assertException("import yk.lang.yads.TestClassNumbers\nTestClassNumbers(b= -1)",
-                "Error at 2:21, Can't properly convert class java.lang.Integer type to byte type, value -1 becomes 255");
+                "Error at 2:21, Can't properly convert class java.lang.Integer type to byte type, value -1 becomes 255");
 
         assertException("import yk.lang.yads.TestClassNumbers\nTestClassNumbers(b=256)",
-                "Error at 2:20, Can't properly convert class java.lang.Integer type to byte type, value 256 becomes 0");
+                "Error at 2:20, Can't properly convert class java.lang.Integer type to byte type, value 256 becomes 0");
         assertS12(new TestClassNumbers().setB((Byte)(byte)1),
                 "import yk.lang.yads.TestClassNumbers\nTestClassNumbers(B=1)");
 
@@ -375,6 +382,14 @@ public class TestYadsSerialization {
         }
         for (String s : variants) {
             assertEquals(expectedObject, Yads.deserializeBody(expectedObject.getClass(), s));
+            if (expectedObject instanceof Map) {
+                assertEquals(expectedObject, Yads.deserializeBody(s));
+                assertEquals(expectedObject, Yads.deserializeMapBody(s));
+            }
+            if (expectedObject instanceof List) {
+                assertEquals(expectedObject, Yads.deserializeBody(s));
+                assertEquals(expectedObject, Yads.deserializeListBody(s));
+            }
         }
     }
 
@@ -383,7 +398,17 @@ public class TestYadsSerialization {
             assertEquals(expectedText, Yads.serializeBody(imports, expectedObject));
             assertEquals(expectedObject, Yads.deserializeBody(imports, expectedObject.getClass(), expectedText));
         }
-        for (String s : variants) assertEquals(expectedObject, Yads.deserializeBody(imports, expectedObject.getClass(), s));
+        for (String s : variants) {
+            assertEquals(expectedObject, Yads.deserializeBody(imports, expectedObject.getClass(), s));
+            if (expectedObject instanceof Map) {
+                assertEquals(expectedObject, Yads.deserializeBody(imports, s));
+                assertEquals(expectedObject, Yads.deserializeMapBody(imports, s));
+            }
+            if (expectedObject instanceof List) {
+                assertEquals(expectedObject, Yads.deserializeBody(imports, s));
+                assertEquals(expectedObject, Yads.deserializeListBody(imports, s));
+            }
+        }
     }
 
     private static void assertS12Exception(Object someObject, String exceptionText) {

@@ -104,7 +104,7 @@ public class YadsDeserializer {
                 Number newNewNumber = convert(result.getClass(), newNumber);
 
                 if (!newNewNumber.equals(result)) {
-                    throw new RuntimeException(String.format("Can't properly convert %s type to %s type, value %s becomes %s", result.getClass(), knownType, result, newNewNumber));
+                    throw new RuntimeException(String.format("Can't properly convert %s type to %s type, value %s becomes %s", result.getClass(), knownType, result, newNewNumber));
                 }
                 result = newNumber;
             }

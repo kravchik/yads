@@ -12,6 +12,10 @@ import static yk.jcommon.collections.YArrayList.al;
 import static yk.lang.yads.YadsShorts.*;
 import static yk.yast.common.YadsWords.*;
 
+/**
+ * Serializes nodes into a YADS string. Performs formatting: introduces new-lines, adds tabs, tries to avoid unnecessary new-lines where possible.
+ * Nodes can contain
+ */
 public class NodesToString {
     private int maxWidth = 100;
     private Tab tab = new Tab("  ");
@@ -72,11 +76,11 @@ public class NodesToString {
                     if (s.endsWith(".0")) s = s.substring(0, s.length() - 2);
                     value = String.format(space + "%sd", s);
                 } else if (valObj instanceof Long) {
-                    value = space + valObj.toString() + "l";
+                    value = space + valObj + "l";
                 } else if (valObj instanceof Integer) {
-                    value = space + valObj.toString();
+                    value = space + valObj;
                 } else if (valObj instanceof Short) {
-                    value = space + valObj.toString();
+                    value = space + valObj;
                 } else {
                     throw new RuntimeException("Should never reach here");
                 }
@@ -84,8 +88,7 @@ public class NodesToString {
                 value = valObj.toString();
             } else {
                 throw new RuntimeException(String.format("Not implemented const type. Class: %s, Value: %s",
-                        valObj.getClass().toString(),
-                        valObj.toString()));
+                        valObj.getClass().toString(), valObj));
             }
             return al(value);
         }
@@ -112,7 +115,7 @@ public class NodesToString {
             return toStringMap(width, node, node.getString(NAME) + "(");
         }
 
-        throw new RuntimeException("Not implemented for " + node);
+        throw new RuntimeException("Not implemented for " + node);
     }
 
     private static boolean withoutQuotes(String value) {

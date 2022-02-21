@@ -1,27 +1,56 @@
 package yk.lang.yads;
 
 import yk.jcommon.collections.YList;
+import yk.jcommon.collections.YMap;
 import yk.yast.common.YastNode;
 
+import static yk.jcommon.collections.YArrayList.al;
 import static yk.yast.common.YadsWords.ARGS;
 import static yk.yast.common.YadsWords.NAMED_ARGS;
 
+//TODO define default imports as classes instead of strings
+//TODO separate methods for serialize serializeFormatted ?
 public class Yads {
     /**
-     * Deserialize the only element. It is an error to have several elements in text. It is possible to have imports.
+     * Deserialize the only element.
+     * <br>The next string will be deserialized into an array of strings "a", "b" and "c":
+     * <br>
+     * <br>
+     * <code>(a "b" 'c')</code>
+     * <br>
+     * <br>
+     * Or, the next string will be deserialized into the instance of class TestClassNumbers (with the help of imports):
+     * <br>
+     * <br>
+     * <code>import yk.lang.yads.TestClassNumbers<br>TestClassNumbers()</code>
+     * <br>
+     * <br>
+     * @param text to be parsed
+     * @return deserialized value
      */
     public static Object deserialize(String text) {
-        YastNode parse = YadsParser.parse(text);
-        return deserialize(new YadsDeserializer(), new YadsResolver().resolve(parse));
+        return deserialize(al(), text);
     }
 
+    /**
+     * Deserialize the only element with the use of a list of default imports to be used.
+     * <br>For example, if <code>imports == al("yk.lang.yads.TestClassNumbers")</code>, then the next text can avoid stating imports and being deserialized into the instance of class TestClassNumbers:
+     * <br>
+     * <br>
+     * <code>TestClassNumbers()</code>
+     * <br>
+     * <br>
+     * @param imports default imports
+     * @param text to be parsed
+     * @return deserialized value
+     */
     public static Object deserialize(YList<String> imports, String text) {
         YadsDeserializer deserializer = new YadsDeserializer();
         deserializer.namespaces.enterScope();
         for (String i : imports) deserializer.namespaces.addClass(i);
 
         YastNode parse = YadsParser.parse(text);
-        return deserialize(deserializer, new YadsResolver().resolve(parse));
+        return deserializeTheOnlyElement(deserializer, new YadsResolver().resolve(parse));
     }
 
     public static Object deserializeBody(String text) {
@@ -34,6 +63,10 @@ public class Yads {
         return new YadsDeserializer().deserializeConcreteType(type, new YadsResolver().resolve(parsed));
     }
 
+    public static <T> T deserializeBody(YList<String> imports, String text) {
+        return deserializeBody(imports, null, text);
+    }
+
     public static <T> T deserializeBody(YList<String> imports, Class<T> type, String text) {
         YadsDeserializer deserializer = new YadsDeserializer();
         deserializer.namespaces.enterScope();
@@ -42,14 +75,61 @@ public class Yads {
         return deserializer.deserializeConcreteType(type, new YadsResolver().resolve(parsed));
     }
 
+    public static <K, V> YMap<K, V> deserializeMapBody(String text) {
+        return deserializeBody(al(), YMap.class, text);
+    }
+
+    public static <K, V> YMap<K, V> deserializeMapBody(YList<String> imports, String text) {
+        return deserializeBody(imports, YMap.class, text);
+    }
+
+    public static <V> YList<V> deserializeListBody(String text) {
+        return deserializeBody(al(), YList.class, text);
+    }
+
+    public static <V> YList<V> deserializeListBody(YList<String> imports, String text) {
+        return deserializeBody(imports, YList.class, text);
+    }
+
     public static String print(Object someObject) {
         return new NodesToString().toString(new YadsSerializer(false).serialize(someObject));
     }
 
+    /**
+     * Serialize the only element.
+     * <br>The result of serializing of a list of strings "a", "b" and "c" will be:
+     * <br>
+     * <br>
+     * <code>(a b c)</code>
+     * <br>
+     * <br>
+     * The result of serializing of an instance of class TestClassNumbers (with the help of imports):
+     * <br>
+     * <br>
+     * <code>import yk.lang.yads.TestClassNumbers<br>TestClassNumbers()</code>
+     * <br>
+     * <br>
+     * @param someObject to be serialized
+     * @return deserialized value
+     */
     public static String serialize(Object someObject) {
         return new NodesToString().toString(new YadsSerializer().serialize(someObject));
     }
 
+    /**
+     * Serialize the only element with default imports which leads to absence of imports in the result text.
+     * The result of serializing of an instance of class TestClassNumbers:
+     * <br>Yads.serialize(al("yk.lang.yads.TestClass2"), new TestClass2()):
+     * <br>
+     * <br>
+     * <br>
+     * <code>TestClassNumbers()</code>
+     * <br>
+     * <br>
+     * @param imports - default values
+     * @param someObject to be serialized
+     * @return serialized value
+     */
     public static String serialize(YList<String> imports, Object someObject) {
         YadsSerializer yadsToNodes = new YadsSerializer();
         yadsToNodes.addDefaultImports(imports);
@@ -60,14 +140,14 @@ public class Yads {
     public static String serializeBody(YList<String> imports, Object someObject) {
         YadsSerializer yadsToNodes = new YadsSerializer();
         yadsToNodes.addDefaultImports(imports);
-        return new NodesToString().toString(yadsToNodes.serialize(someObject));
+        return new NodesToString().toStringBody(yadsToNodes.serializeBody(someObject));
     }
 
     public static String serializeBody(Object someObject) {
         return new NodesToString().toStringBody(new YadsSerializer().serializeBody(someObject));
     }
 
-    private static Object deserialize(YadsDeserializer des, YastNode node) {
+    private static Object deserializeTheOnlyElement(YadsDeserializer des, YastNode node) {
         try {
             if (null != node.map.get(NAMED_ARGS)) throw new RuntimeException("Unexpected named arg at top level");
             YList result = des.deserializeRawList(node.getNodeList(ARGS));
