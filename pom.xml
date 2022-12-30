@@ -4,7 +4,7 @@
 
     <groupId>yk</groupId>
     <artifactId>yads</artifactId>
-    <version>0.02</version>
+    <version>0.03</version>
 
     <packaging>jar</packaging>
     <name>yads</name>
@@ -112,8 +112,8 @@
         </dependency>
         <dependency>
             <groupId>yk</groupId>
-            <artifactId>jcommon</artifactId>
-            <version>0.123</version>
+            <artifactId>yincubator</artifactId>
+            <version>0.04</version>
         </dependency>
     </dependencies>
 

@@ -4,12 +4,21 @@ import yk.jcommon.collections.YList;
 import yk.jcommon.collections.YMap;
 import yk.yast.common.YastNode;
 
+import java.io.InputStream;
+
 import static yk.jcommon.collections.YArrayList.al;
 import static yk.yast.common.YadsWords.ARGS;
 import static yk.yast.common.YadsWords.NAMED_ARGS;
 
 //TODO define default imports as classes instead of strings
 //TODO separate methods for serialize serializeFormatted ?
+/**
+ * Just a collection of some frequently used methods to help avoid the usual boilerplate.
+ * Also serves as an example of how to use YadsParser, YadsSerializer, YadsDeserializer.
+ * <br>
+ * Methods in this class a 'greedy'. They try to read everything available and throw an error if there are 'unexpected more'.
+ * You can easily implement 'not greedy' analogs.
+ */
 public class Yads {
     /**
      * Deserialize the only element.
@@ -30,6 +39,13 @@ public class Yads {
      */
     public static Object deserialize(String text) {
         return deserialize(al(), text);
+    }
+
+    //TODO other versions
+    //TODO comments
+    //TODO tests
+    public static Object deserialize(InputStream is) {
+        return deserialize(al(), is);
     }
 
     /**
@@ -53,14 +69,32 @@ public class Yads {
         return deserializeTheOnlyElement(deserializer, new YadsResolver().resolve(parse));
     }
 
+    //TODO other versions
+    //TODO comments
+    //TODO tests
+    public static Object deserialize(YList<String> imports, InputStream is) {
+
+        YastNode result;
+        try {
+            result = new YadsParser(is).parseListBodyNode();
+        } catch (ParseException e) {
+            throw new RuntimeException(e);
+        }
+
+        YadsDeserializer deserializer = new YadsDeserializer();
+        deserializer.namespaces.enterScope();
+        for (String i : imports) deserializer.namespaces.addClass(i);
+        return deserializeTheOnlyElement(deserializer, new YadsResolver().resolve(result));
+    }
+
     public static Object deserializeBody(String text) {
         YastNode parsed = YadsParser.parse(text);
-        return new YadsDeserializer().deserializeConcreteType(null, new YadsResolver().resolve(parsed));
+        return new YadsDeserializer().deserializeSpecificType(null, new YadsResolver().resolve(parsed));
     }
 
     public static <T> T deserializeBody(Class<T> type, String text) {
         YastNode parsed = YadsParser.parse(text);
-        return new YadsDeserializer().deserializeConcreteType(type, new YadsResolver().resolve(parsed));
+        return new YadsDeserializer().deserializeSpecificType(type, new YadsResolver().resolve(parsed));
     }
 
     public static <T> T deserializeBody(YList<String> imports, String text) {
@@ -72,7 +106,7 @@ public class Yads {
         deserializer.namespaces.enterScope();
         for (String i : imports) deserializer.namespaces.addClass(i);
         YastNode parsed = YadsParser.parse(text);
-        return deserializer.deserializeConcreteType(type, new YadsResolver().resolve(parsed));
+        return deserializer.deserializeSpecificType(type, new YadsResolver().resolve(parsed));
     }
 
     public static <K, V> YMap<K, V> deserializeMapBody(String text) {

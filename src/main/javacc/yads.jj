@@ -96,11 +96,11 @@ TOKEN : /* LITERALS */
 
 TOKEN :
 {
-  <NAMED_CLASS_BEGIN: (["a"-"z","A"-"Z","0"-"9",".","_"])+ "(">
+  <ANY_LITERAL: (["a"-"z","A"-"Z","0"-"9",".","_","$"])+ >
 |
-  <ANY_OPERATOR: ((["+","-","/", "*","%","!","=","^","&","|"])+)>
+  <NAMED_CLASS_BEGIN: <ANY_LITERAL> "(">
 |
-  <ANY_LITERAL: (["a"-"z","A"-"Z","0"-"9",".","_"])+ >
+  <ANY_OPERATOR: ((["+","-","/", "*","%","!","=","^","&","|", "<", ">"])+)>
 |
   < STRING_LITERAL:
       "\""
@@ -200,6 +200,7 @@ YastNode parseElement():
     {return o;}
 }
 
+//TODO remove! not actually used for parsing
 Object parseRawElement():
 {String s;}
 {

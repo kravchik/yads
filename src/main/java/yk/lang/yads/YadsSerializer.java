@@ -9,10 +9,7 @@ import yk.yast.common.YastNode;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
-import java.util.Collection;
-import java.util.IdentityHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static yk.jcommon.collections.YArrayList.al;
 import static yk.jcommon.collections.YArrayList.toYList;
@@ -73,7 +70,7 @@ public class YadsSerializer {
                 ARGS, imports
                         .without(defaultImports).toList()
                         .map(i -> node(IMPORT, VALUE, i))
-                        .with((Collection<YastNode>) result.map.getOr(ARGS, al())),
+                        .withAll((Collection<YastNode>) result.map.getOr(ARGS, al())),
                 NAMED_ARGS, result.map.get(NAMED_ARGS) == null ? hm() : result.map.get(NAMED_ARGS));
     }
 
@@ -109,11 +106,15 @@ public class YadsSerializer {
             return node(CONST, VALUE, null);
         } else if (object instanceof List) {//TODO better
             return node(YADS_ARRAY, ARGS, toYList(((List) object)).map(o -> serializeImpl(o, null)));
+
+            //TODO fix, can't ship like that!
+            //TODO fix, can't ship like that!
+            //TODO fix, can't ship like that!
+
+        } else if (object instanceof Set) {//TODO FIX!
+            return node(YADS_ARRAY, ARGS, toYList(((Set) object)).map(o -> serializeImpl(o, null)));
         } else if (object instanceof Map) {//TODO better
-            YMap<Object, Object> result = hm();
-            for (Map.Entry<?, ?> entry : ((Map<?, ?>) object).entrySet())
-                result.put(serializeImpl(entry.getKey(), null), serializeImpl(entry.getValue(), null));
-            return node(YADS_MAP, NAMED_ARGS, result);
+            return node(YADS_MAP, NAMED_ARGS, serializeMap((Map<?, ?>) object));
         } else if (object instanceof String) {
             return node(CONST, VALUE, object);
         } else if (object instanceof Short && !(knownType == Short.class || knownType == short.class)) {
@@ -125,6 +126,11 @@ public class YadsSerializer {
             return node(CONST, VALUE, object);
         } else if (object instanceof Boolean) {
             return node(CONST, VALUE, object);
+        } else if (object instanceof YadsNamed) {
+            YadsNamed named = (YadsNamed) object;
+            return node(YADS_NAMED, NAME, named.name,
+                    ARGS, named.array == null ? null : named.array.map(o -> serializeImpl(o, null)),
+                    NAMED_ARGS, named.map == null ? null : serializeMap(named.map));
         } else {
             //TO DO use constructor ?
             if (object.getClass() != knownType) imports.add(object.getClass().getCanonicalName());
@@ -133,6 +139,7 @@ public class YadsSerializer {
             for (Field field : Reflector.getAllFieldsInHierarchy(object.getClass())) {
                 field.setAccessible(true);
                 if (Modifier.isStatic(field.getModifiers())) continue;
+                if (Modifier.isTransient(field.getModifiers())) continue;
                 Object value = Reflector.get(object, field);
                 if (defaults != null) {
                     Object defaultValue = Reflector.get(defaults, field);
@@ -151,6 +158,13 @@ public class YadsSerializer {
                 else return node(YADS_MAP, NAMED_ARGS, fields);
             }
         }
+    }
+
+    private YMap<Object, Object> serializeMap(Map<?, ?> object) {
+        YMap<Object, Object> result = hm();
+        for (Map.Entry<?, ?> entry : object.entrySet())
+            result.put(serializeImpl(entry.getKey(), null), serializeImpl(entry.getValue(), null));
+        return result;
     }
 
 

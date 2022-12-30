@@ -2,6 +2,7 @@ package yk.lang.yads;
 
 import org.junit.Test;
 import yk.jcommon.collections.YList;
+import yk.jcommon.fastgeom.Vec3f;
 import yk.jcommon.utils.IO;
 
 import java.time.LocalDateTime;
@@ -15,6 +16,11 @@ import static yk.lang.yads.Yads.deserialize;
 import static yk.lang.yads.Yads.serialize;
 
 public class TestYadsSerialization {
+    //TODO ? remove operators ?
+    //  ((a=1) but (a= -1) or won't deserialize)
+    //TODO get rid of commons.lang3
+
+    //TODO Object[], Object[][][], byte[], byte[][][]
     //TODO typed array
     //TODO typed map
     //TODO called constructor for List<String> but we have List<Int>
@@ -23,7 +29,6 @@ public class TestYadsSerialization {
     //TODO custom serializers
     //TODO implement/test array with numbers of different types
     //TODO simple convertions for constructor/function
-    //TODO get rid of commons.lang3
 
     //TODO readme
 
@@ -35,7 +40,6 @@ public class TestYadsSerialization {
 
     @Test
     public void testS12() {
-
         assertS12(al(), "()", "import yk.lang.yads.TestClass ()");
         assertS12(hm(), "(=)", "import yk.lang.yads.TestClass (=)");
         assertS12(hm("a", "b"), "(a=b)", "import yk.lang.yads.TestClass (a = b)");
@@ -95,6 +99,12 @@ public class TestYadsSerialization {
 
         assertException("TestClass(tc2 = 1f)", al("yk.lang.yads.TestClass"),
                 "Error at 1:17, Expected type class yk.lang.yads.TestClass2, but was class java.lang.Float");
+
+        assertEquals("import yk.lang.yads.TestClass\nTestClass()", Yads.serialize(new TestClass().setSomeTransient(5)));
+
+        assertEquals("import yk.jcommon.fastgeom.Vec3f\nVec3f(x=1f y=1f z=1f)", Yads.serialize(Vec3f.v3(1, 1, 1)));
+        assertEquals("import yk.jcommon.fastgeom.Vec3f\nVec3f(x=1f y=1f z= -0.5f)", Yads.serialize(Vec3f.v3(1, 1, -0.5f)));
+        assertS12(al("N--------N--------", "N--------N--------N--------"), "('N--------N--------' 'N--------N--------N--------')");
     }
 
     @Test
@@ -146,6 +156,13 @@ public class TestYadsSerialization {
                 "a=TestClass(tc2=(a=1f b=1f)) b=TestClass(tc2=(a=1f b=1f))",
                 al("yk.lang.yads.TestClass"),
                 "import yk.lang.yads.TestClass a = TestClass(tc2 = (1f)) b = TestClass(tc2 = (1f))");
+
+        assertBodyS12(al(new TestClass().setTc2(new TestClass2(1))),
+                "TestClass(tc2=(a=1f b=1f))",
+                al("yk.lang.yads.TestClass"),
+                "import yk.lang.yads.TestClass TestClass(tc2 = (1f))");
+
+        System.out.println(Yads.serializeBody(al(new TestClass().setTc2(new TestClass2(1)))));
 
         //assertEquals(hm("a", new TestClass().setTc2(new TestClass25(1)), "b", new TestClass().setTc2(new TestClass25(1))),
         //        deserializeBody("a=b c d"));
@@ -305,6 +322,13 @@ public class TestYadsSerialization {
         assertEquals(IO.readResource("formatting.yads").trim(), new NodesToString().withMaxWidth(30).toString(new YadsSerializer(true).serialize(al(new TestHierarchy("key1", "value1", "key2", new TestHierarchy("key3", "value3")), new TestHierarchy("key1", "value1", "key2", new TestHierarchy("key3", "value3"))))));
     }
 
+    @Test
+    public void testYadsNamed() {
+        assertS12(new YadsNamed("mul"), "mul()");
+        assertS12(new YadsNamed("mul").setArray(al("a", "b")), "mul(a b)");
+        assertS12(new YadsNamed("mul").setMap(hm("k", "v")), "mul(k=v)");
+        assertS12(new YadsNamed("mul").setArray(al("a", "b")).setMap(hm("k", "v")), "mul(a b k=v)");
+    }
 
 
 

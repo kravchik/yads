@@ -13,6 +13,7 @@ public class TestClass {
     public List someList3;
     public YHashMap someMap;
     public int someInt;
+    public transient int someTransient;
 
     public TestClass2 tc2;
 
@@ -43,6 +44,11 @@ public class TestClass {
         return this;
     }
 
+    public TestClass setSomeTransient(int someTransient) {
+        this.someTransient = someTransient;
+        return this;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -50,15 +56,15 @@ public class TestClass {
 
         TestClass testClass = (TestClass) o;
 
-        if (someBoolean != testClass.someBoolean) return false;
         if (someInt != testClass.someInt) return false;
+        if (someTransient != testClass.someTransient) return false;
+        if (someBoolean != testClass.someBoolean) return false;
         if (someList != null ? !someList.equals(testClass.someList) : testClass.someList != null) return false;
         if (someList2 != null ? !someList2.equals(testClass.someList2) : testClass.someList2 != null) return false;
         if (someList3 != null ? !someList3.equals(testClass.someList3) : testClass.someList3 != null) return false;
         if (someMap != null ? !someMap.equals(testClass.someMap) : testClass.someMap != null) return false;
         if (tc2 != null ? !tc2.equals(testClass.tc2) : testClass.tc2 != null) return false;
-
-        return true;
+        return tc != null ? tc.equals(testClass.tc) : testClass.tc == null;
     }
 
     @Override
@@ -68,8 +74,10 @@ public class TestClass {
         result = 31 * result + (someList3 != null ? someList3.hashCode() : 0);
         result = 31 * result + (someMap != null ? someMap.hashCode() : 0);
         result = 31 * result + someInt;
+        result = 31 * result + someTransient;
         result = 31 * result + (tc2 != null ? tc2.hashCode() : 0);
         result = 31 * result + (someBoolean ? 1 : 0);
+        result = 31 * result + (tc != null ? tc.hashCode() : 0);
         return result;
     }
 
@@ -81,8 +89,10 @@ public class TestClass {
                 ", someList3=" + someList3 +
                 ", someMap=" + someMap +
                 ", someInt=" + someInt +
+                ", someTransient=" + someTransient +
                 ", tc2=" + tc2 +
                 ", someBoolean=" + someBoolean +
+                ", tc=" + tc +
                 '}';
     }
 }

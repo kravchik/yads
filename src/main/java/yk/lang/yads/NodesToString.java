@@ -66,7 +66,8 @@ public class NodesToString {
                     if (i < 0) i = i + 256;
                     valObj = i;
                 }
-                String space = ((Number) valObj).intValue() < 0 ? " " : "";
+                //TODO fix for other types of number, tests
+                String space = ((Number) valObj).floatValue() < 0 ? " " : "";
                 if (valObj instanceof Float) {
                     String s = valObj.toString();
                     if (s.endsWith(".0")) s = s.substring(0, s.length() - 2);
@@ -123,16 +124,17 @@ public class NodesToString {
         if (value.equals("true")) return false;
         if (value.equals("false")) return false;
 
-        boolean onlySimpleChars = true;
-        for (int i = 0; i < value.length(); i++) {
-            char c = value.charAt(i);
-            if (c < '!' || c == '\\' || c == '"' || c == '\'') return false;
-            if (c > '~') {
-                onlySimpleChars = false;
-                break;
-            }
-        }
-        if (onlySimpleChars) return true;
+//TODO return this fast check
+//        boolean onlySimpleChars = true;
+//        for (int i = 0; i < value.length(); i++) {
+//            char c = value.charAt(i);
+//            if (c < '!' || c == '\\' || c == '"' || c == '\'') return false;
+//            if (c > '~') {
+//                onlySimpleChars = false;
+//                break;
+//            }
+//        }
+//        if (onlySimpleChars) return true;
         try {
             Object would = new YadsParser(new ByteArrayInputStream(value.getBytes("UTF-8"))).parseRawElement();
             if (value.equals(would)) return true;
