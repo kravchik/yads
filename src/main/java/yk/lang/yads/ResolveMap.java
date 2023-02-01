@@ -2,37 +2,36 @@ package yk.lang.yads;
 
 import yk.jcommon.collections.YList;
 import yk.jcommon.collections.YMap;
-import yk.yast.common.YastNode;
 
 import static yk.jcommon.collections.YArrayList.al;
 import static yk.jcommon.collections.YHashMap.hm;
 import static yk.lang.yads.YadsShorts.*;
-import static yk.yast.common.YadsWords.*;
+import static yk.lang.yads.YadsWords.*;
 
 public class ResolveMap {
     private static final String DELIMITER = "=";
 
-    public YastNode resolve(YastNode node) {
+    public YadsNode resolve(YadsNode node) {
         if (!node.isType(YADS_ARRAY) && !node.isType(YADS_RAW_CLASS)) return node;
-        YList<YastNode> values = (YList) node.map.get(ARGS);
+        YList<YadsNode> values = (YList) node.map.get(ARGS);
 
-        YList<YastNode> args = al();
-        YMap<YastNode, YastNode> namedArgs = hm();
-        YastNode left = null;
+        YList<YadsNode> args = al();
+        YMap<YadsNode, YadsNode> namedArgs = hm();
+        YadsNode left = null;
 
         if (values.size() == 1 && DELIMITER.equals(values.get(0).map.get(VALUE))) {
             return node.with(NODE_TYPE, YADS_MAP, ARGS, null, NAMED_ARGS, hm());
         }
 
         for (int i = 0; i < values.size(); i++) {
-            YastNode arg = values.get(i);
+            YadsNode arg = values.get(i);
             //TODO assert starts with delimiter
             //TODO assert ends with delimiter
             //TODO assert several delimiters in a row
             //TODO errors with Caret
             if (DELIMITER.equals(arg.map.get(VALUE))) {
                 if (left != null) {
-                    YastNode value = values.get(++i);
+                    YadsNode value = values.get(++i);
                     namedArgs.put(left, value);
                     left = null;
                     args.remove(args.size() - 1);//remove, it was a key

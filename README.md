@@ -108,7 +108,7 @@ travaller'
 <dependency>
     <groupId>yk</groupId>
     <artifactId>yads</artifactId>
-    <version>0.01</version>
+    <version>0.03</version>
 </dependency>
 ```
 (current dev version is 0.02-SNAPSHOT)

@@ -1,9 +1,8 @@
 package yk.lang.yads;
 
 import org.apache.commons.lang3.text.translate.*;
-import yk.yast.common.YastNode;
 
-import static yk.yast.common.YadsWords.*;
+import static yk.lang.yads.YadsWords.*;
 
 public class YadsShorts {
     //TODO LIST, MAP, COMPLEX(NAME ARGS NAMED_ARGS)
@@ -16,12 +15,12 @@ public class YadsShorts {
 
     public static final String YADS_RAW_CLASS = "YADS_RAW_CLASS";//class with a name, but ":" isn't addressed
 
-    public static YastNode constNode(Caret caret, String type, Object value) {
-        return new YastNode(NODE_TYPE, CONST, TYPE, type, VALUE, value, CARET, caret);
+    public static YadsNode constNode(Caret caret, String type, Object value) {
+        return new YadsNode(NODE_TYPE, CONST, TYPE, type, VALUE, value, CARET, caret);
     }
 
-    public static YastNode constNode(Object value) {
-        return new YastNode(NODE_TYPE, CONST, VALUE, value);
+    public static YadsNode constNode(Object value) {
+        return new YadsNode(NODE_TYPE, CONST, VALUE, value);
     }
 
     //TODO avoid using commons.lang3

@@ -2,7 +2,6 @@ package yk.lang.yads;
 
 import yk.jcommon.collections.YList;
 import yk.jcommon.collections.YMap;
-import yk.yast.common.YastNode;
 
 import java.util.List;
 import java.util.Map;
@@ -22,7 +21,7 @@ public class YadsResolver {
             for (Object o1 : (List)o) result.add(resolve(o1));
             return result;
         }
-        if (o instanceof YastNode) return resolve((YastNode)o);
+        if (o instanceof YadsNode) return resolve((YadsNode)o);
         //if (o instanceof String) {
         //    Optional<Object> optional = resolveConsts.resolve((String) o);
         //    if (optional.isPresent()) return optional.get();
@@ -30,7 +29,7 @@ public class YadsResolver {
         return o;
     }
 
-    public YastNode resolve(YastNode input) {
+    public YadsNode resolve(YadsNode input) {
         YMap newMap = hm();
         for (Map.Entry<String, Object> entry : input.map.entrySet()) {
             newMap.put(resolve(entry.getKey()), resolve(entry.getValue()));

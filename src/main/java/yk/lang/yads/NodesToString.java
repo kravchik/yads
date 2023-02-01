@@ -3,14 +3,13 @@ package yk.lang.yads;
 import yk.jcommon.collections.YList;
 import yk.jcommon.collections.YMap;
 import yk.jcommon.utils.Tab;
-import yk.yast.common.YastNode;
 
 import java.io.ByteArrayInputStream;
 import java.util.Map;
 
 import static yk.jcommon.collections.YArrayList.al;
 import static yk.lang.yads.YadsShorts.*;
-import static yk.yast.common.YadsWords.*;
+import static yk.lang.yads.YadsWords.*;
 
 /**
  * Serializes nodes into a YADS string. Performs formatting: introduces new-lines, adds tabs, tries to avoid unnecessary new-lines where possible.
@@ -20,15 +19,15 @@ public class NodesToString {
     private int maxWidth = 100;
     private Tab tab = new Tab("  ");
 
-    public String toString(YList<YastNode> nodes) {
+    public String toString(YList<YadsNode> nodes) {
         return nodes.map(n -> toString(0, n).toString("\n")).toString("\n");
     }
 
-    public String toStringBody(YastNode nodes) {
+    public String toStringBody(YadsNode nodes) {
         YList<String> result = al();
-        YList<YastNode> args = nodes.getNodeList(ARGS);
-        YList<YastNode> imports = args.filter(n -> n.isType(IMPORT));
-        YList<YastNode> other = args.filter(n -> !n.isType(IMPORT));
+        YList<YadsNode> args = nodes.getNodeList(ARGS);
+        YList<YadsNode> imports = args.filter(n -> n.isType(IMPORT));
+        YList<YadsNode> other = args.filter(n -> !n.isType(IMPORT));
         nodes = nodes.with(ARGS, other);
         boolean possibleCompact = toStringBody(nodes, result);
         if (possibleCompact) result = compact(0, result);
@@ -36,13 +35,13 @@ public class NodesToString {
         return (si.equals("") ? "" : (si + "\n")) + result.toString("\n");
     }
 
-    private String addListAndCompact(YList<YastNode> nn) {
+    private String addListAndCompact(YList<YadsNode> nn) {
         YList<String> result = al();
         if (addList(nn, result)) result = compact(0, result);
         return result.toString("\n");
     }
 
-    public YList<String> toString(int width, YastNode node) {
+    public YList<String> toString(int width, YadsNode node) {
         if (node.isType(IMPORT)) {
             return al(tab + "import " + node.getString(VALUE));
         }
@@ -95,7 +94,7 @@ public class NodesToString {
         }
 
         if (node.isType(YADS_ARRAY)) {
-            YList<YastNode> nodes = node.getNodeList(ARGS);
+            YList<YadsNode> nodes = node.getNodeList(ARGS);
             YList<String> result = al();
             result.add("(");
             tab.inc();
@@ -107,7 +106,7 @@ public class NodesToString {
         }
 
         if (node.isType(YADS_MAP)) {
-            YMap<YastNode, YastNode> nodes = (YMap) node.map.get(NAMED_ARGS);
+            YMap<YadsNode, YadsNode> nodes = (YMap) node.map.get(NAMED_ARGS);
             if (nodes.isEmpty()) return al("(=)");
             return toStringMap(width, node, "(");
         }
@@ -142,7 +141,7 @@ public class NodesToString {
         return false;
     }
 
-    private YList<String> toStringMap(int width, YastNode node, String classPrefix) {
+    private YList<String> toStringMap(int width, YadsNode node, String classPrefix) {
         YList<String> result = classPrefix == null ? al() : al(classPrefix);
         tab.inc();
         boolean possibleMerge = toStringBody(node, result);
@@ -152,17 +151,17 @@ public class NodesToString {
         return result;
     }
 
-    private boolean toStringBody(YastNode node, YList<String> result) {
-        YMap<YastNode, YastNode> nodes = (YMap<YastNode, YastNode>) node.map.get(NAMED_ARGS);
+    private boolean toStringBody(YadsNode node, YList<String> result) {
+        YMap<YadsNode, YadsNode> nodes = (YMap<YadsNode, YadsNode>) node.map.get(NAMED_ARGS);
         boolean possibleMerge = true;
         if (node.map.get(ARGS) != null) possibleMerge = addList(node.getNodeList(ARGS), result);
         if (node.map.get(NAMED_ARGS) != null) possibleMerge &= addMap(nodes, result);
         return possibleMerge;
     }
 
-    private boolean addList(YList<YastNode> nodes, YList<String> result) {
+    private boolean addList(YList<YadsNode> nodes, YList<String> result) {
         boolean possibleMerge = true;
-        for (YastNode n : nodes) {
+        for (YadsNode n : nodes) {
             YList<String> children = toString(tab.toString().length(), n);
             if (children.size() > 1) possibleMerge = false;
 
@@ -172,9 +171,9 @@ public class NodesToString {
         return possibleMerge;
     }
 
-    private boolean addMap(YMap<YastNode, YastNode> nodes, YList<String> result) {
+    private boolean addMap(YMap<YadsNode, YadsNode> nodes, YList<String> result) {
         boolean possibleMerge = true;
-        for (Map.Entry<YastNode, YastNode> entry : nodes.entrySet()) {
+        for (Map.Entry<YadsNode, YadsNode> entry : nodes.entrySet()) {
             YList<String> key = toString(0, entry.getKey());
             if (key.size() != 1) throw new RuntimeException("Unexpected key: " + key);
             String keyPrefix = key.first() + "=";

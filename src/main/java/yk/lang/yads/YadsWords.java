@@ -1,4 +1,4 @@
-package yk.yast.common;
+package yk.lang.yads;
 
 import yk.jcommon.collections.YList;
 import yk.jcommon.utils.Reflector;
@@ -18,7 +18,7 @@ public class YadsWords {
     public static final String IMPORT = "IMPORT";                               //IMPORT
 
     public static final String TYPE = "TYPE";
-    public static final String ARGS = "ARGS";//TODO either ARGS/PARAMS or ARGUMENTS/PARAMETERS
+    public static final String ARGS = "ARGS";
     public static final String NAMED_ARGS = "NAMED_ARGS";
     public static final String LEFT = "LEFT";
     public static final String REF = "REF";

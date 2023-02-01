@@ -2,13 +2,12 @@ package yk.lang.yads;
 
 import yk.jcommon.collections.YList;
 import yk.jcommon.collections.YMap;
-import yk.yast.common.YastNode;
 
 import java.io.InputStream;
 
 import static yk.jcommon.collections.YArrayList.al;
-import static yk.yast.common.YadsWords.ARGS;
-import static yk.yast.common.YadsWords.NAMED_ARGS;
+import static yk.lang.yads.YadsWords.ARGS;
+import static yk.lang.yads.YadsWords.NAMED_ARGS;
 
 //TODO define default imports as classes instead of strings
 //TODO separate methods for serialize serializeFormatted ?
@@ -65,7 +64,7 @@ public class Yads {
         deserializer.namespaces.enterScope();
         for (String i : imports) deserializer.namespaces.addClass(i);
 
-        YastNode parse = YadsParser.parse(text);
+        YadsNode parse = YadsParser.parse(text);
         return deserializeTheOnlyElement(deserializer, new YadsResolver().resolve(parse));
     }
 
@@ -74,7 +73,7 @@ public class Yads {
     //TODO tests
     public static Object deserialize(YList<String> imports, InputStream is) {
 
-        YastNode result;
+        YadsNode result;
         try {
             result = new YadsParser(is).parseListBodyNode();
         } catch (ParseException e) {
@@ -88,12 +87,12 @@ public class Yads {
     }
 
     public static Object deserializeBody(String text) {
-        YastNode parsed = YadsParser.parse(text);
+        YadsNode parsed = YadsParser.parse(text);
         return new YadsDeserializer().deserializeSpecificType(null, new YadsResolver().resolve(parsed));
     }
 
     public static <T> T deserializeBody(Class<T> type, String text) {
-        YastNode parsed = YadsParser.parse(text);
+        YadsNode parsed = YadsParser.parse(text);
         return new YadsDeserializer().deserializeSpecificType(type, new YadsResolver().resolve(parsed));
     }
 
@@ -105,7 +104,7 @@ public class Yads {
         YadsDeserializer deserializer = new YadsDeserializer();
         deserializer.namespaces.enterScope();
         for (String i : imports) deserializer.namespaces.addClass(i);
-        YastNode parsed = YadsParser.parse(text);
+        YadsNode parsed = YadsParser.parse(text);
         return deserializer.deserializeSpecificType(type, new YadsResolver().resolve(parsed));
     }
 
@@ -181,7 +180,7 @@ public class Yads {
         return new NodesToString().toStringBody(new YadsSerializer().serializeBody(someObject));
     }
 
-    private static Object deserializeTheOnlyElement(YadsDeserializer des, YastNode node) {
+    private static Object deserializeTheOnlyElement(YadsDeserializer des, YadsNode node) {
         try {
             if (null != node.map.get(NAMED_ARGS)) throw new RuntimeException("Unexpected named arg at top level");
             YList result = des.deserializeRawList(node.getNodeList(ARGS));

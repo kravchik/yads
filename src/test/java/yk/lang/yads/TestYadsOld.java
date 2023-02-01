@@ -1,7 +1,6 @@
 package yk.lang.yads;
 
 import org.junit.Test;
-import yk.yast.common.YastNode;
 
 import java.util.Map;
 
@@ -13,7 +12,7 @@ import static yk.jcommon.collections.YArrayList.toYList;
 import static yk.jcommon.collections.YHashMap.hm;
 import static yk.lang.yads.YadsShorts.YADS_ARRAY;
 import static yk.lang.yads.YadsShorts.YADS_MAP;
-import static yk.yast.common.YadsWords.*;
+import static yk.lang.yads.YadsWords.*;
 
 /**
  * Created with IntelliJ IDEA.
@@ -25,13 +24,13 @@ public class TestYadsOld {//TODO restore
 
     //@Test
     public void yast() {
-        assertEqualNodes(new YastNode(NODE_TYPE, YADS_ARRAY, ARGS, al(), CARET, new Caret(1, 1, 1, 2)), YadsParser.parse("(1 + 2)"));
+        assertEqualNodes(new YadsNode(NODE_TYPE, YADS_ARRAY, ARGS, al(), CARET, new Caret(1, 1, 1, 2)), YadsParser.parse("(1 + 2)"));
 
-        assertEqualNodes(new YastNode(NODE_TYPE, YADS_ARRAY, ARGS, al(), CARET, new Caret(1, 1, 1, 2)), YadsParser.parse("()"));
-        assertEqualNodes(new YastNode(NODE_TYPE, YADS_MAP, NAMED_ARGS, hm(), CARET, new Caret(1, 1, 1, 3)), YadsParser.parse("(:)"));
+        assertEqualNodes(new YadsNode(NODE_TYPE, YADS_ARRAY, ARGS, al(), CARET, new Caret(1, 1, 1, 2)), YadsParser.parse("()"));
+        assertEqualNodes(new YadsNode(NODE_TYPE, YADS_MAP, NAMED_ARGS, hm(), CARET, new Caret(1, 1, 1, 3)), YadsParser.parse("(:)"));
     }
 
-    public static void assertEqualNodes(YastNode expected, YastNode actual) {
+    public static void assertEqualNodes(YadsNode expected, YadsNode actual) {
         //TODO assert nodes hierarchically
         //TODO assert maps inclusive
         //TODO use pattern matching!!!

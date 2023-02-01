@@ -1,12 +1,14 @@
-package yk.yast.common;
+package yk.lang.yads;
 
 import yk.jcommon.collections.YList;
 import yk.jcommon.collections.YMap;
 import yk.jcommon.utils.BadException;
 
+import java.util.List;
+
 import static yk.jcommon.collections.YArrayList.al;
 import static yk.jcommon.collections.YHashMap.hm;
-import static yk.yast.common.YadsWords.*;
+import static yk.lang.yads.YadsWords.*;
 
 /**
  * Created with IntelliJ IDEA.
@@ -14,14 +16,14 @@ import static yk.yast.common.YadsWords.*;
  * Date: 30/08/16
  * Time: 17:54
  */
-public class YastNode {//TODO rename YadsNode
+public class YadsNode {
     public static long NEXT_ID;
     public final long id;
     public YMap<String, Object> map;
 
-    public static YastNode node(String type, String k, Object v, Object... kv) {
+    public static YadsNode node(String type, String k, Object v, Object... kv) {
         if ((kv.length % 2) != 0) BadException.die("Expected even count");
-        YastNode result = new YastNode();
+        YadsNode result = new YadsNode();
         result.map = hm();
         result.map.put(NODE_TYPE, type);
         if (v != null) result.map.put(k, v);
@@ -29,8 +31,8 @@ public class YastNode {//TODO rename YadsNode
         return result;
     }
 
-    public static YastNode node(String type) {
-        YastNode result = new YastNode();
+    public static YadsNode node(String type) {
+        YadsNode result = new YadsNode();
         result.map = hm();
         result.map.put(NODE_TYPE, type);
         return result;
@@ -40,34 +42,34 @@ public class YastNode {//TODO rename YadsNode
         return t.equals(map.get(NODE_TYPE));
     }
 
-    private YastNode() {
+    private YadsNode() {
         id = NEXT_ID++;
     }
 
-    public YastNode(String k, Object v, Object... kv) {
+    public YadsNode(String k, Object v, Object... kv) {
         id = NEXT_ID++;
         map = hm(k, v, kv);
     }
 
-    public YastNode(long id, YMap<String, Object> map) {
+    public YadsNode(long id, YMap<String, Object> map) {
         this.id = id;
         this.map = map;
     }
 
-    public YastNode(long id) {
+    public YadsNode(long id) {
         this.id = id;
     }
 
-    public YastNode with(String k, Object v, Object... kv) {
-        return new YastNode(id, map.with(k, v, kv));
+    public YadsNode with(String k, Object v, Object... kv) {
+        return new YadsNode(id, map.with(k, v, kv));
     }
 
-    public YastNode without(String... kk) {
-        return new YastNode(id, map.without(al(kk)));
+    public YadsNode without(String... kk) {
+        return new YadsNode(id, map.without(al(kk)));
     }
 
-    public YastNode withRearrange(String k, Object v, Object... kv) {
-        YastNode result = new YastNode(id, map);
+    public YadsNode withRearrange(String k, Object v, Object... kv) {
+        YadsNode result = new YadsNode(id, map);
         result.map.remove(k);
         result.map.put(k, v);
         for (int i = 0; i < kv.length; i += 2) result.map.remove(kv[i]);
@@ -75,8 +77,8 @@ public class YastNode {//TODO rename YadsNode
         return result;
     }
 
-    public YastNode with(YMap other) {
-        return new YastNode(id, map.with(other));
+    public YadsNode with(YMap other) {
+        return new YadsNode(id, map.with(other));
     }
 
     @Override
@@ -104,27 +106,27 @@ public class YastNode {//TODO rename YadsNode
         return (String) getLast(nn);
     }
 
-    public YastNode getNode(String name) {
-        return (YastNode) map.get(name);
+    public YadsNode getNode(String name) {
+        return (YadsNode) map.get(name);
     }
 
-    public YastNode getNode(String... nn) {
-        return (YastNode) getLast(nn);
+    public YadsNode getNode(String... nn) {
+        return (YadsNode) getLast(nn);
     }
 
     private Object getLast(String... nn) {
-        YastNode result = this;
+        YadsNode result = this;
         for (int i = 0; i < nn.length - 1; i++) {
             String n = nn[i];
             Object cur = result.map.get(n);
-            if (!(cur instanceof YastNode)) return null;
-            result = (YastNode) cur;
+            if (!(cur instanceof YadsNode)) return null;
+            result = (YadsNode) cur;
         }
         return result.map.get(nn[nn.length - 1]);
     }
 
-    public YList<YastNode> getNodeList(String... namesPath) {
-        return (YList<YastNode>) getLast(namesPath);
+    public YList<YadsNode> getNodeList(String... namesPath) {
+        return (YList<YadsNode>) getLast(namesPath);
     }
 
     public boolean getBoolean(String key) {
@@ -146,10 +148,10 @@ public class YastNode {//TODO rename YadsNode
         return (Integer)map.get(name);
     }
 
-    public static YastNode ref(String name) {
+    public static YadsNode ref(String name) {
         return node(REF, NAME, name);
     }
-    public static YastNode dot(Object left, String right) {
+    public static YadsNode dot(Object left, String right) {
         if (right == null) {
             BadException.shouldNeverReachHere();
         }
@@ -161,7 +163,8 @@ public class YastNode {//TODO rename YadsNode
     }
 
     public boolean hasNotEmptyList(String key) {
-        return !isAbsent(key);
+        Object value = map.get(key);
+        return value != null && !((List)value).isEmpty();
     }
 
     public boolean isAbsent(String key) {
