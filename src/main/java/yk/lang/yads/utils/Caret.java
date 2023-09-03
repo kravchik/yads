@@ -1,4 +1,6 @@
-package yk.lang.yads;
+package yk.lang.yads.utils;
+
+import yk.lang.yads.JavaCharStream;
 
 public class Caret {
 

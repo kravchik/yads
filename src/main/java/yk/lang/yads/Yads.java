@@ -5,8 +5,8 @@ import yk.ycollections.YMap;
 
 import java.io.InputStream;
 
-import static yk.lang.yads.YadsWords.ARGS;
-import static yk.lang.yads.YadsWords.NAMED_ARGS;
+import static yk.lang.yads.utils.YadsWords.ARGS;
+import static yk.lang.yads.utils.YadsWords.NAMED_ARGS;
 import static yk.ycollections.YArrayList.al;
 
 //TODO define default imports as classes instead of strings

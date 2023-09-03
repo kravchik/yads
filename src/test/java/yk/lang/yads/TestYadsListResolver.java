@@ -4,7 +4,7 @@ import org.junit.Test;
 
 import static junit.framework.TestCase.assertEquals;
 import static org.junit.Assert.fail;
-import static yk.lang.yads.YadsWords.ARGS;
+import static yk.lang.yads.utils.YadsWords.ARGS;
 
 public class TestYadsListResolver {
 

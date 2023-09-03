@@ -6,14 +6,13 @@ options {
 PARSER_BEGIN(YadsNodeParser)
 
 package yk.lang.yads;
-import yk.ycollections.YList;
+import yk.lang.yads.utils.Caret;import yk.ycollections.YList;
 
 import java.io.ByteArrayInputStream;
 import java.nio.charset.StandardCharsets;
 
 import static yk.ycollections.YArrayList.al;
-import static yk.lang.yads.YadsUtils.*;
-import static yk.lang.yads.YadsWords.*;
+import static yk.lang.yads.utils.YadsWords.*;
 
 public class YadsNodeParser {
     public static YadsNode parse(String s) {
@@ -36,6 +35,9 @@ public class YadsNodeParser {
         caret.setEnd(jj_input_stream);
         target.map.put(CARET, caret);
     }
+}}
+}}
+}}
 }
 
 PARSER_END(YadsNodeParser)

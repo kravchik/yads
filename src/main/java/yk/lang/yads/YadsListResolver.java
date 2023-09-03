@@ -5,8 +5,8 @@ import yk.ycollections.Tuple;
 import yk.ycollections.YList;
 
 import static yk.lang.yads.YadsNodeResolver.DELIMITER;
-import static yk.lang.yads.YadsWords.*;
 import static yk.lang.yads.utils.BadException.die;
+import static yk.lang.yads.utils.YadsWords.*;
 import static yk.ycollections.YArrayList.al;
 
 public class YadsListResolver {

@@ -1,6 +1,7 @@
 package yk.lang.yads;
 
 import yk.lang.yads.utils.Tab;
+import yk.lang.yads.utils.YadsUtils;
 import yk.ycollections.YList;
 import yk.ycollections.YMap;
 
@@ -8,7 +9,7 @@ import java.io.ByteArrayInputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.Map;
 
-import static yk.lang.yads.YadsWords.*;
+import static yk.lang.yads.utils.YadsWords.*;
 import static yk.ycollections.YArrayList.al;
 
 /**

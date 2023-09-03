@@ -1,6 +1,5 @@
-package yk.lang.yads;
+package yk.lang.yads.utils;
 
-import yk.lang.yads.utils.Reflector;
 import yk.ycollections.YList;
 
 import java.lang.reflect.Field;

@@ -1,10 +1,11 @@
-package yk.lang.yads;
+package yk.lang.yads.utils;
 
+import yk.lang.yads.YadsNode;
 import yk.ycollections.YSet;
 
 import java.io.StringWriter;
 
-import static yk.lang.yads.YadsWords.*;
+import static yk.lang.yads.utils.YadsWords.*;
 import static yk.ycollections.YHashSet.hs;
 
 public class YadsUtils {

@@ -1,13 +1,14 @@
 package yk.lang.yads;
 
 import org.junit.Test;
+import yk.lang.yads.utils.Caret;
 
 import java.util.Map;
 
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.TestCase.assertTrue;
 import static junit.framework.TestCase.fail;
-import static yk.lang.yads.YadsWords.*;
+import static yk.lang.yads.utils.YadsWords.*;
 import static yk.ycollections.YArrayList.al;
 import static yk.ycollections.YArrayList.toYList;
 import static yk.ycollections.YHashMap.hm;
