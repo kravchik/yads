@@ -1,10 +1,10 @@
 package yk.lang.yads;
 
-import yk.jcommon.collections.Tuple;
-import yk.jcommon.collections.YList;
 import yk.lang.yads.utils.BadException;
+import yk.ycollections.Tuple;
+import yk.ycollections.YList;
 
-import static yk.jcommon.collections.YArrayList.al;
+import static yk.ycollections.YArrayList.al;
 
 @SuppressWarnings("rawtypes")
 public class YadsListOutput {

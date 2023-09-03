@@ -1,18 +1,18 @@
 package yk.lang.yads;
 
 import org.junit.Test;
-import yk.jcommon.collections.YList;
+import yk.ycollections.YList;
 
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 
 import static org.junit.Assert.*;
-import static yk.jcommon.collections.YArrayList.al;
-import static yk.jcommon.collections.YHashMap.hm;
 import static yk.lang.yads.TestYadsListOutput.readResource;
 import static yk.lang.yads.Yads.deserialize;
 import static yk.lang.yads.Yads.serialize;
+import static yk.ycollections.YArrayList.al;
+import static yk.ycollections.YHashMap.hm;
 
 public class TestYadsSerialization {
     //TODO ? remove operators ?

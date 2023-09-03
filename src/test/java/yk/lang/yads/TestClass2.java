@@ -1,11 +1,10 @@
 package yk.lang.yads;
 
-import yk.jcommon.collections.YList;
+import yk.ycollections.YList;
 
 import java.util.List;
 
-import static yk.jcommon.collections.YArrayList.al;
-import static yk.jcommon.collections.YArrayList.toYList;
+import static yk.ycollections.YArrayList.toYList;
 
 public class TestClass2 {
 

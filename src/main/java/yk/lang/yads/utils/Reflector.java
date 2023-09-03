@@ -1,14 +1,14 @@
 package yk.lang.yads.utils;
 
 import sun.reflect.ReflectionFactory;
-import yk.jcommon.collections.YList;
-import yk.jcommon.collections.YMap;
+import yk.ycollections.YList;
+import yk.ycollections.YMap;
 
 import java.lang.reflect.*;
 import java.util.*;
 
-import static yk.jcommon.collections.YArrayList.al;
-import static yk.jcommon.collections.YHashMap.hm;
+import static yk.ycollections.YArrayList.al;
+import static yk.ycollections.YHashMap.hm;
 
 /**
  * Created with IntelliJ IDEA.

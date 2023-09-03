@@ -1,7 +1,7 @@
 package yk.lang.yads;
 
-import yk.jcommon.collections.YList;
 import yk.lang.yads.utils.Reflector;
+import yk.ycollections.YList;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;

@@ -77,8 +77,8 @@
         </dependency>
         <dependency>
             <groupId>yk</groupId>
-            <artifactId>jcommon</artifactId>
-            <version>0.124</version>
+            <artifactId>ycollections</artifactId>
+            <version>0.2</version>
         </dependency>
     </dependencies>
 

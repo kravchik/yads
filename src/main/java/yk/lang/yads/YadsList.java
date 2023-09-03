@@ -1,6 +1,6 @@
 package yk.lang.yads;
 
-import yk.jcommon.collections.YList;
+import yk.ycollections.YList;
 
 public class YadsList {
     //can be null

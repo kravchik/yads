@@ -1,8 +1,8 @@
 package yk.lang.yads;
 
 import org.junit.Test;
-import yk.jcommon.collections.Tuple;
 import yk.lang.yads.utils.BadException;
+import yk.ycollections.Tuple;
 
 import java.io.BufferedReader;
 import java.io.IOException;

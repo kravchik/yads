@@ -1,7 +1,7 @@
 package yk.lang.yads;
 
-import yk.jcommon.collections.*;
 import yk.lang.yads.utils.Reflector;
+import yk.ycollections.*;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
@@ -9,10 +9,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import static yk.jcommon.collections.YArrayList.al;
-import static yk.jcommon.collections.YHashMap.hm;
-import static yk.jcommon.collections.YHashSet.hs;
 import static yk.lang.yads.YadsWords.*;
+import static yk.ycollections.YArrayList.al;
+import static yk.ycollections.YHashMap.hm;
+import static yk.ycollections.YHashSet.hs;
 
 //YadsNode -> objects
 public class YadsObjectDeserializer {

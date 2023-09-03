@@ -1,8 +1,8 @@
 package yk.lang.yads;
 
-import yk.jcommon.collections.YArrayList;
-import yk.jcommon.collections.YHashMap;
-import yk.jcommon.collections.YList;
+import yk.ycollections.YArrayList;
+import yk.ycollections.YHashMap;
+import yk.ycollections.YList;
 
 import java.util.List;
 

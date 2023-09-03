@@ -7,10 +7,10 @@ import java.util.Map;
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.TestCase.assertTrue;
 import static junit.framework.TestCase.fail;
-import static yk.jcommon.collections.YArrayList.al;
-import static yk.jcommon.collections.YArrayList.toYList;
-import static yk.jcommon.collections.YHashMap.hm;
 import static yk.lang.yads.YadsWords.*;
+import static yk.ycollections.YArrayList.al;
+import static yk.ycollections.YArrayList.toYList;
+import static yk.ycollections.YHashMap.hm;
 
 /**
  * Created with IntelliJ IDEA.
@@ -138,7 +138,7 @@ public class TestYadsOld {//TODO restore
     //        assertEquals(new TestClass(al(1, 2), hm("key1", "value1", "key2", "value2"), 3), YadsObjectSerializer.deserializeClassBody(TestClass.class, "someList=1, 2 someMap=hello someInt=3"));
     //        fail();
     //    } catch (BadException ignore) {
-    //        assertEquals("found instance hello of class class java.lang.String but expected object of class yk.jcommon.collections.YHashMap", ignore.getMessage());
+    //        assertEquals("found instance hello of class class java.lang.String but expected object of class yk.ycollections.YHashMap", ignore.getMessage());
     //    }
     //
     //    TestClass tc = new TestClass();

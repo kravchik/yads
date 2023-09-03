@@ -1,13 +1,13 @@
 package yk.lang.yads;
 
-import yk.jcommon.collections.YList;
-import yk.jcommon.collections.YMap;
+import yk.ycollections.YList;
+import yk.ycollections.YMap;
 
 import java.io.InputStream;
 
-import static yk.jcommon.collections.YArrayList.al;
 import static yk.lang.yads.YadsWords.ARGS;
 import static yk.lang.yads.YadsWords.NAMED_ARGS;
+import static yk.ycollections.YArrayList.al;
 
 //TODO define default imports as classes instead of strings
 //TODO separate methods for serialize serializeFormatted ?

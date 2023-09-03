@@ -1,14 +1,14 @@
 package yk.lang.yads;
 
-import yk.jcommon.collections.YList;
-import yk.jcommon.collections.YMap;
+import yk.ycollections.YList;
+import yk.ycollections.YMap;
 
 import java.util.List;
 import java.util.Map;
 
-import static yk.jcommon.collections.YArrayList.al;
-import static yk.jcommon.collections.YHashMap.hm;
 import static yk.lang.yads.YadsWords.*;
+import static yk.ycollections.YArrayList.al;
+import static yk.ycollections.YHashMap.hm;
 
 public class YadsNodeResolver {
     public static final String DELIMITER = "=";

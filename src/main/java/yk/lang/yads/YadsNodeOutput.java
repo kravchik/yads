@@ -1,15 +1,15 @@
 package yk.lang.yads;
 
-import yk.jcommon.collections.YList;
-import yk.jcommon.collections.YMap;
 import yk.lang.yads.utils.Tab;
+import yk.ycollections.YList;
+import yk.ycollections.YMap;
 
 import java.io.ByteArrayInputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.Map;
 
-import static yk.jcommon.collections.YArrayList.al;
 import static yk.lang.yads.YadsWords.*;
+import static yk.ycollections.YArrayList.al;
 
 /**
  * Serializes nodes into a YADS string. Performs formatting: introduces new-lines, adds tabs, tries to avoid unnecessary new-lines where possible.
