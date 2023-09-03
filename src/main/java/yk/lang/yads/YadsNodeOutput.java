@@ -2,7 +2,7 @@ package yk.lang.yads;
 
 import yk.jcommon.collections.YList;
 import yk.jcommon.collections.YMap;
-import yk.jcommon.utils.Tab;
+import yk.lang.yads.utils.Tab;
 
 import java.io.ByteArrayInputStream;
 import java.nio.charset.StandardCharsets;

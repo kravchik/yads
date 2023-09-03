@@ -2,12 +2,12 @@ package yk.lang.yads;
 
 import yk.jcommon.collections.Tuple;
 import yk.jcommon.collections.YList;
-import yk.jcommon.utils.BadException;
+import yk.lang.yads.utils.BadException;
 
 import static yk.jcommon.collections.YArrayList.al;
-import static yk.jcommon.utils.BadException.die;
 import static yk.lang.yads.YadsNodeResolver.DELIMITER;
 import static yk.lang.yads.YadsWords.*;
+import static yk.lang.yads.utils.BadException.die;
 
 public class YadsListResolver {
     public static Object toYadsList(YadsNode node) {

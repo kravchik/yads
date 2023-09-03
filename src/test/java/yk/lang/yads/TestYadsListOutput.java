@@ -2,15 +2,19 @@ package yk.lang.yads;
 
 import org.junit.Test;
 import yk.jcommon.collections.Tuple;
-import yk.jcommon.utils.BadException;
-import yk.jcommon.utils.IO;
+import yk.lang.yads.utils.BadException;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 
 import static junit.framework.TestCase.assertEquals;
 
 public class TestYadsListOutput {
     @Test
     public void test1() {
-        YadsList yl = Yads.parseYadsListBody(IO.readResource("formatting.cases.yads"));
+        YadsList yl = Yads.parseYadsListBody(readResource("formatting.cases.yads"));
         int maxWidth = 100;
         for (Object o : yl.children) {
             if (o instanceof Tuple) {
@@ -23,4 +27,31 @@ public class TestYadsListOutput {
             }
         }
     }
+
+    public static String readResource(String path) {
+        String content = resourceAsString(path);
+        if (content == null) {
+            throw BadException.die("File " + path + " not found");
+        }
+        return content;
+    }
+    public static String resourceAsString(String name) {
+        return streamToString(resourceAsStream(name));
+    }
+    public static InputStream resourceAsStream(String name) {
+        return TestYadsListOutput.class.getClassLoader().getResourceAsStream(name);
+    }
+    public static String streamToString(InputStream in) {
+        if (in == null) return null;
+        BufferedReader br = new BufferedReader(new InputStreamReader(in));
+        String l;
+        StringBuilder sb = new StringBuilder();
+        try {
+            while((l = br.readLine()) != null) sb.append(l).append("\n");
+            return sb.toString();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
 }

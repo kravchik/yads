@@ -2,10 +2,9 @@ package yk.lang.yads;
 
 import yk.jcommon.collections.Tuple;
 import yk.jcommon.collections.YList;
-import yk.jcommon.utils.BadException;
+import yk.lang.yads.utils.BadException;
 
 import static yk.jcommon.collections.YArrayList.al;
-import static yk.jcommon.utils.MyMath.max;
 
 @SuppressWarnings("rawtypes")
 public class YadsListOutput {
@@ -56,7 +55,7 @@ public class YadsListOutput {
             else commonLength += childStrings.first().length();
         }
         if (tryCompact) {
-            int possibleLen = commonLength + l1.length() + ln.length() + max(0, (cc.size() - 1)) + startAt;
+            int possibleLen = commonLength + l1.length() + ln.length() + Math.max(0, (cc.size() - 1)) + startAt;
             if (possibleLen <= maxWidth) return al(l1 + cc.toString(" ") + ln);
         }
         return al(l1).withAll(cc.map(c -> inc + c)).with(ln);

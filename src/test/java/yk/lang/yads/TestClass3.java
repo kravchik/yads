@@ -1,7 +1,5 @@
 package yk.lang.yads;
 
-import yk.jcommon.fastgeom.Vec2f;
-
 public class TestClass3 {
     public Vec2f pos;
 

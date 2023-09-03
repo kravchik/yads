@@ -2,8 +2,6 @@ package yk.lang.yads;
 
 import org.junit.Test;
 import yk.jcommon.collections.YList;
-import yk.jcommon.fastgeom.Vec3f;
-import yk.jcommon.utils.IO;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -12,6 +10,7 @@ import java.util.Map;
 import static org.junit.Assert.*;
 import static yk.jcommon.collections.YArrayList.al;
 import static yk.jcommon.collections.YHashMap.hm;
+import static yk.lang.yads.TestYadsListOutput.readResource;
 import static yk.lang.yads.Yads.deserialize;
 import static yk.lang.yads.Yads.serialize;
 
@@ -102,8 +101,8 @@ public class TestYadsSerialization {
 
         assertEquals("import yk.lang.yads.TestClass\nTestClass()", Yads.serialize(new TestClass().setSomeTransient(5)));
 
-        assertEquals("import yk.jcommon.fastgeom.Vec3f\nVec3f(x=1f y=1f z=1f)", Yads.serialize(Vec3f.v3(1, 1, 1)));
-        assertEquals("import yk.jcommon.fastgeom.Vec3f\nVec3f(x=1f y=1f z= -0.5f)", Yads.serialize(Vec3f.v3(1, 1, -0.5f)));
+        assertEquals("import yk.lang.yads.Vec2f\nVec2f(x=1f y=1f)", Yads.serialize(Vec2f.v2(1, 1)));
+        assertEquals("import yk.lang.yads.Vec2f\nVec2f(x=1f y= -0.5f)", Yads.serialize(Vec2f.v2(1, -0.5f)));
         assertS12(al("N--------N--------", "N--------N--------N--------"), "('N--------N--------' 'N--------N--------N--------')");
     }
 
@@ -322,7 +321,7 @@ public class TestYadsSerialization {
 
     @Test
     public void testTabs() {
-        assertEquals(IO.readResource("formatting.yads").trim(), new YadsNodeOutput().withMaxWidth(30).toString(new YadsObjectSerializer(true).serialize(al(new TestHierarchy("key1", "value1", "key2", new TestHierarchy("key3", "value3")), new TestHierarchy("key1", "value1", "key2", new TestHierarchy("key3", "value3"))))));
+        assertEquals(readResource("formatting.yads").trim(), new YadsNodeOutput().withMaxWidth(30).toString(new YadsObjectSerializer(true).serialize(al(new TestHierarchy("key1", "value1", "key2", new TestHierarchy("key3", "value3")), new TestHierarchy("key1", "value1", "key2", new TestHierarchy("key3", "value3"))))));
     }
 
     private static void assertRefInPrint(Object a, boolean haveRef, boolean exact) {

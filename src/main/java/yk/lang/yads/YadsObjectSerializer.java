@@ -4,7 +4,7 @@ import yk.jcommon.collections.Tuple;
 import yk.jcommon.collections.YList;
 import yk.jcommon.collections.YMap;
 import yk.jcommon.collections.YSet;
-import yk.jcommon.utils.Reflector;
+import yk.lang.yads.utils.Reflector;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
@@ -14,10 +14,11 @@ import static yk.jcommon.collections.YArrayList.al;
 import static yk.jcommon.collections.YArrayList.toYList;
 import static yk.jcommon.collections.YHashMap.hm;
 import static yk.jcommon.collections.YHashSet.hs;
-import static yk.jcommon.utils.Reflector.newInstanceArgless;
 import static yk.lang.yads.YadsNode.node;
 import static yk.lang.yads.YadsUtils.constNode;
 import static yk.lang.yads.YadsWords.*;
+import static yk.lang.yads.utils.Reflector.newInstanceArgless;
+
 //objects -> YadsNode
 public class YadsObjectSerializer {
     private YSet<String> imports = hs();

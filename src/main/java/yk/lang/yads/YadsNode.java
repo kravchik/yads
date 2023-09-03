@@ -2,7 +2,7 @@ package yk.lang.yads;
 
 import yk.jcommon.collections.YList;
 import yk.jcommon.collections.YMap;
-import yk.jcommon.utils.BadException;
+import yk.lang.yads.utils.BadException;
 
 import java.util.List;
 

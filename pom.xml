@@ -46,21 +46,6 @@
             </plugin>
 
             <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-source-plugin</artifactId>
-                <version>2.2.1</version>
-                <executions>
-                    <execution>
-                        <id>attach-sources</id>
-                        <phase>verify</phase>
-                        <goals>
-                            <goal>jar-no-fork</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-
-            <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>javacc-maven-plugin</artifactId>
                 <version>2.6</version>
@@ -79,19 +64,6 @@
             </plugin>
 
         </plugins>
-
-        <resources>
-            <resource>
-                <directory>src/main/resources</directory>
-                <!--<filtering>true</filtering>-->
-            </resource>
-        </resources>
-        <testResources>
-            <testResource>
-                <directory>src/test/resources</directory>
-                <!--<filtering>true</filtering>-->
-            </testResource>
-        </testResources>
     </build>
 
     <dependencies>
@@ -100,13 +72,13 @@
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
             <version>4.13.1</version>
-            <optional>true</optional>
             <scope>test</scope>
+            <optional>true</optional>
         </dependency>
         <dependency>
             <groupId>yk</groupId>
-            <artifactId>yincubator</artifactId>
-            <version>0.05-SNAPSHOT</version>
+            <artifactId>jcommon</artifactId>
+            <version>0.124</version>
         </dependency>
     </dependencies>
 
