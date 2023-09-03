@@ -9,8 +9,6 @@ import java.nio.charset.StandardCharsets;
 import java.util.Map;
 
 import static yk.jcommon.collections.YArrayList.al;
-import static yk.lang.yads.YadsUtils.ESCAPE_YADS_DOUBLE_QUOTES;
-import static yk.lang.yads.YadsUtils.ESCAPE_YADS_SINGLE_QUOTES;
 import static yk.lang.yads.YadsWords.*;
 
 /**
@@ -86,8 +84,8 @@ public class YadsNodeOutput {
             value1 = valObj.toString();
             boolean woQuotes = withoutQuotes(value1);
             if (!woQuotes) {
-                if (value1.contains("'")) value1 = "\"" + ESCAPE_YADS_DOUBLE_QUOTES.translate(value1) + "\"";
-                else value1 = "'" + ESCAPE_YADS_SINGLE_QUOTES.translate(value1) + "'";
+                if (value1.contains("'")) value1 = "\"" + YadsUtils.escapeDoubleQuotes(value1) + "\"";
+                else value1 = "'" + YadsUtils.escapeSingleQuotes(value1) + "'";
             }
             value = value1;
         } else if (valObj instanceof Number) {

@@ -96,24 +96,17 @@
 
     <dependencies>
 
-        <!--TODO remove-->
-        <dependency>
-            <groupId>org.apache.commons</groupId>
-            <artifactId>commons-lang3</artifactId>
-            <version>3.3.2</version>
-        </dependency>
-
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
-            <version>4.11</version>
+            <version>4.13.1</version>
             <optional>true</optional>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>yk</groupId>
             <artifactId>yincubator</artifactId>
-            <version>0.04</version>
+            <version>0.05-SNAPSHOT</version>
         </dependency>
     </dependencies>
 
