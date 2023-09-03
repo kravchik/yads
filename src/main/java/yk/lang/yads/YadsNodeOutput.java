@@ -144,7 +144,7 @@ public class YadsNodeOutput {
 //        }
 //        if (onlySimpleChars) return true;
         try {
-            Object would = new YadsParser(new ByteArrayInputStream(value.getBytes(StandardCharsets.UTF_8)))
+            Object would = new YadsNodeParser(new ByteArrayInputStream(value.getBytes(StandardCharsets.UTF_8)))
                     .parseRawElement();
             if (value.equals(would)) return true;
         } catch (Exception | Error ignore) {}

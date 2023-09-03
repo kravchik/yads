@@ -13,7 +13,7 @@ import static yk.lang.yads.YadsWords.NAMED_ARGS;
 //TODO separate methods for serialize serializeFormatted ?
 /**
  * Just a collection of some frequently used methods to help avoid the usual boilerplate.
- * Also serves as an example of how to use YadsParser, YadsObjectSerializer, YadsObjectDeserializer.
+ * Also serves as an example of how to use YadsNodeParser, YadsObjectSerializer, YadsObjectDeserializer.
  * <br>
  * Methods in this class a 'greedy'. They try to read everything available and throw an error if there are 'unexpected more'.
  * You can easily implement 'not greedy' analogs.
@@ -21,11 +21,11 @@ import static yk.lang.yads.YadsWords.NAMED_ARGS;
 public class Yads {
 
     public static Object parseYadsList(String s) {
-        return YadsListResolver.toYadsList(YadsParser.parse(s).getNodeList(ARGS)).assertSize(1).first();
+        return YadsListResolver.toYadsList(YadsNodeParser.parse(s).getNodeList(ARGS)).assertSize(1).first();
     }
 
     public static YadsList parseYadsListBody(String s) {
-        return new YadsList(null, YadsListResolver.toYadsList(YadsParser.parse(s).getNodeList(ARGS)));
+        return new YadsList(null, YadsListResolver.toYadsList(YadsNodeParser.parse(s).getNodeList(ARGS)));
     }
 
     public static String printYadsList(Object s) {
@@ -83,7 +83,7 @@ public class Yads {
         deserializer.namespaces.enterScope();
         for (String i : imports) deserializer.namespaces.addClass(i);
 
-        YadsNode parse = YadsParser.parse(text);
+        YadsNode parse = YadsNodeParser.parse(text);
         return deserializeTheOnlyElement(deserializer, new YadsNodeResolver().resolve(parse));
     }
 
@@ -91,7 +91,7 @@ public class Yads {
 
         YadsNode result;
         try {
-            result = new YadsParser(is).parseListBodyNode();
+            result = new YadsNodeParser(is).parseListBodyNode();
         } catch (ParseException e) {
             throw new RuntimeException(e);
         }
@@ -103,12 +103,12 @@ public class Yads {
     }
 
     public static Object deserializeBody(String text) {
-        YadsNode parsed = YadsParser.parse(text);
+        YadsNode parsed = YadsNodeParser.parse(text);
         return new YadsObjectDeserializer().deserializeSpecificType(null, new YadsNodeResolver().resolve(parsed));
     }
 
     public static <T> T deserializeBody(Class<T> type, String text) {
-        YadsNode parsed = YadsParser.parse(text);
+        YadsNode parsed = YadsNodeParser.parse(text);
         return new YadsObjectDeserializer().deserializeSpecificType(type, new YadsNodeResolver().resolve(parsed));
     }
 
@@ -120,7 +120,7 @@ public class Yads {
         YadsObjectDeserializer deserializer = new YadsObjectDeserializer();
         deserializer.namespaces.enterScope();
         for (String i : imports) deserializer.namespaces.addClass(i);
-        YadsNode parsed = YadsParser.parse(text);
+        YadsNode parsed = YadsNodeParser.parse(text);
         return deserializer.deserializeSpecificType(type, new YadsNodeResolver().resolve(parsed));
     }
 

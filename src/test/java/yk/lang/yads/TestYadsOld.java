@@ -22,10 +22,10 @@ public class TestYadsOld {//TODO restore
 
     //@Test
     public void yast() {
-        assertEqualNodes(new YadsNode(NODE_TYPE, YADS_ARRAY, ARGS, al(), CARET, new Caret(1, 1, 1, 2)), YadsParser.parse("(1 + 2)"));
+        assertEqualNodes(new YadsNode(NODE_TYPE, YADS_ARRAY, ARGS, al(), CARET, new Caret(1, 1, 1, 2)), YadsNodeParser.parse("(1 + 2)"));
 
-        assertEqualNodes(new YadsNode(NODE_TYPE, YADS_ARRAY, ARGS, al(), CARET, new Caret(1, 1, 1, 2)), YadsParser.parse("()"));
-        assertEqualNodes(new YadsNode(NODE_TYPE, YADS_MAP, NAMED_ARGS, hm(), CARET, new Caret(1, 1, 1, 3)), YadsParser.parse("(:)"));
+        assertEqualNodes(new YadsNode(NODE_TYPE, YADS_ARRAY, ARGS, al(), CARET, new Caret(1, 1, 1, 2)), YadsNodeParser.parse("()"));
+        assertEqualNodes(new YadsNode(NODE_TYPE, YADS_MAP, NAMED_ARGS, hm(), CARET, new Caret(1, 1, 1, 3)), YadsNodeParser.parse("(:)"));
     }
 
     public static void assertEqualNodes(YadsNode expected, YadsNode actual) {
@@ -46,30 +46,30 @@ public class TestYadsOld {//TODO restore
     @Test
     public void parsePrimitives() {
         //TODO 
-        //assertEquals(al("hello", "hello", "hello", "", ""), YadsParser.parseBody("hello 'hello' \"hello\" '' \"\""));
+        //assertEquals(al("hello", "hello", "hello", "", ""), YadsNodeParser.parseBody("hello 'hello' \"hello\" '' \"\""));
         //
-        //assertEquals(al(hm()), YadsParser.parseBody("(:)"));
-        //assertEquals(al(al()), YadsParser.parseBody("()"));
+        //assertEquals(al(hm()), YadsNodeParser.parseBody("(:)"));
+        //assertEquals(al(al()), YadsNodeParser.parseBody("()"));
         //
-        //assertEquals(al("\"hello\"", "'hello'"), YadsParser.parseBody(" '\\\"hello\\\"'  '\\'hello\\''"));
-        //assertEquals(al("hello\nworld", "hello\tworld"), YadsParser.parseBody(" 'hello\\nworld'  'hello\\tworld'"));
+        //assertEquals(al("\"hello\"", "'hello'"), YadsNodeParser.parseBody(" '\\\"hello\\\"'  '\\'hello\\''"));
+        //assertEquals(al("hello\nworld", "hello\tworld"), YadsNodeParser.parseBody(" 'hello\\nworld'  'hello\\tworld'"));
         //
-        //assertEquals(al("hello\nworld", "hello\tworld"), YadsParser.parseBody(" 'hello\nworld'  'hello\tworld'"));
+        //assertEquals(al("hello\nworld", "hello\tworld"), YadsNodeParser.parseBody(" 'hello\nworld'  'hello\tworld'"));
         //
-        //assertEquals(al("\"'hello world'\"", "\"'hello world'\""), YadsParser.parseBody(" \"\\\"'hello world'\\\"\"  '\"\\'hello world\\'\"'"));
-        //assertEquals(al("\\'"), YadsParser.parseBody(" \"\\\\'\" "));
-        //assertEquals(al("\\\""), YadsParser.parseBody(" '\\\\\"' "));
+        //assertEquals(al("\"'hello world'\"", "\"'hello world'\""), YadsNodeParser.parseBody(" \"\\\"'hello world'\\\"\"  '\"\\'hello world\\'\"'"));
+        //assertEquals(al("\\'"), YadsNodeParser.parseBody(" \"\\\\'\" "));
+        //assertEquals(al("\\\""), YadsNodeParser.parseBody(" '\\\\\"' "));
         //
-        //assertEquals(al(10, 10l, 10L, 10f, 10d, 10D, 10.1d, 10.1f, 10.1f), YadsParser.parseBody("10 10l 10L 10f 10d 10D 10.1d 10.1f 10.1"));
-        //assertEquals(al(1424083792130l), YadsParser.parseBody("1424083792130l"));
-        //assertEquals(al(-10), YadsParser.parseBody("-10"));
-        //assertEquals(al(true, false), YadsParser.parseBody("true false"));
+        //assertEquals(al(10, 10l, 10L, 10f, 10d, 10D, 10.1d, 10.1f, 10.1f), YadsNodeParser.parseBody("10 10l 10L 10f 10d 10D 10.1d 10.1f 10.1"));
+        //assertEquals(al(1424083792130l), YadsNodeParser.parseBody("1424083792130l"));
+        //assertEquals(al(-10), YadsNodeParser.parseBody("-10"));
+        //assertEquals(al(true, false), YadsNodeParser.parseBody("true false"));
     }
 
     @Test
     public void testPositions() throws Exception {
         //ByteArrayInputStream stream = new ByteArrayInputStream("(hello world) (hello world)".getBytes("UTF-8"));
-        //YadsParser parser = new YadsParser(stream).setRememberPositions(true);
+        //YadsNodeParser parser = new YadsNodeParser(stream).setRememberPositions(true);
         //parser.unnamedClassBody();
         //
         //assertEquals("{[hello, world]=Caret{beginLine=1, beginColumn=1, endLine=1, endColumn=13}, [hello, world]=Caret{beginLine=1, beginColumn=15, endLine=1, endColumn=27}}", parser.positions.toString());
@@ -187,14 +187,14 @@ public class TestYadsOld {//TODO restore
     //public void test() {
     //    System.out.println("'\u005cn'");
     //
-    //    System.out.println(YadsParser.parseList("hello world"));
-    //    System.out.println(YadsParser.parseClass("XY{10 20}"));
-    //    System.out.println(YadsParser.parseClass("HBox{pos = 10, 20 VBox{size= 50, 50}}"));
+    //    System.out.println(YadsNodeParser.parseList("hello world"));
+    //    System.out.println(YadsNodeParser.parseClass("XY{10 20}"));
+    //    System.out.println(YadsNodeParser.parseClass("HBox{pos = 10, 20 VBox{size= 50, 50}}"));
     //    System.out.println(YadsObjectSerializer.deserialize("import=yk.lang.yads HBox{pos = 10, 20 VBox{size= 50, 50}}"));
     //    System.out.println(HBox.class.getName());
-    //    //System.out.println(YADSSerializer.deserializeClass(null, YadsParser.parseClass("HBox{pos = 10, 20}")).toStringPrefixInfix());
+    //    //System.out.println(YADSSerializer.deserializeClass(null, YadsNodeParser.parseClass("HBox{pos = 10, 20}")).toStringPrefixInfix());
     //
-    //    //System.out.println(YADSSerializer.deserializeList(YadsParser.parseList("import= yk.lang.yads HBox{pos = 10, 20}")).toStringPrefixInfix());
+    //    //System.out.println(YADSSerializer.deserializeList(YadsNodeParser.parseList("import= yk.lang.yads HBox{pos = 10, 20}")).toStringPrefixInfix());
     //
     //    //TODO convert with respect to method call arguments types!
     //    //TODO map or YAD if class not defined and unknown
