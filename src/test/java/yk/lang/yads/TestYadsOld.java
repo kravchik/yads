@@ -10,8 +10,6 @@ import static junit.framework.TestCase.fail;
 import static yk.jcommon.collections.YArrayList.al;
 import static yk.jcommon.collections.YArrayList.toYList;
 import static yk.jcommon.collections.YHashMap.hm;
-import static yk.lang.yads.YadsShorts.YADS_ARRAY;
-import static yk.lang.yads.YadsShorts.YADS_MAP;
 import static yk.lang.yads.YadsWords.*;
 
 /**
@@ -79,65 +77,65 @@ public class TestYadsOld {//TODO restore
     }
     //@Test
     //public void serializePrimitives() {
-    //    assertEquals("10l", YadsSerializer.serialize(10l));
-    //    assertEquals("hello", YadsSerializer.serialize("hello"));
-    //    assertEquals("'hello\\n'", YadsSerializer.serialize("hello\n"));//TODO don't escape?
+    //    assertEquals("10l", YadsObjectSerializer.serialize(10l));
+    //    assertEquals("hello", YadsObjectSerializer.serialize("hello"));
+    //    assertEquals("'hello\\n'", YadsObjectSerializer.serialize("hello\n"));//TODO don't escape?
     //}
     //
     ////@Test
     ////public void deserializer() {
-    ////    assertEquals(al("hello", "world"), YadsSerializer.deserializeList("hello world"));
-    ////    assertEquals(al(al("hello", "world"), al("hello2", "world2")), YadsSerializer.deserializeList("{hello world} {hello2 world2}"));
-    ////    assertEquals(hm("hello", "world"), YadsSerializer.deserializeMap("hello=world"));
+    ////    assertEquals(al("hello", "world"), YadsObjectSerializer.deserializeList("hello world"));
+    ////    assertEquals(al(al("hello", "world"), al("hello2", "world2")), YadsObjectSerializer.deserializeList("{hello world} {hello2 world2}"));
+    ////    assertEquals(hm("hello", "world"), YadsObjectSerializer.deserializeMap("hello=world"));
     ////
-    ////    assertEquals(new YadsClass(null, al(new Tuple("a", "b"), "c")), YadsSerializer.deserialize("{a=b c}"));
-    ////    assertEquals(new YadsClass("name", al(new Tuple("a", "b"), "c")), YadsSerializer.deserialize("name{a=b c}"));
+    ////    assertEquals(new YadsClass(null, al(new Tuple("a", "b"), "c")), YadsObjectSerializer.deserialize("{a=b c}"));
+    ////    assertEquals(new YadsClass("name", al(new Tuple("a", "b"), "c")), YadsObjectSerializer.deserialize("name{a=b c}"));
     ////
-    ////    assertEquals(al(new TestEnumClass(TestEnum.ENUM1)), YadsSerializer.deserialize(Namespaces.packages("yk.lang.yads"), "TestEnumClass{enumField=ENUM1}"));
-    ////    assertEquals(al(TestEnum.ENUM1), YadsSerializer.deserialize(Namespaces.packages("yk.lang.yads"), "TestEnum{ENUM1}"));
+    ////    assertEquals(al(new TestEnumClass(TestEnum.ENUM1)), YadsObjectSerializer.deserialize(Namespaces.packages("yk.lang.yads"), "TestEnumClass{enumField=ENUM1}"));
+    ////    assertEquals(al(TestEnum.ENUM1), YadsObjectSerializer.deserialize(Namespaces.packages("yk.lang.yads"), "TestEnum{ENUM1}"));
     ////
-    ////    assertEquals(al(new TestEnumClass(null)), YadsSerializer.deserialize(Namespaces.packages("yk.lang.yads"), "TestEnumClass{enumField=null}"));
+    ////    assertEquals(al(new TestEnumClass(null)), YadsObjectSerializer.deserialize(Namespaces.packages("yk.lang.yads"), "TestEnumClass{enumField=null}"));
     ////}
     //
     ////@Test
     ////public void deserializerImports() {
-    ////    assertEquals(new YadsClass("XY", al(1, 2)), YadsSerializer.deserialize("XY{1 2}"));
-    ////    assertEquals(new Vec2f(1, 2), YadsSerializer.deserialize("yk.jcommon.fastgeom.Vec2f{x=1 y=2}"));
-    ////    assertEquals(new Vec2f(1, 2), YadsSerializer.deserialize("import=yk.jcommon.fastgeom \n\n Vec2f{x=1 y=2}"));
-    ////    assertEquals(new TestClass(al(1, 2), hm("key1", "value1", "key2", "value2"), 3), YadsSerializer.deserializeClassBody(TestClass.class, "import=yk.jcommon.fastgeom, yk.jcommon.fastgeom someList=1, 2 someMap={key1=value1 'key2'=value2} someInt=3"));
+    ////    assertEquals(new YadsClass("XY", al(1, 2)), YadsObjectSerializer.deserialize("XY{1 2}"));
+    ////    assertEquals(new Vec2f(1, 2), YadsObjectSerializer.deserialize("yk.jcommon.fastgeom.Vec2f{x=1 y=2}"));
+    ////    assertEquals(new Vec2f(1, 2), YadsObjectSerializer.deserialize("import=yk.jcommon.fastgeom \n\n Vec2f{x=1 y=2}"));
+    ////    assertEquals(new TestClass(al(1, 2), hm("key1", "value1", "key2", "value2"), 3), YadsObjectSerializer.deserializeClassBody(TestClass.class, "import=yk.jcommon.fastgeom, yk.jcommon.fastgeom someList=1, 2 someMap={key1=value1 'key2'=value2} someInt=3"));
     ////}
     //
     //@Test
     //public void serializer() {
-    //    assertEquals("import={yk.jcommon.fastgeom}\n\nVec2f{x= 1.0 y= 2.0}", YadsSerializer.serialize(new Vec2f(1, 2)));
-    //    assertEquals("{\n  hello\n  world\n}\n", YadsSerializer.serialize(al("hello", "world")));
-    //    assertEquals("{\n  k= v\n}\n", YadsSerializer.serialize(hm("k", "v")));
+    //    assertEquals("import={yk.jcommon.fastgeom}\n\nVec2f{x= 1.0 y= 2.0}", YadsObjectSerializer.serialize(new Vec2f(1, 2)));
+    //    assertEquals("{\n  hello\n  world\n}\n", YadsObjectSerializer.serialize(al("hello", "world")));
+    //    assertEquals("{\n  k= v\n}\n", YadsObjectSerializer.serialize(hm("k", "v")));
     //
-    //    assertEquals("import={yk.lang.yads}\n\nTestEnumClass{enumField= ENUM1}", YadsSerializer.serialize(new TestEnumClass(TestEnum.ENUM1)));
-    //    assertEquals("import={yk.lang.yads}\n\nTestEnumClass{}", YadsSerializer.serialize(new TestEnumClass(null)));
+    //    assertEquals("import={yk.lang.yads}\n\nTestEnumClass{enumField= ENUM1}", YadsObjectSerializer.serialize(new TestEnumClass(TestEnum.ENUM1)));
+    //    assertEquals("import={yk.lang.yads}\n\nTestEnumClass{}", YadsObjectSerializer.serialize(new TestEnumClass(null)));
     //
-    //    assertEquals("{\n  hello\n  null\n}\n", YadsSerializer.serialize(al("hello", null)));
+    //    assertEquals("{\n  hello\n  null\n}\n", YadsObjectSerializer.serialize(al("hello", null)));
     //
-    //    assertEquals("{\n  'h\"e\\'l\\nl\\to'\n}\n", YadsSerializer.serialize(al("h\"e'l\nl\to")));
+    //    assertEquals("{\n  'h\"e\\'l\\nl\\to'\n}\n", YadsObjectSerializer.serialize(al("h\"e'l\nl\to")));
     //
-    //    assertEquals("enumField= ENUM1\n", YadsSerializer.serializeClassBody(new TestEnumClass(TestEnum.ENUM1)));
+    //    assertEquals("enumField= ENUM1\n", YadsObjectSerializer.serializeClassBody(new TestEnumClass(TestEnum.ENUM1)));
     //}
     //
     //@Test
     //public void testClass() {
-    //    assertEquals(new TestClass(al(1, 2), hm("key1", "value1", "key2", "value2"), 3), YadsSerializer.deserializeClassBody(TestClass.class, "someList=1, 2 someMap={key1=value1 'key2'=value2} someInt=3"));
+    //    assertEquals(new TestClass(al(1, 2), hm("key1", "value1", "key2", "value2"), 3), YadsObjectSerializer.deserializeClassBody(TestClass.class, "someList=1, 2 someMap={key1=value1 'key2'=value2} someInt=3"));
     //
     //    TestClass test1 = new TestClass();
     //    test1.someList2 = al(1, 2);
     //    test1.someList3 = al(3, 4);
-    //    assertEquals(test1, YadsSerializer.deserializeClassBody(TestClass.class, "someList2=1, 2 someList3=3,4"));
+    //    assertEquals(test1, YadsObjectSerializer.deserializeClassBody(TestClass.class, "someList2=1, 2 someList3=3,4"));
     //
-    //    assertEquals(new TestClass(al(1, 2), hm("key1", "value1", "key2", "value2"), 3), YadsSerializer.deserializeClassBody(TestClass.class, "1, 2 {key1=value1 'key2'=value2} 3"));
+    //    assertEquals(new TestClass(al(1, 2), hm("key1", "value1", "key2", "value2"), 3), YadsObjectSerializer.deserializeClassBody(TestClass.class, "1, 2 {key1=value1 'key2'=value2} 3"));
     //
-    //    assertEquals(new TestClass(false), YadsSerializer.deserializeClassBody(TestClass.class, "someBoolean=false"));
+    //    assertEquals(new TestClass(false), YadsObjectSerializer.deserializeClassBody(TestClass.class, "someBoolean=false"));
     //
     //    try {
-    //        assertEquals(new TestClass(al(1, 2), hm("key1", "value1", "key2", "value2"), 3), YadsSerializer.deserializeClassBody(TestClass.class, "someList=1, 2 someMap=hello someInt=3"));
+    //        assertEquals(new TestClass(al(1, 2), hm("key1", "value1", "key2", "value2"), 3), YadsObjectSerializer.deserializeClassBody(TestClass.class, "someList=1, 2 someMap=hello someInt=3"));
     //        fail();
     //    } catch (BadException ignore) {
     //        assertEquals("found instance hello of class class java.lang.String but expected object of class yk.jcommon.collections.YHashMap", ignore.getMessage());
@@ -145,39 +143,39 @@ public class TestYadsOld {//TODO restore
     //
     //    TestClass tc = new TestClass();
     //    tc.tc2 = new TestClass2(1);
-    //    assertEquals(tc, YadsSerializer.deserializeClassBody(TestClass.class, "tc2=1f, 1f"));
-    //    //assertEquals(tc, YadsSerializer.deserializeClass(TestClass.class, "tc2={1f, 1f}"));
-    //    //assertEquals(tc, YadsSerializer.deserializeClass(TestClass.class, "tc2=TestClass2{1f, 1f}"));
-    //    assertEquals(tc, YadsSerializer.deserializeClassBody(TestClass.class, "tc2=1f"));
-    //    assertEquals(tc, YadsSerializer.deserializeClassBody(TestClass.class, "tc2={1f}"));
-    //    assertEquals(tc, YadsSerializer.deserializeClassBody(TestClass.class, "tc2=TestClass2{1f}"));
+    //    assertEquals(tc, YadsObjectSerializer.deserializeClassBody(TestClass.class, "tc2=1f, 1f"));
+    //    //assertEquals(tc, YadsObjectSerializer.deserializeClass(TestClass.class, "tc2={1f, 1f}"));
+    //    //assertEquals(tc, YadsObjectSerializer.deserializeClass(TestClass.class, "tc2=TestClass2{1f, 1f}"));
+    //    assertEquals(tc, YadsObjectSerializer.deserializeClassBody(TestClass.class, "tc2=1f"));
+    //    assertEquals(tc, YadsObjectSerializer.deserializeClassBody(TestClass.class, "tc2={1f}"));
+    //    assertEquals(tc, YadsObjectSerializer.deserializeClassBody(TestClass.class, "tc2=TestClass2{1f}"));
     //
     //    tc.tc2 = new TestClass2(al("hello", "world"));
     //    tc.tc2.a = 4;
-    //    TestClass des = YadsSerializer.deserializeClassBody(TestClass.class, "tc2={a=4 hello world}");
+    //    TestClass des = YadsObjectSerializer.deserializeClassBody(TestClass.class, "tc2={a=4 hello world}");
     //    assertEquals(tc, des);
     //}
     //
     //@Test
     //public void testYadsAware() {
-    //    assertEquals("import={yk.lang.yads}\n\nTestClass2{1.0}", YadsSerializer.serialize(new TestClass2(1)));
-    //    assertEquals("import={yk.lang.yads}\n\nTestClass2{1.0 2.0}", YadsSerializer.serialize(new TestClass2(1, 2)));
+    //    assertEquals("import={yk.lang.yads}\n\nTestClass2{1.0}", YadsObjectSerializer.serialize(new TestClass2(1)));
+    //    assertEquals("import={yk.lang.yads}\n\nTestClass2{1.0 2.0}", YadsObjectSerializer.serialize(new TestClass2(1, 2)));
     //
     //    TestClass tc = new TestClass();
     //    tc.tc2 = new TestClass2(1);
-    //    assertEquals("import={yk.lang.yads}\n\nTestClass{someInt= 0 tc2={1.0}someBoolean= false}", YadsSerializer.serialize(tc));
+    //    assertEquals("import={yk.lang.yads}\n\nTestClass{someInt= 0 tc2={1.0}someBoolean= false}", YadsObjectSerializer.serialize(tc));
     //
     //}
     //
     //@Test
     //public void testFieldTypeNotImported() {
-    //    assertEquals(fill(new TestClass3(), "pos", new Vec2f(3, 3)), YadsSerializer.deserialize("import=yk.lang.yads TestClass3{pos=3f, 3f}"));
-    //    assertEquals(fill(new TestClass3(), "pos", new Vec2f(3, 3)), YadsSerializer.deserializeClassBody(TestClass3.class, "pos=3f, 3f"));
+    //    assertEquals(fill(new TestClass3(), "pos", new Vec2f(3, 3)), YadsObjectSerializer.deserialize("import=yk.lang.yads TestClass3{pos=3f, 3f}"));
+    //    assertEquals(fill(new TestClass3(), "pos", new Vec2f(3, 3)), YadsObjectSerializer.deserializeClassBody(TestClass3.class, "pos=3f, 3f"));
     //}
     //
     //@Test
     //public void testFieldTypeIsKnown() {
-    //    assertEquals("import={yk.lang.yads}\n\nTestClass3{pos={x= 3.0 y= 3.0}}", YadsSerializer.serialize(fill(new TestClass3(), "pos", new Vec2f(3, 3))));
+    //    assertEquals("import={yk.lang.yads}\n\nTestClass3{pos={x= 3.0 y= 3.0}}", YadsObjectSerializer.serialize(fill(new TestClass3(), "pos", new Vec2f(3, 3))));
     //}
     //
     //private static <T> T fill(T obj, Object... values) {
@@ -192,7 +190,7 @@ public class TestYadsOld {//TODO restore
     //    System.out.println(YadsParser.parseList("hello world"));
     //    System.out.println(YadsParser.parseClass("XY{10 20}"));
     //    System.out.println(YadsParser.parseClass("HBox{pos = 10, 20 VBox{size= 50, 50}}"));
-    //    System.out.println(YadsSerializer.deserialize("import=yk.lang.yads HBox{pos = 10, 20 VBox{size= 50, 50}}"));
+    //    System.out.println(YadsObjectSerializer.deserialize("import=yk.lang.yads HBox{pos = 10, 20 VBox{size= 50, 50}}"));
     //    System.out.println(HBox.class.getName());
     //    //System.out.println(YADSSerializer.deserializeClass(null, YadsParser.parseClass("HBox{pos = 10, 20}")).toStringPrefixInfix());
     //
@@ -205,16 +203,16 @@ public class TestYadsOld {//TODO restore
     //
     ////@Test
     ////public void testDeserializeComfort() {
-    ////    assertEquals(hm("hello", "world", "someOther", al()), YadsSerializer.deserializeMap("import=yk.lang.yads hello=world someOther={}"));
-    ////    assertEquals(al("hello", new NamedMap("world")), YadsSerializer.deserializeList("import=yk.lang.yads hello world {}"));
-    ////    assertEquals(al("hello", "world", al()), YadsSerializer.deserializeList("import=yk.lang.yads hello 'world' {}"));
-    ////    assertEquals(al("hello", new NamedMap("world", hm("hello", "world"))), YadsSerializer.deserializeList("import=yk.lang.yads hello world {hello=world}"));
-    ////    assertEquals(al("hello", new YadsClass("world", al("hello"))), YadsSerializer.deserializeList("import=yk.lang.yads hello world {hello}"));
-    ////    assertEquals(al("hello", new YadsClass("world", al("hello", "world"))), YadsSerializer.deserializeList("import=yk.lang.yads hello world {hello world}"));
+    ////    assertEquals(hm("hello", "world", "someOther", al()), YadsObjectSerializer.deserializeMap("import=yk.lang.yads hello=world someOther={}"));
+    ////    assertEquals(al("hello", new NamedMap("world")), YadsObjectSerializer.deserializeList("import=yk.lang.yads hello world {}"));
+    ////    assertEquals(al("hello", "world", al()), YadsObjectSerializer.deserializeList("import=yk.lang.yads hello 'world' {}"));
+    ////    assertEquals(al("hello", new NamedMap("world", hm("hello", "world"))), YadsObjectSerializer.deserializeList("import=yk.lang.yads hello world {hello=world}"));
+    ////    assertEquals(al("hello", new YadsClass("world", al("hello"))), YadsObjectSerializer.deserializeList("import=yk.lang.yads hello world {hello}"));
+    ////    assertEquals(al("hello", new YadsClass("world", al("hello", "world"))), YadsObjectSerializer.deserializeList("import=yk.lang.yads hello world {hello world}"));
     ////    assertEquals(al("hello", new YadsClass("world", al(new Tuple<>("hello", "world"), "someother"))),
-    ////            YadsSerializer.deserializeList("import=yk.lang.yads hello world {hello=world someother}"));
+    ////            YadsObjectSerializer.deserializeList("import=yk.lang.yads hello world {hello=world someother}"));
     ////
-    ////    assertEquals(new NamedMap("world", hm("hello", "world")), YadsSerializer.deserializeNamedMap("import=yk.lang.yads world {hello=world}"));
+    ////    assertEquals(new NamedMap("world", hm("hello", "world")), YadsObjectSerializer.deserializeNamedMap("import=yk.lang.yads world {hello=world}"));
     ////}
     //
     //@Test
@@ -222,7 +220,7 @@ public class TestYadsOld {//TODO restore
     //    //TODO fix for  "import= yk.jcommon.fastgeom, yk.jcommon.utils"
     //    //? don't write import list with comma ?
     //
-    //    String ser = YadsSerializer.serialize(al(v3(0, 0, 0), XYit.wh(10, 10)));
+    //    String ser = YadsObjectSerializer.serialize(al(v3(0, 0, 0), XYit.wh(10, 10)));
     //    System.out.println(ser);
     //
     //    //ser = "import= {yk.jcommon.fastgeom yk.jcommon.utils}\n" +
@@ -231,53 +229,53 @@ public class TestYadsOld {//TODO restore
     //    //        "  Vec3f{x= 0.0 y= 0.0 z= 0.0}\n" +
     //    //        "  XYit{r= 10 t= 10 l= 0 b= 0 x= 0 y= 0}\n" +
     //    //        "}\n";
-    //    YadsSerializer.deserialize(ser);
+    //    YadsObjectSerializer.deserialize(ser);
     //
-    //    ser = YadsSerializer.serialize(al(v3(0, 0, 0)));
+    //    ser = YadsObjectSerializer.serialize(al(v3(0, 0, 0)));
     //    System.out.println(ser);
-    //    YadsSerializer.deserialize(ser);
+    //    YadsObjectSerializer.deserialize(ser);
     //}
     //
     //@Test
     //public void serDesList() {
     //
-    //    assertEquals(al(), YadsSerializer.deserializeList(YadsSerializer.serializeList(al())));
-    //    assertEquals(al("a"), YadsSerializer.deserializeList(YadsSerializer.serializeList(al("a"))));
-    //    assertEquals(al("a", "b"), YadsSerializer.deserializeList(YadsSerializer.serializeList(al("a", "b"))));
+    //    assertEquals(al(), YadsObjectSerializer.deserializeList(YadsObjectSerializer.serializeList(al())));
+    //    assertEquals(al("a"), YadsObjectSerializer.deserializeList(YadsObjectSerializer.serializeList(al("a"))));
+    //    assertEquals(al("a", "b"), YadsObjectSerializer.deserializeList(YadsObjectSerializer.serializeList(al("a", "b"))));
     //
-    //    assertEquals("", YadsSerializer.serializeList(al()));
-    //    assertEquals("  a\n", YadsSerializer.serializeList(al("a")));
-    //    assertEquals("  a\n  b\n", YadsSerializer.serializeList(al("a", "b")));
+    //    assertEquals("", YadsObjectSerializer.serializeList(al()));
+    //    assertEquals("  a\n", YadsObjectSerializer.serializeList(al("a")));
+    //    assertEquals("  a\n  b\n", YadsObjectSerializer.serializeList(al("a", "b")));
     //
     //
-    //    assertEquals(al(), YadsSerializer.deserialize(YadsSerializer.serialize(al())));
-    //    assertEquals(al("a"), YadsSerializer.deserialize(YadsSerializer.serialize(al("a"))));
-    //    assertEquals(al("a", "b"), YadsSerializer.deserialize(YadsSerializer.serialize(al("a", "b"))));
+    //    assertEquals(al(), YadsObjectSerializer.deserialize(YadsObjectSerializer.serialize(al())));
+    //    assertEquals(al("a"), YadsObjectSerializer.deserialize(YadsObjectSerializer.serialize(al("a"))));
+    //    assertEquals(al("a", "b"), YadsObjectSerializer.deserialize(YadsObjectSerializer.serialize(al("a", "b"))));
     //
-    //    assertEquals("{\n}\n", YadsSerializer.serialize(al()));
-    //    assertEquals("{\n  a\n}\n", YadsSerializer.serialize(al("a")));
-    //    assertEquals("{\n  a\n  b\n}\n", YadsSerializer.serialize(al("a", "b")));
+    //    assertEquals("{\n}\n", YadsObjectSerializer.serialize(al()));
+    //    assertEquals("{\n  a\n}\n", YadsObjectSerializer.serialize(al("a")));
+    //    assertEquals("{\n  a\n  b\n}\n", YadsObjectSerializer.serialize(al("a", "b")));
     //
     //}
     //
     //@Test
     //public void serDesMap() {
-    //    assertEquals(hm(), YadsSerializer.deserializeMap(YadsSerializer.serializeMap(hm())));
-    //    assertEquals(hm("a", "b"), YadsSerializer.deserializeMap(YadsSerializer.serializeMap(hm("a", "b"))));
-    //    assertEquals(hm("a", "b", "c", "d"), YadsSerializer.deserializeMap(YadsSerializer.serializeMap(hm("a", "b", "c", "d"))));
+    //    assertEquals(hm(), YadsObjectSerializer.deserializeMap(YadsObjectSerializer.serializeMap(hm())));
+    //    assertEquals(hm("a", "b"), YadsObjectSerializer.deserializeMap(YadsObjectSerializer.serializeMap(hm("a", "b"))));
+    //    assertEquals(hm("a", "b", "c", "d"), YadsObjectSerializer.deserializeMap(YadsObjectSerializer.serializeMap(hm("a", "b", "c", "d"))));
     //
-    //    assertEquals("", YadsSerializer.serializeMap(hm()));
-    //    assertEquals("a= b\n", YadsSerializer.serializeMap(hm("a", "b")));
-    //    assertEquals("a= b\nc= d\n", YadsSerializer.serializeMap(hm("a", "b", "c", "d")));
+    //    assertEquals("", YadsObjectSerializer.serializeMap(hm()));
+    //    assertEquals("a= b\n", YadsObjectSerializer.serializeMap(hm("a", "b")));
+    //    assertEquals("a= b\nc= d\n", YadsObjectSerializer.serializeMap(hm("a", "b", "c", "d")));
     //
     //    //!! can't distinguish between empty map and empty list
-    //    assertEquals(al(), YadsSerializer.deserialize(YadsSerializer.serialize(hm())));
-    //    assertEquals(hm("a", "b"), YadsSerializer.deserialize(YadsSerializer.serialize(hm("a", "b"))));
-    //    assertEquals(hm("a", "b", "c", "d"), YadsSerializer.deserialize(YadsSerializer.serialize(hm("a", "b", "c", "d"))));
+    //    assertEquals(al(), YadsObjectSerializer.deserialize(YadsObjectSerializer.serialize(hm())));
+    //    assertEquals(hm("a", "b"), YadsObjectSerializer.deserialize(YadsObjectSerializer.serialize(hm("a", "b"))));
+    //    assertEquals(hm("a", "b", "c", "d"), YadsObjectSerializer.deserialize(YadsObjectSerializer.serialize(hm("a", "b", "c", "d"))));
     //
-    //    assertEquals("{\n}\n", YadsSerializer.serialize(hm()));
-    //    assertEquals("{\n  a= b\n}\n", YadsSerializer.serialize(hm("a", "b")));
-    //    assertEquals("{\n  a= b\n  c= d\n}\n", YadsSerializer.serialize(hm("a", "b", "c", "d")));
+    //    assertEquals("{\n}\n", YadsObjectSerializer.serialize(hm()));
+    //    assertEquals("{\n  a= b\n}\n", YadsObjectSerializer.serialize(hm("a", "b")));
+    //    assertEquals("{\n  a= b\n  c= d\n}\n", YadsObjectSerializer.serialize(hm("a", "b", "c", "d")));
     //
     //}
     //
@@ -285,11 +283,11 @@ public class TestYadsOld {//TODO restore
     //public void serDesClass() {
     //    TestClass testClass = new TestClass(al(1, 2), hm("key1", "value1", "key2", "value2"), 3);
     //
-    //    assertEquals(testClass, YadsSerializer.deserializeClassBody(TestClass.class, YadsSerializer.serializeClassBody(testClass)));
-    //    assertEquals(testClass, YadsSerializer.deserialize(YadsSerializer.serialize(testClass)));
+    //    assertEquals(testClass, YadsObjectSerializer.deserializeClassBody(TestClass.class, YadsObjectSerializer.serializeClassBody(testClass)));
+    //    assertEquals(testClass, YadsObjectSerializer.deserialize(YadsObjectSerializer.serialize(testClass)));
     //
-    //    assertEquals(al(testClass), YadsSerializer.deserialize(YadsSerializer.serialize(al(testClass))));
-    //    assertEquals(al(testClass, testClass), YadsSerializer.deserialize(YadsSerializer.serialize(al(testClass, testClass))));
+    //    assertEquals(al(testClass), YadsObjectSerializer.deserialize(YadsObjectSerializer.serialize(al(testClass))));
+    //    assertEquals(al(testClass, testClass), YadsObjectSerializer.deserialize(YadsObjectSerializer.serialize(al(testClass, testClass))));
     //}
     //
 

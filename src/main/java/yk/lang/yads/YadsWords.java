@@ -27,6 +27,14 @@ public class YadsWords {
     public static final String NAME = "NAME";
     public static final String CARET = "CARET";
 
+    public static final String YADS_NAMED = "YADS_NAMED";
+    public static final String YADS_UNNAMED = "YADS_UNNAMED";
+    public static final String YADS_ARRAY = "YADS_ARRAY";
+    public static final String YADS_MAP = "YADS_MAP";
+    public static final String COMMENT_SINGLE_LINE = "COMMENT_SINGLE_LINE";
+    public static final String COMMENT_MULTI_LINE = "COMMENT_MULTI_LINE";
+    public static final String YADS_RAW_CLASS = "YADS_RAW_CLASS";//class with a name, but ":" isn't addressed
+
     public static void main(String[] args) {
         checkFields();
     }

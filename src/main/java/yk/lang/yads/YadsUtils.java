@@ -4,17 +4,7 @@ import org.apache.commons.lang3.text.translate.*;
 
 import static yk.lang.yads.YadsWords.*;
 
-public class YadsShorts {
-    //TODO LIST, MAP, COMPLEX(NAME ARGS NAMED_ARGS)
-
-    //TODO move all consts to YAST and make them common
-    public static final String YADS_NAMED = "YADS_NAMED";
-    public static final String YADS_UNNAMED = "YADS_UNNAMED";
-    public static final String YADS_ARRAY = "YADS_ARRAY";
-    public static final String YADS_MAP = "YADS_MAP";
-
-    public static final String YADS_RAW_CLASS = "YADS_RAW_CLASS";//class with a name, but ":" isn't addressed
-
+public class YadsUtils {
     public static YadsNode constNode(Caret caret, String type, Object value) {
         return new YadsNode(NODE_TYPE, CONST, TYPE, type, VALUE, value, CARET, caret);
     }
@@ -36,6 +26,20 @@ public class YadsShorts {
                                     {"\\", ""}
                             })
             );
+
+    public static String unescapeDoubleQuotes(String s) {
+        String woQuotes = s.substring(1, s.length() - 1);
+        if (woQuotes.startsWith("\n") && woQuotes.endsWith("\n"))
+            woQuotes = woQuotes.substring(1, woQuotes.length() - 1);
+        return UNESCAPE_YADS_DOUBLE_QUOTES.translate(woQuotes);
+    }
+
+    public static String unescapeSingleQuotes(String s) {
+        String woQuotes = s.substring(1, s.length() - 1);
+        if (woQuotes.startsWith("\n") && woQuotes.endsWith("\n"))
+            woQuotes = woQuotes.substring(1, woQuotes.length() - 1);
+        return UNESCAPE_YADS_SINGLE_QUOTES.translate(woQuotes);
+    }
 
     public static final CharSequenceTranslator UNESCAPE_YADS_DOUBLE_QUOTES =
             new AggregateTranslator(

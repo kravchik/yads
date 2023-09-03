@@ -319,18 +319,8 @@ public class TestYadsSerialization {
 
     @Test
     public void testTabs() {
-        assertEquals(IO.readResource("formatting.yads").trim(), new NodesToString().withMaxWidth(30).toString(new YadsSerializer(true).serialize(al(new TestHierarchy("key1", "value1", "key2", new TestHierarchy("key3", "value3")), new TestHierarchy("key1", "value1", "key2", new TestHierarchy("key3", "value3"))))));
+        assertEquals(IO.readResource("formatting.yads").trim(), new YadsNodeOutput().withMaxWidth(30).toString(new YadsObjectSerializer(true).serialize(al(new TestHierarchy("key1", "value1", "key2", new TestHierarchy("key3", "value3")), new TestHierarchy("key1", "value1", "key2", new TestHierarchy("key3", "value3"))))));
     }
-
-    @Test
-    public void testYadsNamed() {
-        assertS12(new YadsNamed("mul"), "mul()");
-        assertS12(new YadsNamed("mul").setArray(al("a", "b")), "mul(a b)");
-        assertS12(new YadsNamed("mul").setMap(hm("k", "v")), "mul(k=v)");
-        assertS12(new YadsNamed("mul").setArray(al("a", "b")).setMap(hm("k", "v")), "mul(a b k=v)");
-    }
-
-
 
     private static void assertRefInPrint(Object a, boolean haveRef, boolean exact) {
         assertRefInPrint(a, a, haveRef, exact);

@@ -12,10 +12,10 @@ import java.util.Set;
 import static yk.jcommon.collections.YArrayList.al;
 import static yk.jcommon.collections.YHashMap.hm;
 import static yk.jcommon.collections.YHashSet.hs;
-import static yk.lang.yads.YadsShorts.*;
 import static yk.lang.yads.YadsWords.*;
 
-public class YadsDeserializer {
+//YadsNode -> objects
+public class YadsObjectDeserializer {
 
     private YList<Caret> caretStack = al();
     public Namespaces namespaces = new Namespaces();
@@ -149,7 +149,7 @@ public class YadsDeserializer {
         if (stringName != null) typeByNode = namespaces.findClass(stringName);
         if (typeByNode != null && knownType != null && !knownType.isAssignableFrom(typeByNode)) throw new RuntimeException(String.format("Can't assign %s to %s", typeByNode, knownType));
         if (typeByNode != null) knownType = typeByNode;
-        if (knownType == null) return YadsNamed.class;
+        if (knownType == null) throw new RuntimeException("Unresolved type for node " + node.map.get(NAME));
         return knownType;
     }
 
@@ -158,10 +158,7 @@ public class YadsDeserializer {
         YList array = node.map.get(ARGS) == null ? al() : deserializeRawList((YList) node.map.get(ARGS));
 
         Object instance;
-        if (type == YadsNamed.class) {
-            instance = new YadsNamed(node.getString(NAME));
-            if (array.notEmpty()) ((YadsNamed) instance).array = array;
-        } else if (array.notEmpty()) {
+        if (array.notEmpty()) {
             Constructor constructor = Reflector.getApropriateConstructor(type, array.toArray());
             if (constructor != null) instance = Reflector.newInstance(type, array.toArray());
             else instance = Reflector.newInstance(type, array);
@@ -171,10 +168,6 @@ public class YadsDeserializer {
 
         //set fields from named args
         if (node.map.get(NAMED_ARGS) != null && ((YMap)node.map.get(NAMED_ARGS)).notEmpty()) {
-            if (type == YadsNamed.class) {
-                YadsNamed named = (YadsNamed) instance;
-                named.map = deserializeRawMap((YMap) node.map.get(NAMED_ARGS), refIndex);
-            } else
             for (Map.Entry<YadsNode, YadsNode> entry1 : ((YMap<YadsNode, YadsNode>) node.map.get(NAMED_ARGS)).entrySet()) {
 
                 pushCaret(entry1.getKey());

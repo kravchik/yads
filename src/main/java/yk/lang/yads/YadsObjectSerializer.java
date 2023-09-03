@@ -16,14 +16,14 @@ import static yk.jcommon.collections.YHashMap.hm;
 import static yk.jcommon.collections.YHashSet.hs;
 import static yk.jcommon.utils.Reflector.newInstanceArgless;
 import static yk.lang.yads.YadsNode.node;
-import static yk.lang.yads.YadsShorts.*;
+import static yk.lang.yads.YadsUtils.constNode;
 import static yk.lang.yads.YadsWords.*;
-
-public class YadsSerializer {
+//objects -> YadsNode
+public class YadsObjectSerializer {
     private YSet<String> imports = hs();
     private YSet<String> defaultImports = hs();
 
-    public YadsSerializer addDefaultImports(YList<String> imports) {
+    public YadsObjectSerializer addDefaultImports(YList<String> imports) {
         defaultImports.addAll(imports);
         return this;
     }
@@ -33,7 +33,7 @@ public class YadsSerializer {
 
     private boolean strictReferencing = true;
 
-    public YadsSerializer() {
+    public YadsObjectSerializer() {
     }
 
     /**
@@ -43,7 +43,7 @@ public class YadsSerializer {
      * <br><br>
      * <b>Notice</b>, that for all other objects except String and inheritors of Number - there will always be used referencing if the same instance is referenced.
      */
-    public YadsSerializer(boolean strictReferencing) {
+    public YadsObjectSerializer(boolean strictReferencing) {
         this.strictReferencing = strictReferencing;
     }
 
@@ -125,11 +125,6 @@ public class YadsSerializer {
             return node(CONST, VALUE, object);
         } else if (object instanceof Boolean) {
             return node(CONST, VALUE, object);
-        } else if (object instanceof YadsNamed) {
-            YadsNamed named = (YadsNamed) object;
-            return node(YADS_NAMED, NAME, named.name,
-                    ARGS, named.array == null ? null : named.array.map(o -> serializeImpl(o, null)),
-                    NAMED_ARGS, named.map == null ? null : serializeMap(named.map));
         } else {
             //TO DO use constructor ?
             if (object.getClass() != knownType) imports.add(object.getClass().getCanonicalName());

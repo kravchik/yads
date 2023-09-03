@@ -5,17 +5,19 @@ import yk.jcommon.collections.YMap;
 import yk.jcommon.utils.Tab;
 
 import java.io.ByteArrayInputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.Map;
 
 import static yk.jcommon.collections.YArrayList.al;
-import static yk.lang.yads.YadsShorts.*;
+import static yk.lang.yads.YadsUtils.ESCAPE_YADS_DOUBLE_QUOTES;
+import static yk.lang.yads.YadsUtils.ESCAPE_YADS_SINGLE_QUOTES;
 import static yk.lang.yads.YadsWords.*;
 
 /**
  * Serializes nodes into a YADS string. Performs formatting: introduces new-lines, adds tabs, tries to avoid unnecessary new-lines where possible.
  * Nodes can contain
  */
-public class NodesToString {
+public class YadsNodeOutput {
     private int maxWidth = 100;
     private Tab tab = new Tab("  ");
 
@@ -47,50 +49,7 @@ public class NodesToString {
         }
 
         if (node.isType(CONST)) {
-            Object valObj = node.map.get(VALUE);
-            String value;
-            if (valObj == null) {
-                value = "null";
-            } else if (valObj instanceof String || valObj instanceof Character) {
-                value = valObj.toString();
-                boolean woQuotes = withoutQuotes(value);
-                if (!woQuotes) {
-                    if (value.contains("'")) value = "\"" + ESCAPE_YADS_DOUBLE_QUOTES.translate(value) + "\"";
-                    else value = "'" + ESCAPE_YADS_SINGLE_QUOTES.translate(value) + "'";
-                }
-
-            } else if (valObj instanceof Number) {
-                if (valObj instanceof Byte) {
-                    int i = ((Byte) valObj).intValue();
-                    if (i < 0) i = i + 256;
-                    valObj = i;
-                }
-                //TODO fix for other types of number, tests
-                String space = ((Number) valObj).floatValue() < 0 ? " " : "";
-                if (valObj instanceof Float) {
-                    String s = valObj.toString();
-                    if (s.endsWith(".0")) s = s.substring(0, s.length() - 2);
-                    value = String.format(space + "%sf", s);
-                } else if (valObj instanceof Double) {
-                    String s = valObj.toString();
-                    if (s.endsWith(".0")) s = s.substring(0, s.length() - 2);
-                    value = String.format(space + "%sd", s);
-                } else if (valObj instanceof Long) {
-                    value = space + valObj + "l";
-                } else if (valObj instanceof Integer) {
-                    value = space + valObj;
-                } else if (valObj instanceof Short) {
-                    value = space + valObj;
-                } else {
-                    throw new RuntimeException("Should never reach here");
-                }
-            } else if (valObj instanceof Boolean) {
-                value = valObj.toString();
-            } else {
-                throw new RuntimeException(String.format("Not implemented const type. Class: %s, Value: %s",
-                        valObj.getClass().toString(), valObj));
-            }
-            return al(value);
+            return al(valueToString(node.map.get(VALUE)));
         }
 
         if (node.isType(YADS_ARRAY)) {
@@ -118,6 +77,56 @@ public class NodesToString {
         throw new RuntimeException("Not implemented for " + node);
     }
 
+    public static String valueToString(Object valObj) {
+        String value;
+        if (valObj == null) {
+            value = "null";
+        } else if (valObj instanceof String || valObj instanceof Character) {
+            String value1;
+            value1 = valObj.toString();
+            boolean woQuotes = withoutQuotes(value1);
+            if (!woQuotes) {
+                if (value1.contains("'")) value1 = "\"" + ESCAPE_YADS_DOUBLE_QUOTES.translate(value1) + "\"";
+                else value1 = "'" + ESCAPE_YADS_SINGLE_QUOTES.translate(value1) + "'";
+            }
+            value = value1;
+        } else if (valObj instanceof Number) {
+            Number valObj1 = (Number) valObj;
+            String value1;
+            if (valObj1 instanceof Byte) {
+                int i = ((Byte) valObj1).intValue();
+                if (i < 0) i = i + 256;
+                valObj1 = i;
+            }
+            //TODO fix for other types of number, tests
+            String space = valObj1.floatValue() < 0 ? " " : "";
+            if (valObj1 instanceof Float) {
+                String s = valObj1.toString();
+                if (s.endsWith(".0")) s = s.substring(0, s.length() - 2);
+                value1 = String.format(space + "%sf", s);
+            } else if (valObj1 instanceof Double) {
+                String s = valObj1.toString();
+                if (s.endsWith(".0")) s = s.substring(0, s.length() - 2);
+                value1 = String.format(space + "%sd", s);
+            } else if (valObj1 instanceof Long) {
+                value1 = space + valObj1 + "l";
+            } else if (valObj1 instanceof Integer) {
+                value1 = space + valObj1;
+            } else if (valObj1 instanceof Short) {
+                value1 = space + valObj1;
+            } else {
+                throw new RuntimeException("Should never reach here");
+            }
+            value = value1;
+        } else if (valObj instanceof Boolean) {
+            value = valObj.toString();
+        } else {
+            throw new RuntimeException(String.format("Not implemented const type. Class: %s, Value: %s",
+                    valObj.getClass().toString(), valObj));
+        }
+        return value;
+    }
+
     private static boolean withoutQuotes(String value) {
         if (value.equals("null")) return false;
         if (value.equals("true")) return false;
@@ -135,7 +144,8 @@ public class NodesToString {
 //        }
 //        if (onlySimpleChars) return true;
         try {
-            Object would = new YadsParser(new ByteArrayInputStream(value.getBytes("UTF-8"))).parseRawElement();
+            Object would = new YadsParser(new ByteArrayInputStream(value.getBytes(StandardCharsets.UTF_8)))
+                    .parseRawElement();
             if (value.equals(would)) return true;
         } catch (Exception | Error ignore) {}
         return false;
@@ -210,7 +220,7 @@ public class NodesToString {
         return ss;
     }
 
-    public NodesToString withMaxWidth(int maxWidth) {
+    public YadsNodeOutput withMaxWidth(int maxWidth) {
         this.maxWidth = maxWidth;
         return this;
     }

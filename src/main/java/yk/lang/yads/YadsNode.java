@@ -61,7 +61,17 @@ public class YadsNode {
     }
 
     public YadsNode with(String k, Object v, Object... kv) {
-        return new YadsNode(id, map.with(k, v, kv));
+        return new YadsNode(id, map.with(k, v, kv).filter((kk, vv) -> vv != null));
+    }
+
+    //TODO remove key if value is null?
+    public YadsNode put(String k, Object v, Object... kv) {
+        if (v != null) map.put(k, v);
+        for (int i = 0; i < kv.length; i += 2) {
+            Object value = kv[i + 1];
+            if (value != null) map.put((String) kv[i], value);
+        }
+        return this;
     }
 
     public YadsNode without(String... kk) {
@@ -78,7 +88,7 @@ public class YadsNode {
     }
 
     public YadsNode with(YMap other) {
-        return new YadsNode(id, map.with(other));
+        return new YadsNode(id, map.with(other).filter((kk, vv) -> vv != null));
     }
 
     @Override

@@ -6,25 +6,20 @@ options {
 PARSER_BEGIN(YadsParser)
 
 package yk.lang.yads;
-import yk.jcommon.collections.Tuple;
 import yk.jcommon.collections.YList;
-import yk.lang.yads.YadsSerializer;
-import yk.lang.yads.YadsNode;
 
 import java.io.ByteArrayInputStream;
-import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
 
 import static yk.jcommon.collections.YArrayList.al;
-import static yk.lang.yads.YadsShorts.*;
+import static yk.lang.yads.YadsUtils.*;
 import static yk.lang.yads.YadsWords.*;
 
 public class YadsParser {
     public static YadsNode parse(String s) {
         try {
-            return new YadsParser(new ByteArrayInputStream(s.getBytes("UTF-8"))).parseListBodyNode();
-        } catch (UnsupportedEncodingException e) {
-            throw new RuntimeException(e);
-        } catch (ParseException e) {
+            return new YadsParser(new ByteArrayInputStream(s.getBytes(StandardCharsets.UTF_8))).parseListBodyNode();
+        }  catch (ParseException e) {
             throw new RuntimeException(e);
         }
     }
@@ -41,7 +36,6 @@ public class YadsParser {
         caret.setEnd(jj_input_stream);
         target.map.put(CARET, caret);
     }
-
 }
 
 PARSER_END(YadsParser)
@@ -54,13 +48,6 @@ SKIP : /* WHITE SPACE */
 | "\n"
 | "\r"
 | "\f"
-}
-
-SPECIAL_TOKEN : /* COMMENTS */
-{
-  <SINGLE_LINE_COMMENT: "//" (~["\n","\r"])* ("\n"|"\r"|"\r\n")>
-| <FORMAL_COMMENT: "/**" (~["*"])* "*" ("*" | (~["*","/"] (~["*"])* "*"))* "/">
-| <MULTI_LINE_COMMENT: "/*" (~["*"])* "*" ("*" | (~["*","/"] (~["*"])* "*"))* "/">
 }
 
 TOKEN :
@@ -96,13 +83,12 @@ TOKEN : /* LITERALS */
 
 TOKEN :
 {
-  <ANY_LITERAL: (["a"-"z","A"-"Z","0"-"9",".","_","$"])+ >
-|
-  <NAMED_CLASS_BEGIN: <ANY_LITERAL> "(">
-|
-  <ANY_OPERATOR: ((["+","-","/", "*","%","!","=","^","&","|", "<", ">"])+)>
-|
-  < STRING_LITERAL:
+  <SINGLE_LINE_COMMENT: "//" (~["\n","\r"])*>
+| <MULTI_LINE_COMMENT: "/*" (~["*"])* "*" ("*" | (~["*","/"] (~["*"])* "*"))* "/">
+| <ANY_LITERAL: (["a"-"z","A"-"Z","0"-"9",".","_","$"])+ >
+| <NAMED_CLASS_BEGIN: <ANY_LITERAL> "(">
+| <ANY_OPERATOR: ((["+","-","/", "*","%","!","=","^","&","|", "<", ">"])+)>
+| < STRING_LITERAL:
       "\""
       (   (~["\"","\\"])
         | ("\\"
@@ -114,8 +100,7 @@ TOKEN :
       )*
       "\""
   >
-|
-  < STRING_LITERAL_2:
+| < STRING_LITERAL_2:
       "'"
       (   (~["'","\\"])
         | ("\\"
@@ -130,16 +115,16 @@ TOKEN :
 }
 
 YadsNode parseClass():
-{YList body;String name = null;}
+{YList body;Token name = null;}
 {
     {beginCaret();}
-    (name = <NAMED_CLASS_BEGIN>.image | <UNNAMED_CLASS_BEGIN>)
+    (name = <NAMED_CLASS_BEGIN> | <UNNAMED_CLASS_BEGIN>)
         body = parseListBody()
     <CLASS_END>
 
     {
         YadsNode result;
-        if (name != null) result = new YadsNode(NODE_TYPE, YADS_RAW_CLASS, NAME, name.substring(0, name.length() - 1), ARGS, body);
+        if (name != null) result = new YadsNode(NODE_TYPE, YADS_RAW_CLASS, NAME, name.image.substring(0, name.image.length() - 1), ARGS, body);
         else result = new YadsNode(NODE_TYPE, YADS_ARRAY, ARGS, body);
         finishCaret(result);
         return result;
@@ -172,28 +157,35 @@ YList parseListBody():
 }
 
 YadsNode parseElement():
-{YadsNode o;String s;}
+{YadsNode o;Token t;String s;}
 {
     (
-    s = <INTEGER_LITERAL>.image {
+    t = <SINGLE_LINE_COMMENT> { o = new YadsNode(NODE_TYPE, COMMENT_SINGLE_LINE, VALUE, t.image, CARET, Caret.create(jj_input_stream));}
+    |
+    t = <MULTI_LINE_COMMENT> { o = new YadsNode(NODE_TYPE, COMMENT_MULTI_LINE, VALUE, t.image, CARET, Caret.create(jj_input_stream));}
+    |
+    t = <INTEGER_LITERAL> {
+            s = t.image;
             if (s.toLowerCase().endsWith("l")) o = constNode(Caret.create(jj_input_stream), "Long", Long.parseLong(s.substring(0, s.length()-1)));
             else o = constNode(Caret.create(jj_input_stream), "Integer", Integer.parseInt(s));}
     |
-    s = <FLOATING_POINT_LITERAL>.image {
+    t = <FLOATING_POINT_LITERAL> {
+            s = t.image;
             if (s.toLowerCase().endsWith("d")) o = constNode(Caret.create(jj_input_stream), "Double", Double.parseDouble(s.substring(0, s.length()-1)));
             else o = constNode(Caret.create(jj_input_stream), "Float", Float.parseFloat(s));}
     |
-    s = <ANY_LITERAL>.image {
-                Object oo;
+    t = <ANY_LITERAL> {
+            s = t.image;
+            Object oo;
 
-                if (s.equals("null")) oo = null;
-                else if (s.equals("true")) oo = true;
-                else if (s.equals("false")) oo = false;
-                else oo = s;
+            if (s.equals("null")) oo = null;
+            else if (s.equals("true")) oo = true;
+            else if (s.equals("false")) oo = false;
+            else oo = s;
 
-                o = constNode(Caret.create(jj_input_stream), "Literal", oo);}
+            o = constNode(Caret.create(jj_input_stream), "Literal", oo);}
     |
-    s = <ANY_OPERATOR>.image {o = constNode(Caret.create(jj_input_stream), "Operator", s);}
+    t = <ANY_OPERATOR> {o = constNode(Caret.create(jj_input_stream), "Operator", t.image);}
     |
     s = parseString() {o = constNode(Caret.create(jj_input_stream), "String", s);}
     )
@@ -202,33 +194,31 @@ YadsNode parseElement():
 
 //TODO remove! not actually used for parsing
 Object parseRawElement():
-{String s;}
+{Token t;String s;}
 {
     (
-    s = <INTEGER_LITERAL>.image {if (s.toLowerCase().endsWith("l")) return Long.parseLong(s.substring(0, s.length()-1)); else return Integer.parseInt(s);}
+    t = <INTEGER_LITERAL> {s = t.image;if (s.toLowerCase().endsWith("l")) return Long.parseLong(s.substring(0, s.length()-1)); else return Integer.parseInt(s);}
     |
-    s = <FLOATING_POINT_LITERAL>.image {if (s.toLowerCase().endsWith("d")) return Double.parseDouble(s.substring(0, s.length()-1)); else return Float.parseFloat(s);}
+    t = <FLOATING_POINT_LITERAL> {s = t.image;if (s.toLowerCase().endsWith("d")) return Double.parseDouble(s.substring(0, s.length()-1)); else return Float.parseFloat(s);}
     |
-    s = <ANY_LITERAL>.image {
+    t = <ANY_LITERAL> {
+                            s = t.image;
                             if (s.equals("null")) return null;
                             if (s.equals("true")) return true;
                             if (s.equals("false")) return false;
                             return s;}
     |
-    s = <ANY_OPERATOR>.image {return s;}
+    t = <ANY_OPERATOR> {return t.image;}
     )
     {return null;}
 }
 
 String parseString():
-{Object o;String s;}
+{Object o;Token t;}
 {
-    (
-    s = <STRING_LITERAL>.image {s = YadsShorts.UNESCAPE_YADS_DOUBLE_QUOTES.translate(s.substring(1, s.length() - 1));}
+    t = <STRING_LITERAL> {return YadsUtils.unescapeDoubleQuotes(t.image);}
     |
-    s = <STRING_LITERAL_2>.image {s = YadsShorts.UNESCAPE_YADS_SINGLE_QUOTES.translate(s.substring(1, s.length() - 1));}
-    )
-    {return s;}
+    t = <STRING_LITERAL_2> {return YadsUtils.unescapeSingleQuotes(t.image);}
 }
 
 

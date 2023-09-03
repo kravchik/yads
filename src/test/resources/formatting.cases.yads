@@ -1,0 +1,98 @@
+
+'true'
+
+'hello'
+
+'hello()'
+
+maxWidth = 1
+
+'true'
+
+'hello'
+
+'
+(
+  a
+  b
+  c
+)
+'
+
+'
+hello(
+  a
+  k = v
+  c
+)
+'
+
+maxWidth = 9
+
+'
+hello(
+  a
+  (a b c)
+  c
+)
+'
+
+maxWidth = 8
+
+'
+hello(
+  a
+  (
+    a
+    b
+    c
+  )
+  c
+)
+'
+
+'
+hello(
+  //comment
+  a
+  b
+)
+'
+'
+hello(
+  a
+  //comment
+  b
+)
+'
+'
+hello(
+  a
+  b
+  //comment
+)
+'
+'
+hello(
+  //comment
+  a = b
+  b
+)
+'
+'
+hello(
+  a = b
+  //comment
+  b
+)
+'
+'
+hello(
+  /*
+  safd
+     comment
+  */
+  a = b
+  b
+)
+'

@@ -13,12 +13,31 @@ import static yk.lang.yads.YadsWords.NAMED_ARGS;
 //TODO separate methods for serialize serializeFormatted ?
 /**
  * Just a collection of some frequently used methods to help avoid the usual boilerplate.
- * Also serves as an example of how to use YadsParser, YadsSerializer, YadsDeserializer.
+ * Also serves as an example of how to use YadsParser, YadsObjectSerializer, YadsObjectDeserializer.
  * <br>
  * Methods in this class a 'greedy'. They try to read everything available and throw an error if there are 'unexpected more'.
  * You can easily implement 'not greedy' analogs.
  */
 public class Yads {
+
+    public static Object parseYadsList(String s) {
+        return YadsListResolver.toYadsList(YadsParser.parse(s).getNodeList(ARGS)).assertSize(1).first();
+    }
+
+    public static YadsList parseYadsListBody(String s) {
+        return new YadsList(null, YadsListResolver.toYadsList(YadsParser.parse(s).getNodeList(ARGS)));
+    }
+
+    public static String printYadsList(Object s) {
+        return new YadsListOutput().yadsListToString(s);
+    }
+
+    public static String printYadsList(Object s, int maxWidth) {
+        YadsListOutput yadsListOutput = new YadsListOutput();
+        yadsListOutput.maxWidth = maxWidth;
+        return yadsListOutput.yadsListToString(s);
+    }
+
     /**
      * Deserialize the only element.
      * <br>The next string will be deserialized into an array of strings "a", "b" and "c":
@@ -60,17 +79,14 @@ public class Yads {
      * @return deserialized value
      */
     public static Object deserialize(YList<String> imports, String text) {
-        YadsDeserializer deserializer = new YadsDeserializer();
+        YadsObjectDeserializer deserializer = new YadsObjectDeserializer();
         deserializer.namespaces.enterScope();
         for (String i : imports) deserializer.namespaces.addClass(i);
 
         YadsNode parse = YadsParser.parse(text);
-        return deserializeTheOnlyElement(deserializer, new YadsResolver().resolve(parse));
+        return deserializeTheOnlyElement(deserializer, new YadsNodeResolver().resolve(parse));
     }
 
-    //TODO other versions
-    //TODO comments
-    //TODO tests
     public static Object deserialize(YList<String> imports, InputStream is) {
 
         YadsNode result;
@@ -80,20 +96,20 @@ public class Yads {
             throw new RuntimeException(e);
         }
 
-        YadsDeserializer deserializer = new YadsDeserializer();
+        YadsObjectDeserializer deserializer = new YadsObjectDeserializer();
         deserializer.namespaces.enterScope();
         for (String i : imports) deserializer.namespaces.addClass(i);
-        return deserializeTheOnlyElement(deserializer, new YadsResolver().resolve(result));
+        return deserializeTheOnlyElement(deserializer, new YadsNodeResolver().resolve(result));
     }
 
     public static Object deserializeBody(String text) {
         YadsNode parsed = YadsParser.parse(text);
-        return new YadsDeserializer().deserializeSpecificType(null, new YadsResolver().resolve(parsed));
+        return new YadsObjectDeserializer().deserializeSpecificType(null, new YadsNodeResolver().resolve(parsed));
     }
 
     public static <T> T deserializeBody(Class<T> type, String text) {
         YadsNode parsed = YadsParser.parse(text);
-        return new YadsDeserializer().deserializeSpecificType(type, new YadsResolver().resolve(parsed));
+        return new YadsObjectDeserializer().deserializeSpecificType(type, new YadsNodeResolver().resolve(parsed));
     }
 
     public static <T> T deserializeBody(YList<String> imports, String text) {
@@ -101,11 +117,11 @@ public class Yads {
     }
 
     public static <T> T deserializeBody(YList<String> imports, Class<T> type, String text) {
-        YadsDeserializer deserializer = new YadsDeserializer();
+        YadsObjectDeserializer deserializer = new YadsObjectDeserializer();
         deserializer.namespaces.enterScope();
         for (String i : imports) deserializer.namespaces.addClass(i);
         YadsNode parsed = YadsParser.parse(text);
-        return deserializer.deserializeSpecificType(type, new YadsResolver().resolve(parsed));
+        return deserializer.deserializeSpecificType(type, new YadsNodeResolver().resolve(parsed));
     }
 
     public static <K, V> YMap<K, V> deserializeMapBody(String text) {
@@ -125,7 +141,7 @@ public class Yads {
     }
 
     public static String print(Object someObject) {
-        return new NodesToString().toString(new YadsSerializer(false).serialize(someObject));
+        return new YadsNodeOutput().toString(new YadsObjectSerializer(false).serialize(someObject));
     }
 
     /**
@@ -146,7 +162,7 @@ public class Yads {
      * @return deserialized value
      */
     public static String serialize(Object someObject) {
-        return new NodesToString().toString(new YadsSerializer().serialize(someObject));
+        return new YadsNodeOutput().toString(new YadsObjectSerializer().serialize(someObject));
     }
 
     /**
@@ -164,23 +180,23 @@ public class Yads {
      * @return serialized value
      */
     public static String serialize(YList<String> imports, Object someObject) {
-        YadsSerializer yadsToNodes = new YadsSerializer();
+        YadsObjectSerializer yadsToNodes = new YadsObjectSerializer();
         yadsToNodes.addDefaultImports(imports);
-        return new NodesToString().toString(yadsToNodes.serialize(someObject));
+        return new YadsNodeOutput().toString(yadsToNodes.serialize(someObject));
     }
 
     //TODO 'avoid compact of the first level' option
     public static String serializeBody(YList<String> imports, Object someObject) {
-        YadsSerializer yadsToNodes = new YadsSerializer();
+        YadsObjectSerializer yadsToNodes = new YadsObjectSerializer();
         yadsToNodes.addDefaultImports(imports);
-        return new NodesToString().toStringBody(yadsToNodes.serializeBody(someObject));
+        return new YadsNodeOutput().toStringBody(yadsToNodes.serializeBody(someObject));
     }
 
     public static String serializeBody(Object someObject) {
-        return new NodesToString().toStringBody(new YadsSerializer().serializeBody(someObject));
+        return new YadsNodeOutput().toStringBody(new YadsObjectSerializer().serializeBody(someObject));
     }
 
-    private static Object deserializeTheOnlyElement(YadsDeserializer des, YadsNode node) {
+    private static Object deserializeTheOnlyElement(YadsObjectDeserializer des, YadsNode node) {
         try {
             if (null != node.map.get(NAMED_ARGS)) throw new RuntimeException("Unexpected named arg at top level");
             YList result = des.deserializeRawList(node.getNodeList(ARGS));

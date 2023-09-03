@@ -3,15 +3,40 @@ package yk.lang.yads;
 import yk.jcommon.collections.YList;
 import yk.jcommon.collections.YMap;
 
+import java.util.List;
+import java.util.Map;
+
 import static yk.jcommon.collections.YArrayList.al;
 import static yk.jcommon.collections.YHashMap.hm;
-import static yk.lang.yads.YadsShorts.*;
 import static yk.lang.yads.YadsWords.*;
 
-public class ResolveMap {
-    private static final String DELIMITER = "=";
+public class YadsNodeResolver {
+    public static final String DELIMITER = "=";
 
-    public YadsNode resolve(YadsNode node) {
+    public Object resolve(Object o) {
+        if (o instanceof List) {
+            YList result = al();
+            for (Object o1 : (List)o) result.add(resolve(o1));
+            return result;
+        }
+        if (o instanceof YadsNode) return resolve((YadsNode)o);
+        //if (o instanceof String) {
+        //    Optional<Object> optional = resolveConsts.resolve((String) o);
+        //    if (optional.isPresent()) return optional.get();
+        //}
+        return o;
+    }
+
+    public YadsNode resolve(YadsNode input) {
+        YMap newMap = hm();
+        for (Map.Entry<String, Object> entry : input.map.entrySet()) {
+            newMap.put(resolve(entry.getKey()), resolve(entry.getValue()));
+        }
+        //return input.with(newMap);
+        return resolveImpl(input.with(newMap));
+    }
+
+    private static YadsNode resolveImpl(YadsNode node) {
         if (!node.isType(YADS_ARRAY) && !node.isType(YADS_RAW_CLASS)) return node;
         YList<YadsNode> values = (YList) node.map.get(ARGS);
 
