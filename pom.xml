@@ -4,7 +4,7 @@
 
     <groupId>yk</groupId>
     <artifactId>yads</artifactId>
-    <version>0.04-SNAPSHOT</version>
+    <version>0.1</version>
 
     <packaging>jar</packaging>
     <name>yads</name>
