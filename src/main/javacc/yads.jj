@@ -6,7 +6,10 @@ options {
 PARSER_BEGIN(YadsNodeParser)
 
 package yk.lang.yads;
-import yk.lang.yads.utils.Caret;import yk.ycollections.YList;
+import yk.lang.yads.utils.Caret;
+import yk.ycollections.YList;
+import static yk.lang.yads.utils.YadsUtils.*;
+import yk.lang.yads.utils.YadsUtils;
 
 import java.io.ByteArrayInputStream;
 import java.nio.charset.StandardCharsets;
@@ -35,9 +38,7 @@ public class YadsNodeParser {
         caret.setEnd(jj_input_stream);
         target.map.put(CARET, caret);
     }
-}}
-}}
-}}
+
 }
 
 PARSER_END(YadsNodeParser)
