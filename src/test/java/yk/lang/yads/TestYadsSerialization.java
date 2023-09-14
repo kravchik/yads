@@ -39,7 +39,9 @@ public class TestYadsSerialization {
 
     @Test
     public void testS12() {
-        assertS12(al(), "()", "import yk.lang.yads.TestClass ()");
+        assertS12(al(), "()", "import yk.lang.yads.TestClass ()", "import yk.lang.yads.TestClass ()//");
+        assertS12(al(), "()", "import yk.lang.yads.TestClass ()", "import yk.lang.yads.TestClass ()/**/");
+        assertS12(al(), "()", "import yk.lang.yads.TestClass ()", "import yk.lang.yads.TestClass ()");
         assertS12(hm(), "(=)", "import yk.lang.yads.TestClass (=)");
         assertS12(hm("a", "b"), "(a=b)", "import yk.lang.yads.TestClass (a = b)");
         assertS12(al(1, 2, 3), "(1 2 3)", "import yk.lang.yads.TestClass (1 2 3)");
@@ -322,6 +324,14 @@ public class TestYadsSerialization {
     @Test
     public void testTabs() {
         assertEquals(readResource("formatting.yads").trim(), new YadsNodeOutput().withMaxWidth(30).toString(new YadsObjectSerializer(true).serialize(al(new TestHierarchy("key1", "value1", "key2", new TestHierarchy("key3", "value3")), new TestHierarchy("key1", "value1", "key2", new TestHierarchy("key3", "value3"))))));
+    }
+
+    @Test
+    public void testYadsNamed() {
+        assertS12(new YadsNamed("mul"), "mul()");
+        assertS12(new YadsNamed("mul").setArray(al("a", "b")), "mul(a b)");
+        assertS12(new YadsNamed("mul").setMap(hm("k", "v")), "mul(k=v)");
+        assertS12(new YadsNamed("mul").setArray(al("a", "b")).setMap(hm("k", "v")), "mul(a b k=v)");
     }
 
     private static void assertRefInPrint(Object a, boolean haveRef, boolean exact) {

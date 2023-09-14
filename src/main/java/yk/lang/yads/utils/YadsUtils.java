@@ -37,10 +37,7 @@ public class YadsUtils {
     public static final YSet<Character> SINGLE_QUOTES_ESCAPED = hs('\'');
 
     private static String handleQuotes(String s) {
-        String woQuotes = s.substring(1, s.length() - 1);
-        if (woQuotes.startsWith("\n") && woQuotes.endsWith("\n"))
-            woQuotes = woQuotes.substring(1, woQuotes.length() - 1);
-        return woQuotes;
+        return s.substring(1, s.length() - 1);
     }
 
     public static String unescapeDoubleQuotes(String s) {

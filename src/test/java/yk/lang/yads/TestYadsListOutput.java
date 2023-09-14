@@ -3,6 +3,7 @@ package yk.lang.yads;
 import org.junit.Test;
 import yk.lang.yads.utils.BadException;
 import yk.ycollections.Tuple;
+import yk.ycollections.YList;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -14,16 +15,16 @@ import static junit.framework.TestCase.assertEquals;
 public class TestYadsListOutput {
     @Test
     public void test1() {
-        YadsList yl = Yads.parseYadsListBody(readResource("formatting.cases.yads"));
+        YList<Object> yl = Yads.parseYadsListBody(readResource("formatting.cases.yads"));
         int maxWidth = 100;
-        for (Object o : yl.children) {
+        for (Object o : yl) {
             if (o instanceof Tuple) {
                 if (((Tuple<?, ?>) o).a.equals("maxWidth")) {
                     maxWidth = ((Number)((Tuple<?, ?>) o).b).intValue();
                 } else BadException.notImplemented("o");
             } else if (o instanceof String) {
                 String s = (String) o;
-                assertEquals(s, Yads.printYadsList(Yads.parseYadsList(s), maxWidth));
+                assertEquals(s, "\n" + Yads.printYadsList(Yads.parseYadsList(s), maxWidth) + "\n");
             }
         }
     }

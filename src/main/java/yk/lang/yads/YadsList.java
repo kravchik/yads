@@ -1,5 +1,6 @@
 package yk.lang.yads;
 
+import yk.ycollections.Tuple;
 import yk.ycollections.YList;
 
 public class YadsList {
@@ -14,6 +15,20 @@ public class YadsList {
     public YadsList(String name, YList<Object> children) {
         this.name = name;
         this.children = children;
+    }
+
+    public boolean containsKey(Object k) {
+        return children.isAny(o -> o instanceof Tuple && k.equals(((Tuple<?, ?>) o).a));
+    }
+
+    public Object get(Object k) {
+        Object result = children.first(o -> o instanceof Tuple && k.equals(((Tuple<?, ?>) o).a));
+        return result == null ? null : ((Tuple)result).b;
+    }
+
+    public Object getOr(Object k, Object or) {
+        Object result = children.first(o -> o instanceof Tuple && k.equals(((Tuple<?, ?>) o).a));
+        return result == null ? or : ((Tuple)result).b;
     }
 
     public static class YadsComment {

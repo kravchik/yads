@@ -126,6 +126,11 @@ public class YadsObjectSerializer {
             return node(CONST, VALUE, object);
         } else if (object instanceof Boolean) {
             return node(CONST, VALUE, object);
+        } else if (object instanceof YadsNamed) {
+            YadsNamed named = (YadsNamed) object;
+            return node(YADS_NAMED, NAME, named.name,
+                    ARGS, named.array == null ? null : named.array.map(o -> serializeImpl(o, null)),
+                    NAMED_ARGS, named.map == null ? null : serializeMap(named.map));
         } else {
             //TO DO use constructor ?
             if (object.getClass() != knownType) imports.add(object.getClass().getCanonicalName());

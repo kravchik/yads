@@ -24,8 +24,8 @@ public class Yads {
         return YadsListResolver.toYadsList(YadsNodeParser.parse(s).getNodeList(ARGS)).assertSize(1).first();
     }
 
-    public static YadsList parseYadsListBody(String s) {
-        return new YadsList(null, YadsListResolver.toYadsList(YadsNodeParser.parse(s).getNodeList(ARGS)));
+    public static YList<Object> parseYadsListBody(String s) {
+        return YadsListResolver.toYadsList(YadsNodeParser.parse(s).getNodeList(ARGS));
     }
 
     public static String printYadsList(Object s) {

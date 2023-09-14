@@ -118,7 +118,9 @@ public class YadsObjectDeserializer {
             }
             if (refIndex > 0) refs.put(refIndex, result);
         } else {
-            if (knownType == null) throw new RuntimeException("Can't continue, type is still unknown");
+            if (knownType == null) {
+                throw new RuntimeException("Can't continue, type is still unknown");
+            }
             result = construct(knownType, node, refIndex);
         }
         popCaret();
@@ -150,7 +152,7 @@ public class YadsObjectDeserializer {
         if (stringName != null) typeByNode = namespaces.findClass(stringName);
         if (typeByNode != null && knownType != null && !knownType.isAssignableFrom(typeByNode)) throw new RuntimeException(String.format("Can't assign %s to %s", typeByNode, knownType));
         if (typeByNode != null) knownType = typeByNode;
-        if (knownType == null) throw new RuntimeException("Unresolved type for node " + node.map.get(NAME));
+        if (knownType == null) return YadsNamed.class;
         return knownType;
     }
 
@@ -159,7 +161,10 @@ public class YadsObjectDeserializer {
         YList array = node.map.get(ARGS) == null ? al() : deserializeRawList((YList) node.map.get(ARGS));
 
         Object instance;
-        if (array.notEmpty()) {
+        if (type == YadsNamed.class) {
+            instance = new YadsNamed(node.getString(NAME));
+            if (array.notEmpty()) ((YadsNamed) instance).array = array;
+        } else if (array.notEmpty()) {
             Constructor constructor = Reflector.getApropriateConstructor(type, array.toArray());
             if (constructor != null) instance = Reflector.newInstance(type, array.toArray());
             else instance = Reflector.newInstance(type, array);
@@ -169,6 +174,10 @@ public class YadsObjectDeserializer {
 
         //set fields from named args
         if (node.map.get(NAMED_ARGS) != null && ((YMap)node.map.get(NAMED_ARGS)).notEmpty()) {
+            if (type == YadsNamed.class) {
+                YadsNamed named = (YadsNamed) instance;
+                named.map = deserializeRawMap((YMap) node.map.get(NAMED_ARGS), refIndex);
+            } else
             for (Map.Entry<YadsNode, YadsNode> entry1 : ((YMap<YadsNode, YadsNode>) node.map.get(NAMED_ARGS)).entrySet()) {
 
                 pushCaret(entry1.getKey());
@@ -224,7 +233,11 @@ public class YadsObjectDeserializer {
             if (refIndex > 0) refs.put(refIndex, result);
             YList<YadsNode> argNodes = (YList<YadsNode>) node.map.get(ARGS);
             if (argNodes != null) {
-                for (YadsNode argNode : argNodes) result.add(deserialize(null, argNode));
+                for (YadsNode argNode : argNodes) {
+                    if (argNode.isType(COMMENT_SINGLE_LINE)) continue;
+                    if (argNode.isType(COMMENT_MULTI_LINE)) continue;
+                    result.add(deserialize(null, argNode));
+                }
                 if (result.size() != argNodes.size()) throw new RuntimeException("Set contains equal elements");
             }
             //TO DO typed array
@@ -276,6 +289,8 @@ public class YadsObjectDeserializer {
                 popCaret();
                 continue;
             }
+            if (n.isType(COMMENT_SINGLE_LINE)) continue;
+            if (n.isType(COMMENT_MULTI_LINE)) continue;
             Object deserialized = deserialize(null, n);
             resultList.add(deserialized);
         }
