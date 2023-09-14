@@ -16,7 +16,7 @@ import static yk.ycollections.YHashMap.hm;
 import static yk.ycollections.YHashSet.hs;
 
 //YadsNode -> objects
-public class YadsObjectDeserializer {
+public class YadsJavaDeserializer {
 
     private YList<Caret> caretStack = al();
     public Namespaces namespaces = new Namespaces();

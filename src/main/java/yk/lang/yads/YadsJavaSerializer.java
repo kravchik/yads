@@ -20,11 +20,11 @@ import static yk.ycollections.YHashMap.hm;
 import static yk.ycollections.YHashSet.hs;
 
 //objects -> YadsNode
-public class YadsObjectSerializer {
+public class YadsJavaSerializer {
     private YSet<String> imports = hs();
     private YSet<String> defaultImports = hs();
 
-    public YadsObjectSerializer addDefaultImports(YList<String> imports) {
+    public YadsJavaSerializer addDefaultImports(YList<String> imports) {
         defaultImports.addAll(imports);
         return this;
     }
@@ -34,7 +34,7 @@ public class YadsObjectSerializer {
 
     private boolean strictReferencing = true;
 
-    public YadsObjectSerializer() {
+    public YadsJavaSerializer() {
     }
 
     /**
@@ -44,7 +44,7 @@ public class YadsObjectSerializer {
      * <br><br>
      * <b>Notice</b>, that for all other objects except String and inheritors of Number - there will always be used referencing if the same instance is referenced.
      */
-    public YadsObjectSerializer(boolean strictReferencing) {
+    public YadsJavaSerializer(boolean strictReferencing) {
         this.strictReferencing = strictReferencing;
     }
 
