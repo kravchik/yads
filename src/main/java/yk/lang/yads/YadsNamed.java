@@ -8,7 +8,7 @@ import java.util.Objects;
 /**
  * Created by Yuri at 01.04.22
  */
-@Deprecated //use YadsList instead
+@Deprecated //use YadsObject instead
 public class YadsNamed {
     public String name;
     public YList<Object> array;

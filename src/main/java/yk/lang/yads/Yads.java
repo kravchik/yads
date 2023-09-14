@@ -21,21 +21,21 @@ import static yk.ycollections.YArrayList.al;
 public class Yads {
 
     public static Object parseYadsList(String s) {
-        return YadsListResolver.toYadsList(YadsNodeParser.parse(s).getNodeList(ARGS)).assertSize(1).first();
+        return YadsObjectResolver.toYadsList(YadsNodeParser.parse(s).getNodeList(ARGS)).assertSize(1).first();
     }
 
     public static YList<Object> parseYadsListBody(String s) {
-        return YadsListResolver.toYadsList(YadsNodeParser.parse(s).getNodeList(ARGS));
+        return YadsObjectResolver.toYadsList(YadsNodeParser.parse(s).getNodeList(ARGS));
     }
 
     public static String printYadsList(Object s) {
-        return new YadsListOutput().yadsListToString(s);
+        return new YadsObjectOutput().yadsListToString(s);
     }
 
     public static String printYadsList(Object s, int maxWidth) {
-        YadsListOutput yadsListOutput = new YadsListOutput();
-        yadsListOutput.maxWidth = maxWidth;
-        return yadsListOutput.yadsListToString(s);
+        YadsObjectOutput yadsObjectOutput = new YadsObjectOutput();
+        yadsObjectOutput.maxWidth = maxWidth;
+        return yadsObjectOutput.yadsListToString(s);
     }
 
     /**

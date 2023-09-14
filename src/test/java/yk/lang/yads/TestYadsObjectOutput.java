@@ -12,7 +12,7 @@ import java.io.InputStreamReader;
 
 import static junit.framework.TestCase.assertEquals;
 
-public class TestYadsListOutput {
+public class TestYadsObjectOutput {
     @Test
     public void test1() {
         YList<Object> yl = Yads.parseYadsListBody(readResource("formatting.cases.yads"));
@@ -40,7 +40,7 @@ public class TestYadsListOutput {
         return streamToString(resourceAsStream(name));
     }
     public static InputStream resourceAsStream(String name) {
-        return TestYadsListOutput.class.getClassLoader().getResourceAsStream(name);
+        return TestYadsObjectOutput.class.getClassLoader().getResourceAsStream(name);
     }
     public static String streamToString(InputStream in) {
         if (in == null) return null;
