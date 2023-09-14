@@ -20,19 +20,19 @@ import static yk.ycollections.YArrayList.al;
  */
 public class Yads {
 
-    public static Object parseYadsList(String s) {
+    public static Object parseYadsObject(String s) {
         return YadsObjectResolver.toYadsList(YadsNodeParser.parse(s).getNodeList(ARGS)).assertSize(1).first();
     }
 
-    public static YList<Object> parseYadsListBody(String s) {
+    public static YList<Object> parseYadsObjectBody(String s) {
         return YadsObjectResolver.toYadsList(YadsNodeParser.parse(s).getNodeList(ARGS));
     }
 
-    public static String printYadsList(Object s) {
+    public static String printYadsObject(Object s) {
         return new YadsObjectOutput().yadsListToString(s);
     }
 
-    public static String printYadsList(Object s, int maxWidth) {
+    public static String printYadsObject(Object s, int maxWidth) {
         YadsObjectOutput yadsObjectOutput = new YadsObjectOutput();
         yadsObjectOutput.maxWidth = maxWidth;
         return yadsObjectOutput.yadsListToString(s);

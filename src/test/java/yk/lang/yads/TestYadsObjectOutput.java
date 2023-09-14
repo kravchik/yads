@@ -15,7 +15,7 @@ import static junit.framework.TestCase.assertEquals;
 public class TestYadsObjectOutput {
     @Test
     public void test1() {
-        YList<Object> yl = Yads.parseYadsListBody(readResource("formatting.cases.yads"));
+        YList<Object> yl = Yads.parseYadsObjectBody(readResource("formatting.cases.yads"));
         int maxWidth = 100;
         for (Object o : yl) {
             if (o instanceof Tuple) {
@@ -24,7 +24,7 @@ public class TestYadsObjectOutput {
                 } else BadException.notImplemented("o");
             } else if (o instanceof String) {
                 String s = (String) o;
-                assertEquals(s, "\n" + Yads.printYadsList(Yads.parseYadsList(s), maxWidth) + "\n");
+                assertEquals(s, "\n" + Yads.printYadsObject(Yads.parseYadsObject(s), maxWidth) + "\n");
             }
         }
     }
