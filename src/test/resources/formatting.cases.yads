@@ -106,3 +106,18 @@ hello(
   b
 )
 '
+
+'
+hello(
+  key1 = internal(
+    intKey1 = asdf
+    intKey2 = intInt(
+      hello
+      world
+    )
+    hello
+    world
+  )
+  key2
+)
+'

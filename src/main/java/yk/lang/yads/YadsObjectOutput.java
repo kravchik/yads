@@ -25,7 +25,7 @@ public class YadsObjectOutput {
             if (kk.size() != 1) BadException.notImplemented();
             YList<String> vv = yadsListToString(startAt + inc.length(), t.b);
             if (vv.isEmpty()) BadException.shouldNeverReachHere();
-            return vv.mapWithIndex((i, v) -> i == 0 ? (kk.first() + " = " + v) : i == vv.size() - 1 ? v : inc + v);
+            return vv.mapWithIndex((i, v) -> i == 0 ? (kk.first() + " = " + v) : v);
         } else if (o instanceof YadsObject) {
             return yadsListToString(startAt, (YadsObject) o);
         } else return al(YadsNodeOutput.valueToString(o));
