@@ -3,7 +3,7 @@ package yk.lang.yads;
 import yk.ycollections.Tuple;
 import yk.ycollections.YList;
 
-public class YadsObject {
+public class YadsThingy {
     //can be null
     public String name;
     //Tuple<String, Object> - field
@@ -12,7 +12,7 @@ public class YadsObject {
     //YadsComment - comment
     public YList<Object> children;
 
-    public YadsObject(String name, YList<Object> children) {
+    public YadsThingy(String name, YList<Object> children) {
         this.name = name;
         this.children = children;
     }
@@ -55,6 +55,6 @@ public class YadsObject {
 
     @Override
     public String toString() {
-        return "YadsObject{" + (name == null ? "" : "name='" + name + "', ") + "children=" + children + '}';
+        return "YadsThingy{" + (name == null ? "" : "name='" + name + "', ") + "children=" + children + '}';
     }
 }

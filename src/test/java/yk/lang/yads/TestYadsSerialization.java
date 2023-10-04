@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.Map;
 
 import static org.junit.Assert.*;
-import static yk.lang.yads.TestYadsObjectOutput.readResource;
+import static yk.lang.yads.TestYadsThingyOutput.readResource;
 import static yk.lang.yads.Yads.deserialize;
 import static yk.lang.yads.Yads.serialize;
 import static yk.ycollections.YArrayList.al;

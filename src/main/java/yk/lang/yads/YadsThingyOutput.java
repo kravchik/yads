@@ -7,7 +7,7 @@ import yk.ycollections.YList;
 import static yk.ycollections.YArrayList.al;
 
 @SuppressWarnings("rawtypes")
-public class YadsObjectOutput {
+public class YadsThingyOutput {
     public int maxWidth = 100;
     public String inc = "  ";
 
@@ -26,20 +26,20 @@ public class YadsObjectOutput {
             YList<String> vv = yadsListToString(startAt + inc.length(), t.b);
             if (vv.isEmpty()) BadException.shouldNeverReachHere();
             return vv.mapWithIndex((i, v) -> i == 0 ? (kk.first() + " = " + v) : v);
-        } else if (o instanceof YadsObject) {
-            return yadsListToString(startAt, (YadsObject) o);
+        } else if (o instanceof YadsThingy) {
+            return yadsListToString(startAt, (YadsThingy) o);
         } else return al(YadsNodeOutput.valueToString(o));
     }
 
-    private YList<String> yadsListToString(int startAt, YadsObject yl) {
+    private YList<String> yadsListToString(int startAt, YadsThingy yl) {
         String l1 = (yl.name == null ? "" : yl.name) + "(";
         String ln = ")";
         boolean tryCompact = true;
         YList<String> cc = al();
         int commonLength = 0;
         for (Object child : yl.children) {
-            if (child instanceof YadsObject.YadsComment) {
-                YadsObject.YadsComment c = (YadsObject.YadsComment) child;
+            if (child instanceof YadsThingy.YadsComment) {
+                YadsThingy.YadsComment c = (YadsThingy.YadsComment) child;
                 tryCompact = false;
                 if (c.isOneLine) {
                     cc.add("//" + c.text);

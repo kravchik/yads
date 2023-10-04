@@ -16,9 +16,8 @@ import static yk.ycollections.YHashMap.hm;
  * Date: 30/08/16
  * Time: 17:54
  */
+//TODO rename! remove?
 public class YadsNode {
-    public static long NEXT_ID;
-    public final long id;
     public YMap<String, Object> map;
 
     public static YadsNode node(String type, String k, Object v, Object... kv) {
@@ -43,25 +42,18 @@ public class YadsNode {
     }
 
     private YadsNode() {
-        id = NEXT_ID++;
     }
 
     public YadsNode(String k, Object v, Object... kv) {
-        id = NEXT_ID++;
         map = hm(k, v, kv);
     }
 
-    public YadsNode(long id, YMap<String, Object> map) {
-        this.id = id;
+    public YadsNode(YMap<String, Object> map) {
         this.map = map;
     }
 
-    public YadsNode(long id) {
-        this.id = id;
-    }
-
     public YadsNode with(String k, Object v, Object... kv) {
-        return new YadsNode(id, map.with(k, v, kv).filter((kk, vv) -> vv != null));
+        return new YadsNode(map.with(k, v, kv).filter((kk, vv) -> vv != null));
     }
 
     //TODO remove key if value is null?
@@ -75,11 +67,11 @@ public class YadsNode {
     }
 
     public YadsNode without(String... kk) {
-        return new YadsNode(id, map.without(al(kk)));
+        return new YadsNode(map.without(al(kk)));
     }
 
     public YadsNode withRearrange(String k, Object v, Object... kv) {
-        YadsNode result = new YadsNode(id, map);
+        YadsNode result = new YadsNode(map);
         result.map.remove(k);
         result.map.put(k, v);
         for (int i = 0; i < kv.length; i += 2) result.map.remove(kv[i]);
@@ -88,12 +80,12 @@ public class YadsNode {
     }
 
     public YadsNode with(YMap other) {
-        return new YadsNode(id, map.with(other).filter((kk, vv) -> vv != null));
+        return new YadsNode(map.with(other).filter((kk, vv) -> vv != null));
     }
 
     @Override
     public String toString() {
-        return "{" + id + " " + map.toString(" ") + "}";
+        return "{" + map.toString(" ") + "}";
     }
 
     public Long getLong(String name) {

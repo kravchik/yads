@@ -12,10 +12,10 @@ import java.io.InputStreamReader;
 
 import static junit.framework.TestCase.assertEquals;
 
-public class TestYadsObjectOutput {
+public class TestYadsThingyOutput {
     @Test
     public void test1() {
-        YList<Object> yl = Yads.parseYadsObjectBody(readResource("formatting.cases.yads"));
+        YList<Object> yl = Yads.parseYadsThingyBody(readResource("formatting.cases.yads"));
         int maxWidth = 100;
         for (Object o : yl) {
             if (o instanceof Tuple) {
@@ -24,7 +24,7 @@ public class TestYadsObjectOutput {
                 } else BadException.notImplemented("o");
             } else if (o instanceof String) {
                 String s = (String) o;
-                assertEquals(s, "\n" + Yads.printYadsObject(Yads.parseYadsObject(s), maxWidth) + "\n");
+                assertEquals(s, "\n" + Yads.printYadsThingy(Yads.parseYadsThingy(s), maxWidth) + "\n");
             }
         }
     }
@@ -40,7 +40,7 @@ public class TestYadsObjectOutput {
         return streamToString(resourceAsStream(name));
     }
     public static InputStream resourceAsStream(String name) {
-        return TestYadsObjectOutput.class.getClassLoader().getResourceAsStream(name);
+        return TestYadsThingyOutput.class.getClassLoader().getResourceAsStream(name);
     }
     public static String streamToString(InputStream in) {
         if (in == null) return null;

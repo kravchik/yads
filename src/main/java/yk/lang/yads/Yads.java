@@ -20,22 +20,22 @@ import static yk.ycollections.YArrayList.al;
  */
 public class Yads {
 
-    public static Object parseYadsObject(String s) {
-        return YadsObjectResolver.toYadsList(YadsNodeParser.parse(s).getNodeList(ARGS)).assertSize(1).first();
+    public static Object parseYadsThingy(String s) {
+        return YadsThingyResolver.toYadsList(YadsNodeParser.parse(s).getNodeList(ARGS)).assertSize(1).first();
     }
 
-    public static YList<Object> parseYadsObjectBody(String s) {
-        return YadsObjectResolver.toYadsList(YadsNodeParser.parse(s).getNodeList(ARGS));
+    public static YList<Object> parseYadsThingyBody(String s) {
+        return YadsThingyResolver.toYadsList(YadsNodeParser.parse(s).getNodeList(ARGS));
     }
 
-    public static String printYadsObject(Object s) {
-        return new YadsObjectOutput().yadsListToString(s);
+    public static String printYadsThingy(Object s) {
+        return new YadsThingyOutput().yadsListToString(s);
     }
 
-    public static String printYadsObject(Object s, int maxWidth) {
-        YadsObjectOutput yadsObjectOutput = new YadsObjectOutput();
-        yadsObjectOutput.maxWidth = maxWidth;
-        return yadsObjectOutput.yadsListToString(s);
+    public static String printYadsThingy(Object s, int maxWidth) {
+        YadsThingyOutput yadsThingyOutput = new YadsThingyOutput();
+        yadsThingyOutput.maxWidth = maxWidth;
+        return yadsThingyOutput.yadsListToString(s);
     }
 
     /**
