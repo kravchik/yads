@@ -15,14 +15,14 @@ import static yk.ycollections.YArrayList.al;
 import static yk.ycollections.YHashMap.hm;
 import static yk.ycollections.YHashSet.hs;
 
-//YadsNode -> objects
+//YadsObject -> objects
 public class YadsJavaDeserializer {
 
     private YList<Caret> caretStack = al();
     public Namespaces namespaces = new Namespaces();
     private YMap<Integer, Object> refs = hm();
 
-    private void pushCaret(YadsNode node) {
+    private void pushCaret(YadsObject node) {
         Caret e = (Caret) node.map.get(CARET);
         caretStack.add(e);
     }
@@ -31,7 +31,7 @@ public class YadsJavaDeserializer {
         caretStack.remove(caretStack.size() - 1);
     }
 
-    public <T> T deserializeSpecificType(Class<T> c, YadsNode node) {
+    public <T> T deserializeSpecificType(Class<T> c, YadsObject node) {
         try {
             Object result = deserialize(c, node);
             if (c != null && !c.isAssignableFrom(result.getClass())) {
@@ -60,9 +60,9 @@ public class YadsJavaDeserializer {
     }
 
 
-    private Object deserialize(Class knownType, YadsNode node) {
+    private Object deserialize(Class knownType, YadsObject node) {
         if (node.isType(YADS_NAMED) && node.getString(NAME).equals("ref")) {
-            YList<YadsNode> args = node.getNodeList(ARGS);
+            YList<YadsObject> args = node.getNodeList(ARGS);
             if (args.size() == 1) {
                 int refId = ((Number)args.get(0).map.get(VALUE)).intValue();
                 if (!refs.containsKey(refId)) throw new RuntimeException("Undefined (yet?) ref id: " + refId);
@@ -80,7 +80,7 @@ public class YadsJavaDeserializer {
         return deserialize2(knownType, node, 0);
     }
 
-    private Object deserialize2(Class knownType, YadsNode node, int refIndex) {
+    private Object deserialize2(Class knownType, YadsObject node, int refIndex) {
         pushCaret(node);
         Object result;
         if (node.isType(YADS_NAMED)) {
@@ -145,7 +145,7 @@ public class YadsJavaDeserializer {
         return newNumber;
     }
 
-    private Class resolveName(Class knownType, YadsNode node) {
+    private Class resolveName(Class knownType, YadsObject node) {
         Class typeByNode = null;
         String stringName = node.getString(NAME);
         if ("import".equals(stringName)) throw new RuntimeException("Can't use class name 'import'");
@@ -156,7 +156,7 @@ public class YadsJavaDeserializer {
         return knownType;
     }
 
-    private Object construct(Class type, YadsNode node, int refIndex) {
+    private Object construct(Class type, YadsObject node, int refIndex) {
         pushCaret(node);
         YList array = node.map.get(ARGS) == null ? al() : deserializeRawList((YList) node.map.get(ARGS));
 
@@ -178,7 +178,7 @@ public class YadsJavaDeserializer {
                 YadsNamed named = (YadsNamed) instance;
                 named.map = deserializeRawMap((YMap) node.map.get(NAMED_ARGS), refIndex);
             } else
-            for (Map.Entry<YadsNode, YadsNode> entry1 : ((YMap<YadsNode, YadsNode>) node.map.get(NAMED_ARGS)).entrySet()) {
+            for (Map.Entry<YadsObject, YadsObject> entry1 : ((YMap<YadsObject, YadsObject>) node.map.get(NAMED_ARGS)).entrySet()) {
 
                 pushCaret(entry1.getKey());
                 String key = (String) deserialize(String.class, entry1.getKey());
@@ -197,7 +197,7 @@ public class YadsJavaDeserializer {
         return instance;
     }
 
-    private Object deserializeNodeMap(YadsNode node, int refIndex) {
+    private Object deserializeNodeMap(YadsObject node, int refIndex) {
         pushCaret(node);
         Object result;
 
@@ -213,17 +213,17 @@ public class YadsJavaDeserializer {
         return result;
     }
 
-    private YMap deserializeRawMap(YMap<YadsNode, YadsNode> rawMap, int refIndex) {
+    private YMap deserializeRawMap(YMap<YadsObject, YadsObject> rawMap, int refIndex) {
         YMap result = hm();
         if (refIndex > 0) refs.put(refIndex, result);
         //TO DO typed map
-        if (rawMap != null) for (Map.Entry<YadsNode, YadsNode> entry : rawMap.entrySet()) {
+        if (rawMap != null) for (Map.Entry<YadsObject, YadsObject> entry : rawMap.entrySet()) {
             result.put(deserialize(null, entry.getKey()), deserialize(null, entry.getValue()));
         }
         return result;
     }
 
-    private Object deserializeNodeSet(YadsNode node, int refIndex) {
+    private Object deserializeNodeSet(YadsObject node, int refIndex) {
         pushCaret(node);
         YSet result;
         if (null != node.map.get(NAMED_ARGS)) throw new RuntimeException("Unexpected named args in set");
@@ -231,9 +231,9 @@ public class YadsJavaDeserializer {
         else {
             result = hs();
             if (refIndex > 0) refs.put(refIndex, result);
-            YList<YadsNode> argNodes = (YList<YadsNode>) node.map.get(ARGS);
+            YList<YadsObject> argNodes = (YList<YadsObject>) node.map.get(ARGS);
             if (argNodes != null) {
-                for (YadsNode argNode : argNodes) {
+                for (YadsObject argNode : argNodes) {
                     if (argNode.isType(COMMENT_SINGLE_LINE)) continue;
                     if (argNode.isType(COMMENT_MULTI_LINE)) continue;
                     result.add(deserialize(null, argNode));
@@ -247,7 +247,7 @@ public class YadsJavaDeserializer {
         return result;
     }
 
-    private Object deserializeNodeList(YadsNode node, int refIndex) {
+    private Object deserializeNodeList(YadsObject node, int refIndex) {
         pushCaret(node);
         Object result;
 
@@ -258,27 +258,27 @@ public class YadsJavaDeserializer {
         } else if (!(node.map.get(ARGS) instanceof List)) {
             throw new RuntimeException("Unexpected type of args " + node.map.get(ARGS).getClass() + " in array");
         } else {
-            result = deserializeRawList((YList<YadsNode>) node.map.get(ARGS), refIndex);
+            result = deserializeRawList((YList<YadsObject>) node.map.get(ARGS), refIndex);
         }
         popCaret();
         return result;
     }
 
-    YList deserializeRawList(YList<YadsNode> args) {
+    YList deserializeRawList(YList<YadsObject> args) {
         return deserializeRawList(args, 0);
     }
 
-    private YList deserializeRawList(YList<YadsNode> args, int refIndex) {
+    private YList deserializeRawList(YList<YadsObject> args, int refIndex) {
         YList resultList = al();
         if (refIndex > 0) refs.put(refIndex, resultList);
         for (int i = 0; i < (args).size(); i++) {
-            YadsNode n = args.get(i);
+            YadsObject n = args.get(i);
             if ("import".equals(n.map.get(VALUE))) {
                 namespaces.enterScope();//TODO exit scope, or require imports to be the first element
                 pushCaret(n);
                 if (args.size() <= i + 1) throw new RuntimeException("Expected type name after 'import'");
                 popCaret();
-                YadsNode nextNode = args.get(i + 1);
+                YadsObject nextNode = args.get(i + 1);
                 pushCaret(nextNode);
                 if (!nextNode.isType(CONST)
                         || !nextNode.map.containsKey(VALUE)

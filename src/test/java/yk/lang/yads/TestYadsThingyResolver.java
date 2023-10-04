@@ -84,6 +84,6 @@ public class TestYadsThingyResolver {
     }
 
     private static String getYadsList(String s) {
-        return YadsThingyResolver.toYadsList(YadsNodeParser.parse(s).getNodeList(ARGS).first()).toString();
+        return YadsThingyResolver.toYadsList(YadsObjectParser.parse(s).getNodeList(ARGS).first()).toString();
     }
 }

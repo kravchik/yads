@@ -323,7 +323,7 @@ public class TestYadsSerialization {
 
     @Test
     public void testTabs() {
-        assertEquals(readResource("formatting.yads").trim(), new YadsNodeOutput().withMaxWidth(30).toString(new YadsJavaSerializer(true).serialize(al(new TestHierarchy("key1", "value1", "key2", new TestHierarchy("key3", "value3")), new TestHierarchy("key1", "value1", "key2", new TestHierarchy("key3", "value3"))))));
+        assertEquals(readResource("formatting.yads").trim(), new YadsObjectOutput().withMaxWidth(30).toString(new YadsJavaSerializer(true).serialize(al(new TestHierarchy("key1", "value1", "key2", new TestHierarchy("key3", "value3")), new TestHierarchy("key1", "value1", "key2", new TestHierarchy("key3", "value3"))))));
     }
 
     @Test

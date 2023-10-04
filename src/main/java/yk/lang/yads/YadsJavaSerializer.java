@@ -10,7 +10,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.*;
 
-import static yk.lang.yads.YadsNode.node;
+import static yk.lang.yads.YadsObject.node;
 import static yk.lang.yads.utils.Reflector.newInstanceArgless;
 import static yk.lang.yads.utils.YadsUtils.constNode;
 import static yk.lang.yads.utils.YadsWords.*;
@@ -19,7 +19,7 @@ import static yk.ycollections.YArrayList.toYList;
 import static yk.ycollections.YHashMap.hm;
 import static yk.ycollections.YHashSet.hs;
 
-//objects -> YadsNode
+//objects -> YadsObject
 public class YadsJavaSerializer {
     private YSet<String> imports = hs();
     private YSet<String> defaultImports = hs();
@@ -29,7 +29,7 @@ public class YadsJavaSerializer {
         return this;
     }
 
-    private IdentityHashMap<Object, Tuple<YadsNode, Integer>> identity = new IdentityHashMap<>();
+    private IdentityHashMap<Object, Tuple<YadsObject, Integer>> identity = new IdentityHashMap<>();
     private int nextRefId = 1;
 
     private boolean strictReferencing = true;
@@ -48,8 +48,8 @@ public class YadsJavaSerializer {
         this.strictReferencing = strictReferencing;
     }
 
-    public YList<YadsNode> serialize(Object object) {
-        YadsNode result = serializeImpl(object, null);
+    public YList<YadsObject> serialize(Object object) {
+        YadsObject result = serializeImpl(object, null);
         imports.removeAll(defaultImports);
         resolveRefs();
         return imports
@@ -58,50 +58,50 @@ public class YadsJavaSerializer {
                 .with(result);
     }
 
-    public YadsNode serializeBody(Object object) {
+    public YadsObject serializeBody(Object object) {
         if (object == null) throw new RuntimeException("Can't serialize body of null");
         if (object instanceof Number) throw new RuntimeException("Can't serialize body of Number");
         if (object instanceof String) throw new RuntimeException("Can't serialize body of String");
 
         if (object != null) defaultImports.add(object.getClass().getCanonicalName());
-        YadsNode result = serializeImpl(object, null);
+        YadsObject result = serializeImpl(object, null);
         resolveRefs();
         return node(YADS_UNNAMED,
                 ARGS, imports
                         .withoutAll(defaultImports).toList()
                         .map(i -> node(IMPORT, VALUE, i))
-                        .withAll((Collection<YadsNode>) result.map.getOr(ARGS, al())),
+                        .withAll((Collection<YadsObject>) result.map.getOr(ARGS, al())),
                 NAMED_ARGS, result.map.get(NAMED_ARGS) == null ? hm() : result.map.get(NAMED_ARGS));
     }
 
     private void resolveRefs() {
-        for (Tuple<YadsNode, Integer> tuple : identity.values()) {
+        for (Tuple<YadsObject, Integer> tuple : identity.values()) {
             if (tuple.b > 0) {
-                YadsNode copy = tuple.a.with(hm());
+                YadsObject copy = tuple.a.with(hm());
                 tuple.a.map = hm(NODE_TYPE, YADS_NAMED, NAME, "ref", ARGS, al(constNode(tuple.b), copy));
             }
         }
     }
 
-    private YadsNode serializeImpl(Object object, Class knownType) {
+    private YadsObject serializeImpl(Object object, Class knownType) {
         if (identity.containsKey(object)) {
-            Tuple<YadsNode, Integer> tuple = identity.get(object);
+            Tuple<YadsObject, Integer> tuple = identity.get(object);
             if (tuple.b == 0) tuple.b = nextRefId++;
             return node(YADS_NAMED, NAME, "ref", ARGS, al(constNode(tuple.b)));
         }
-        Tuple<YadsNode, Integer> tuple = new Tuple<>(null, 0);
+        Tuple<YadsObject, Integer> tuple = new Tuple<>(null, 0);
 
         if (object == null || object instanceof Boolean
                 || knownType != null && knownType.isPrimitive()
                 || !strictReferencing && (object instanceof String || object instanceof Number));
         else identity.put(object, tuple);
 
-        YadsNode yadsNode = serializeImpl2(object, knownType);
-        tuple.a = yadsNode;
-        return yadsNode;
+        YadsObject yadsObject = serializeImpl2(object, knownType);
+        tuple.a = yadsObject;
+        return yadsObject;
     }
 
-    private YadsNode serializeImpl2(Object object, Class knownType) {
+    private YadsObject serializeImpl2(Object object, Class knownType) {
         if (object == null) {
             return node(CONST, VALUE, null);
         } else if (object instanceof List) {//TODO better
@@ -134,7 +134,7 @@ public class YadsJavaSerializer {
         } else {
             //TO DO use constructor ?
             if (object.getClass() != knownType) imports.add(object.getClass().getCanonicalName());
-            YMap<YadsNode, YadsNode> fields = hm();
+            YMap<YadsObject, YadsObject> fields = hm();
             Object defaults = newInstanceArgless(object.getClass());
             for (Field field : Reflector.getAllFieldsInHierarchy(object.getClass())) {
                 field.setAccessible(true);

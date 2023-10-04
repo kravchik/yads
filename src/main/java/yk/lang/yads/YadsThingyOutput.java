@@ -28,7 +28,7 @@ public class YadsThingyOutput {
             return vv.mapWithIndex((i, v) -> i == 0 ? (kk.first() + " = " + v) : v);
         } else if (o instanceof YadsThingy) {
             return yadsListToString(startAt, (YadsThingy) o);
-        } else return al(YadsNodeOutput.valueToString(o));
+        } else return al(YadsObjectOutput.valueToString(o));
     }
 
     private YList<String> yadsListToString(int startAt, YadsThingy yl) {

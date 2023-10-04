@@ -15,14 +15,15 @@ import static yk.ycollections.YHashMap.hm;
  * User: yuri
  * Date: 30/08/16
  * Time: 17:54
+ *
+ * Would be great to just use Map and extension methods...
  */
-//TODO rename! remove?
-public class YadsNode {
+public class YadsObject {
     public YMap<String, Object> map;
 
-    public static YadsNode node(String type, String k, Object v, Object... kv) {
+    public static YadsObject node(String type, String k, Object v, Object... kv) {
         if ((kv.length % 2) != 0) BadException.die("Expected even count");
-        YadsNode result = new YadsNode();
+        YadsObject result = new YadsObject();
         result.map = hm();
         result.map.put(NODE_TYPE, type);
         if (v != null) result.map.put(k, v);
@@ -30,8 +31,8 @@ public class YadsNode {
         return result;
     }
 
-    public static YadsNode node(String type) {
-        YadsNode result = new YadsNode();
+    public static YadsObject node(String type) {
+        YadsObject result = new YadsObject();
         result.map = hm();
         result.map.put(NODE_TYPE, type);
         return result;
@@ -41,23 +42,23 @@ public class YadsNode {
         return t.equals(map.get(NODE_TYPE));
     }
 
-    private YadsNode() {
+    private YadsObject() {
     }
 
-    public YadsNode(String k, Object v, Object... kv) {
+    public YadsObject(String k, Object v, Object... kv) {
         map = hm(k, v, kv);
     }
 
-    public YadsNode(YMap<String, Object> map) {
+    public YadsObject(YMap<String, Object> map) {
         this.map = map;
     }
 
-    public YadsNode with(String k, Object v, Object... kv) {
-        return new YadsNode(map.with(k, v, kv).filter((kk, vv) -> vv != null));
+    public YadsObject with(String k, Object v, Object... kv) {
+        return new YadsObject(map.with(k, v, kv).filter((kk, vv) -> vv != null));
     }
 
     //TODO remove key if value is null?
-    public YadsNode put(String k, Object v, Object... kv) {
+    public YadsObject put(String k, Object v, Object... kv) {
         if (v != null) map.put(k, v);
         for (int i = 0; i < kv.length; i += 2) {
             Object value = kv[i + 1];
@@ -66,12 +67,12 @@ public class YadsNode {
         return this;
     }
 
-    public YadsNode without(String... kk) {
-        return new YadsNode(map.without(al(kk)));
+    public YadsObject without(String... kk) {
+        return new YadsObject(map.without(al(kk)));
     }
 
-    public YadsNode withRearrange(String k, Object v, Object... kv) {
-        YadsNode result = new YadsNode(map);
+    public YadsObject withRearrange(String k, Object v, Object... kv) {
+        YadsObject result = new YadsObject(map);
         result.map.remove(k);
         result.map.put(k, v);
         for (int i = 0; i < kv.length; i += 2) result.map.remove(kv[i]);
@@ -79,8 +80,8 @@ public class YadsNode {
         return result;
     }
 
-    public YadsNode with(YMap other) {
-        return new YadsNode(map.with(other).filter((kk, vv) -> vv != null));
+    public YadsObject with(YMap other) {
+        return new YadsObject(map.with(other).filter((kk, vv) -> vv != null));
     }
 
     @Override
@@ -108,27 +109,27 @@ public class YadsNode {
         return (String) getLast(nn);
     }
 
-    public YadsNode getNode(String name) {
-        return (YadsNode) map.get(name);
+    public YadsObject getNode(String name) {
+        return (YadsObject) map.get(name);
     }
 
-    public YadsNode getNode(String... nn) {
-        return (YadsNode) getLast(nn);
+    public YadsObject getNode(String... nn) {
+        return (YadsObject) getLast(nn);
     }
 
     private Object getLast(String... nn) {
-        YadsNode result = this;
+        YadsObject result = this;
         for (int i = 0; i < nn.length - 1; i++) {
             String n = nn[i];
             Object cur = result.map.get(n);
-            if (!(cur instanceof YadsNode)) return null;
-            result = (YadsNode) cur;
+            if (!(cur instanceof YadsObject)) return null;
+            result = (YadsObject) cur;
         }
         return result.map.get(nn[nn.length - 1]);
     }
 
-    public YList<YadsNode> getNodeList(String... namesPath) {
-        return (YList<YadsNode>) getLast(namesPath);
+    public YList<YadsObject> getNodeList(String... namesPath) {
+        return (YList<YadsObject>) getLast(namesPath);
     }
 
     public boolean getBoolean(String key) {
@@ -150,10 +151,10 @@ public class YadsNode {
         return (Integer)map.get(name);
     }
 
-    public static YadsNode ref(String name) {
+    public static YadsObject ref(String name) {
         return node(REF, NAME, name);
     }
-    public static YadsNode dot(Object left, String right) {
+    public static YadsObject dot(Object left, String right) {
         if (right == null) {
             BadException.shouldNeverReachHere();
         }

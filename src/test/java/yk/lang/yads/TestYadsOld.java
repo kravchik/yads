@@ -23,13 +23,13 @@ public class TestYadsOld {//TODO restore
 
     //@Test
     public void yast() {
-        assertEqualNodes(new YadsNode(NODE_TYPE, YADS_ARRAY, ARGS, al(), CARET, new Caret(1, 1, 1, 2)), YadsNodeParser.parse("(1 + 2)"));
+        assertEqualNodes(new YadsObject(NODE_TYPE, YADS_ARRAY, ARGS, al(), CARET, new Caret(1, 1, 1, 2)), YadsObjectParser.parse("(1 + 2)"));
 
-        assertEqualNodes(new YadsNode(NODE_TYPE, YADS_ARRAY, ARGS, al(), CARET, new Caret(1, 1, 1, 2)), YadsNodeParser.parse("()"));
-        assertEqualNodes(new YadsNode(NODE_TYPE, YADS_MAP, NAMED_ARGS, hm(), CARET, new Caret(1, 1, 1, 3)), YadsNodeParser.parse("(:)"));
+        assertEqualNodes(new YadsObject(NODE_TYPE, YADS_ARRAY, ARGS, al(), CARET, new Caret(1, 1, 1, 2)), YadsObjectParser.parse("()"));
+        assertEqualNodes(new YadsObject(NODE_TYPE, YADS_MAP, NAMED_ARGS, hm(), CARET, new Caret(1, 1, 1, 3)), YadsObjectParser.parse("(:)"));
     }
 
-    public static void assertEqualNodes(YadsNode expected, YadsNode actual) {
+    public static void assertEqualNodes(YadsObject expected, YadsObject actual) {
         //TODO assert nodes hierarchically
         //TODO assert maps inclusive
         //TODO use pattern matching!!!
@@ -47,30 +47,30 @@ public class TestYadsOld {//TODO restore
     @Test
     public void parsePrimitives() {
         //TODO 
-        //assertEquals(al("hello", "hello", "hello", "", ""), YadsNodeParser.parseBody("hello 'hello' \"hello\" '' \"\""));
+        //assertEquals(al("hello", "hello", "hello", "", ""), YadsObjectParser.parseBody("hello 'hello' \"hello\" '' \"\""));
         //
-        //assertEquals(al(hm()), YadsNodeParser.parseBody("(:)"));
-        //assertEquals(al(al()), YadsNodeParser.parseBody("()"));
+        //assertEquals(al(hm()), YadsObjectParser.parseBody("(:)"));
+        //assertEquals(al(al()), YadsObjectParser.parseBody("()"));
         //
-        //assertEquals(al("\"hello\"", "'hello'"), YadsNodeParser.parseBody(" '\\\"hello\\\"'  '\\'hello\\''"));
-        //assertEquals(al("hello\nworld", "hello\tworld"), YadsNodeParser.parseBody(" 'hello\\nworld'  'hello\\tworld'"));
+        //assertEquals(al("\"hello\"", "'hello'"), YadsObjectParser.parseBody(" '\\\"hello\\\"'  '\\'hello\\''"));
+        //assertEquals(al("hello\nworld", "hello\tworld"), YadsObjectParser.parseBody(" 'hello\\nworld'  'hello\\tworld'"));
         //
-        //assertEquals(al("hello\nworld", "hello\tworld"), YadsNodeParser.parseBody(" 'hello\nworld'  'hello\tworld'"));
+        //assertEquals(al("hello\nworld", "hello\tworld"), YadsObjectParser.parseBody(" 'hello\nworld'  'hello\tworld'"));
         //
-        //assertEquals(al("\"'hello world'\"", "\"'hello world'\""), YadsNodeParser.parseBody(" \"\\\"'hello world'\\\"\"  '\"\\'hello world\\'\"'"));
-        //assertEquals(al("\\'"), YadsNodeParser.parseBody(" \"\\\\'\" "));
-        //assertEquals(al("\\\""), YadsNodeParser.parseBody(" '\\\\\"' "));
+        //assertEquals(al("\"'hello world'\"", "\"'hello world'\""), YadsObjectParser.parseBody(" \"\\\"'hello world'\\\"\"  '\"\\'hello world\\'\"'"));
+        //assertEquals(al("\\'"), YadsObjectParser.parseBody(" \"\\\\'\" "));
+        //assertEquals(al("\\\""), YadsObjectParser.parseBody(" '\\\\\"' "));
         //
-        //assertEquals(al(10, 10l, 10L, 10f, 10d, 10D, 10.1d, 10.1f, 10.1f), YadsNodeParser.parseBody("10 10l 10L 10f 10d 10D 10.1d 10.1f 10.1"));
-        //assertEquals(al(1424083792130l), YadsNodeParser.parseBody("1424083792130l"));
-        //assertEquals(al(-10), YadsNodeParser.parseBody("-10"));
-        //assertEquals(al(true, false), YadsNodeParser.parseBody("true false"));
+        //assertEquals(al(10, 10l, 10L, 10f, 10d, 10D, 10.1d, 10.1f, 10.1f), YadsObjectParser.parseBody("10 10l 10L 10f 10d 10D 10.1d 10.1f 10.1"));
+        //assertEquals(al(1424083792130l), YadsObjectParser.parseBody("1424083792130l"));
+        //assertEquals(al(-10), YadsObjectParser.parseBody("-10"));
+        //assertEquals(al(true, false), YadsObjectParser.parseBody("true false"));
     }
 
     @Test
     public void testPositions() throws Exception {
         //ByteArrayInputStream stream = new ByteArrayInputStream("(hello world) (hello world)".getBytes("UTF-8"));
-        //YadsNodeParser parser = new YadsNodeParser(stream).setRememberPositions(true);
+        //YadsObjectParser parser = new YadsObjectParser(stream).setRememberPositions(true);
         //parser.unnamedClassBody();
         //
         //assertEquals("{[hello, world]=Caret{beginLine=1, beginColumn=1, endLine=1, endColumn=13}, [hello, world]=Caret{beginLine=1, beginColumn=15, endLine=1, endColumn=27}}", parser.positions.toString());
@@ -188,14 +188,14 @@ public class TestYadsOld {//TODO restore
     //public void test() {
     //    System.out.println("'\u005cn'");
     //
-    //    System.out.println(YadsNodeParser.parseList("hello world"));
-    //    System.out.println(YadsNodeParser.parseClass("XY{10 20}"));
-    //    System.out.println(YadsNodeParser.parseClass("HBox{pos = 10, 20 VBox{size= 50, 50}}"));
+    //    System.out.println(YadsObjectParser.parseList("hello world"));
+    //    System.out.println(YadsObjectParser.parseClass("XY{10 20}"));
+    //    System.out.println(YadsObjectParser.parseClass("HBox{pos = 10, 20 VBox{size= 50, 50}}"));
     //    System.out.println(YadsJavaSerializer.deserialize("import=yk.lang.yads HBox{pos = 10, 20 VBox{size= 50, 50}}"));
     //    System.out.println(HBox.class.getName());
-    //    //System.out.println(YADSSerializer.deserializeClass(null, YadsNodeParser.parseClass("HBox{pos = 10, 20}")).toStringPrefixInfix());
+    //    //System.out.println(YADSSerializer.deserializeClass(null, YadsObjectParser.parseClass("HBox{pos = 10, 20}")).toStringPrefixInfix());
     //
-    //    //System.out.println(YADSSerializer.deserializeList(YadsNodeParser.parseList("import= yk.lang.yads HBox{pos = 10, 20}")).toStringPrefixInfix());
+    //    //System.out.println(YADSSerializer.deserializeList(YadsObjectParser.parseList("import= yk.lang.yads HBox{pos = 10, 20}")).toStringPrefixInfix());
     //
     //    //TODO convert with respect to method call arguments types!
     //    //TODO map or YAD if class not defined and unknown

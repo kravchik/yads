@@ -1,6 +1,6 @@
 package yk.lang.yads.utils;
 
-import yk.lang.yads.YadsNode;
+import yk.lang.yads.YadsObject;
 import yk.ycollections.YSet;
 
 import java.io.StringWriter;
@@ -11,12 +11,12 @@ import static yk.ycollections.YHashSet.hs;
 public class YadsUtils {
 
 
-    public static YadsNode constNode(Caret caret, String type, Object value) {
-        return new YadsNode(NODE_TYPE, CONST, TYPE, type, VALUE, value, CARET, caret);
+    public static YadsObject constNode(Caret caret, String type, Object value) {
+        return new YadsObject(NODE_TYPE, CONST, TYPE, type, VALUE, value, CARET, caret);
     }
 
-    public static YadsNode constNode(Object value) {
-        return new YadsNode(NODE_TYPE, CONST, VALUE, value);
+    public static YadsObject constNode(Object value) {
+        return new YadsObject(NODE_TYPE, CONST, VALUE, value);
     }
 
     //public static final CharSequenceTranslator UNESCAPE_YADS_SINGLE_QUOTES =

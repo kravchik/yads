@@ -3,7 +3,7 @@ options {
   JAVA_UNICODE_ESCAPE = true;
 }
 
-PARSER_BEGIN(YadsNodeParser)
+PARSER_BEGIN(YadsObjectParser)
 
 package yk.lang.yads;
 import yk.lang.yads.utils.Caret;
@@ -17,10 +17,10 @@ import java.nio.charset.StandardCharsets;
 import static yk.ycollections.YArrayList.al;
 import static yk.lang.yads.utils.YadsWords.*;
 
-public class YadsNodeParser {
-    public static YadsNode parse(String s) {
+public class YadsObjectParser {
+    public static YadsObject parse(String s) {
         try {
-            return new YadsNodeParser(new ByteArrayInputStream(s.getBytes(StandardCharsets.UTF_8))).parseListBodyNode();
+            return new YadsObjectParser(new ByteArrayInputStream(s.getBytes(StandardCharsets.UTF_8))).parseListBodyNode();
         }  catch (ParseException e) {
             throw new RuntimeException(e);
         }
@@ -32,25 +32,24 @@ public class YadsNodeParser {
         caretStack.add(caret);
     }
 
-    private void finishCaret(YadsNode target) {
+    private void finishCaret(YadsObject target) {
         //TODO asserts
         Caret caret = caretStack.remove(caretStack.size() - 1);
         caret.setEnd(jj_input_stream);
         target.map.put(CARET, caret);
     }
-
 }
 
-PARSER_END(YadsNodeParser)
+PARSER_END(YadsObjectParser)
 
 
-SKIP : /* WHITE SPACE */
-{
-  " "
+TOKEN : /* WHITE SPACE */
+{<WHITE_SPACE:
+( " "
 | "\t"
 | "\n"
 | "\r"
-| "\f"
+| "\f")+>
 }
 
 TOKEN :
@@ -117,55 +116,58 @@ TOKEN :
   >
 }
 
-YadsNode parseClass():
+YadsObject parseClass():
 {YList body;Token name = null;}
 {
     {beginCaret();}
     (name = <NAMED_CLASS_BEGIN> | <UNNAMED_CLASS_BEGIN>)
+      [<WHITE_SPACE>]
         body = parseListBody()
     <CLASS_END>
 
     {
-        YadsNode result;
-        if (name != null) result = new YadsNode(NODE_TYPE, YADS_RAW_CLASS, NAME, name.image.substring(0, name.image.length() - 1), ARGS, body);
-        else result = new YadsNode(NODE_TYPE, YADS_ARRAY, ARGS, body);
-        finishCaret(result);
-        return result;
-    }
+    YadsObject result;
+    if (name != null) result = new YadsObject(NODE_TYPE, YADS_RAW_CLASS, NAME, name.image.substring(0, name.image.length() - 1), ARGS, body);
+    else result = new YadsObject(NODE_TYPE, YADS_ARRAY, ARGS, body);
+    finishCaret(result);
+    return result;
+}
 }
 
-YadsNode parseListBodyNode():
+YadsObject parseListBodyNode():
 {YList body;}
 {
     {beginCaret();}
+      [<WHITE_SPACE>]
       body = parseListBody()
     {
-        YadsNode result = new YadsNode(NODE_TYPE, YADS_ARRAY, ARGS, body);
+        YadsObject result = new YadsObject(NODE_TYPE, YADS_ARRAY, ARGS, body);
         finishCaret(result);
         return result;
     }
 }
 
 YList parseListBody():
-{YList list = al();YadsNode value;}
+{YList list = al();YadsObject value;}
 {
-    (
-     (
-       value = parseElement()
-       |
-       value = parseClass()
-     )                                 {list.add(value);}
-    )*
+
+    [value = parseElement() {list.add(value);}
+     [<WHITE_SPACE>]
+    (value = parseElement() {list.add(value);} [<WHITE_SPACE>])*
+    ]
+
     { return list;}
 }
 
-YadsNode parseElement():
-{YadsNode o;Token t;String s;}
+YadsObject parseElement():
+{YadsObject o;Token t;String s;}
 {
     (
-    t = <SINGLE_LINE_COMMENT> { o = new YadsNode(NODE_TYPE, COMMENT_SINGLE_LINE, VALUE, t.image, CARET, Caret.create(jj_input_stream));}
+    o = parseClass()
     |
-    t = <MULTI_LINE_COMMENT> { o = new YadsNode(NODE_TYPE, COMMENT_MULTI_LINE, VALUE, t.image, CARET, Caret.create(jj_input_stream));}
+    t = <SINGLE_LINE_COMMENT> { o = new YadsObject(NODE_TYPE, COMMENT_SINGLE_LINE, VALUE, t.image, CARET, Caret.create(jj_input_stream));}
+    |
+    t = <MULTI_LINE_COMMENT> { o = new YadsObject(NODE_TYPE, COMMENT_MULTI_LINE, VALUE, t.image, CARET, Caret.create(jj_input_stream));}
     |
     t = <INTEGER_LITERAL> {
             s = t.image;

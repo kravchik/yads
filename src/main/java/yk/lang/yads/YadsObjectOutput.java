@@ -16,19 +16,19 @@ import static yk.ycollections.YArrayList.al;
  * Serializes nodes into a YADS string. Performs formatting: introduces new-lines, adds tabs, tries to avoid unnecessary new-lines where possible.
  * Nodes can contain
  */
-public class YadsNodeOutput {
+public class YadsObjectOutput {
     private int maxWidth = 100;
     private Tab tab = new Tab("  ");
 
-    public String toString(YList<YadsNode> nodes) {
+    public String toString(YList<YadsObject> nodes) {
         return nodes.map(n -> toString(0, n).toString("\n")).toString("\n");
     }
 
-    public String toStringBody(YadsNode nodes) {
+    public String toStringBody(YadsObject nodes) {
         YList<String> result = al();
-        YList<YadsNode> args = nodes.getNodeList(ARGS);
-        YList<YadsNode> imports = args.filter(n -> n.isType(IMPORT));
-        YList<YadsNode> other = args.filter(n -> !n.isType(IMPORT));
+        YList<YadsObject> args = nodes.getNodeList(ARGS);
+        YList<YadsObject> imports = args.filter(n -> n.isType(IMPORT));
+        YList<YadsObject> other = args.filter(n -> !n.isType(IMPORT));
         nodes = nodes.with(ARGS, other);
         boolean possibleCompact = toStringBody(nodes, result);
         if (possibleCompact) result = compact(0, result);
@@ -36,13 +36,13 @@ public class YadsNodeOutput {
         return (si.equals("") ? "" : (si + "\n")) + result.toString("\n");
     }
 
-    private String addListAndCompact(YList<YadsNode> nn) {
+    private String addListAndCompact(YList<YadsObject> nn) {
         YList<String> result = al();
         if (addList(nn, result)) result = compact(0, result);
         return result.toString("\n");
     }
 
-    public YList<String> toString(int width, YadsNode node) {
+    public YList<String> toString(int width, YadsObject node) {
         if (node.isType(IMPORT)) {
             return al(tab + "import " + node.getString(VALUE));
         }
@@ -52,7 +52,7 @@ public class YadsNodeOutput {
         }
 
         if (node.isType(YADS_ARRAY)) {
-            YList<YadsNode> nodes = node.getNodeList(ARGS);
+            YList<YadsObject> nodes = node.getNodeList(ARGS);
             YList<String> result = al();
             result.add("(");
             tab.inc();
@@ -64,7 +64,7 @@ public class YadsNodeOutput {
         }
 
         if (node.isType(YADS_MAP)) {
-            YMap<YadsNode, YadsNode> nodes = (YMap) node.map.get(NAMED_ARGS);
+            YMap<YadsObject, YadsObject> nodes = (YMap) node.map.get(NAMED_ARGS);
             if (nodes.isEmpty()) return al("(=)");
             return toStringMap(width, node, "(");
         }
@@ -143,14 +143,14 @@ public class YadsNodeOutput {
 //        }
 //        if (onlySimpleChars) return true;
         try {
-            Object would = new YadsNodeParser(new ByteArrayInputStream(value.getBytes(StandardCharsets.UTF_8)))
+            Object would = new YadsObjectParser(new ByteArrayInputStream(value.getBytes(StandardCharsets.UTF_8)))
                     .parseRawElement();
             if (value.equals(would)) return true;
         } catch (Exception | Error ignore) {}
         return false;
     }
 
-    private YList<String> toStringMap(int width, YadsNode node, String classPrefix) {
+    private YList<String> toStringMap(int width, YadsObject node, String classPrefix) {
         YList<String> result = classPrefix == null ? al() : al(classPrefix);
         tab.inc();
         boolean possibleMerge = toStringBody(node, result);
@@ -160,17 +160,17 @@ public class YadsNodeOutput {
         return result;
     }
 
-    private boolean toStringBody(YadsNode node, YList<String> result) {
-        YMap<YadsNode, YadsNode> nodes = (YMap<YadsNode, YadsNode>) node.map.get(NAMED_ARGS);
+    private boolean toStringBody(YadsObject node, YList<String> result) {
+        YMap<YadsObject, YadsObject> nodes = (YMap<YadsObject, YadsObject>) node.map.get(NAMED_ARGS);
         boolean possibleMerge = true;
         if (node.map.get(ARGS) != null) possibleMerge = addList(node.getNodeList(ARGS), result);
         if (node.map.get(NAMED_ARGS) != null) possibleMerge &= addMap(nodes, result);
         return possibleMerge;
     }
 
-    private boolean addList(YList<YadsNode> nodes, YList<String> result) {
+    private boolean addList(YList<YadsObject> nodes, YList<String> result) {
         boolean possibleMerge = true;
-        for (YadsNode n : nodes) {
+        for (YadsObject n : nodes) {
             YList<String> children = toString(tab.toString().length(), n);
             if (children.size() > 1) possibleMerge = false;
 
@@ -180,9 +180,9 @@ public class YadsNodeOutput {
         return possibleMerge;
     }
 
-    private boolean addMap(YMap<YadsNode, YadsNode> nodes, YList<String> result) {
+    private boolean addMap(YMap<YadsObject, YadsObject> nodes, YList<String> result) {
         boolean possibleMerge = true;
-        for (Map.Entry<YadsNode, YadsNode> entry : nodes.entrySet()) {
+        for (Map.Entry<YadsObject, YadsObject> entry : nodes.entrySet()) {
             YList<String> key = toString(0, entry.getKey());
             if (key.size() != 1) throw new RuntimeException("Unexpected key: " + key);
             String keyPrefix = key.first() + "=";
@@ -219,7 +219,7 @@ public class YadsNodeOutput {
         return ss;
     }
 
-    public YadsNodeOutput withMaxWidth(int maxWidth) {
+    public YadsObjectOutput withMaxWidth(int maxWidth) {
         this.maxWidth = maxWidth;
         return this;
     }
