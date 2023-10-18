@@ -9,18 +9,18 @@ import static yk.lang.yads.utils.BadException.die;
 import static yk.lang.yads.utils.YadsWords.*;
 import static yk.ycollections.YArrayList.al;
 
-public class YadsThingyResolver {
+public class YadsEntityResolver {
     public static Object toYadsList(YadsObject node) {
         if (node.isType(CONST)) return node.get(VALUE);
-        if (node.isType(COMMENT_SINGLE_LINE)) return new YadsThingy.YadsComment(true, node.getString(VALUE).substring(2));
+        if (node.isType(COMMENT_SINGLE_LINE)) return new YadsEntity.YadsComment(true, node.getString(VALUE).substring(2));
         if (node.isType(COMMENT_MULTI_LINE)) {
             String v = node.getString(VALUE);
-            return new YadsThingy.YadsComment(false, v.substring(2, v.length() - 2));
+            return new YadsEntity.YadsComment(false, v.substring(2, v.length() - 2));
         }
         if (!node.isType(YADS_RAW_CLASS) && !node.isType(YADS_ARRAY)) BadException.shouldNeverReachHere();
         YList<YadsObject> args = (YList<YadsObject>) node.map.get(ARGS);
         YList<Object> result = toYadsList(args);
-        return new YadsThingy((String) node.get(NAME), result);
+        return new YadsEntity((String) node.get(NAME), result);
     }
 
     public static YList<Object> toYadsList(YList<YadsObject> args) {

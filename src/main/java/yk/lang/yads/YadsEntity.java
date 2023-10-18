@@ -3,7 +3,16 @@ package yk.lang.yads;
 import yk.ycollections.Tuple;
 import yk.ycollections.YList;
 
-public class YadsThingy {
+import java.util.Objects;
+
+//TODO rename
+//  Node
+//  Entity
+//  Something, Smthng
+//  Item
+//  Thing, Thingy
+//  Piece
+public class YadsEntity {
     //can be null
     public String name;
     //Tuple<String, Object> - field
@@ -12,7 +21,7 @@ public class YadsThingy {
     //YadsComment - comment
     public YList<Object> children;
 
-    public YadsThingy(String name, YList<Object> children) {
+    public YadsEntity(String name, YList<Object> children) {
         this.name = name;
         this.children = children;
     }
@@ -32,7 +41,7 @@ public class YadsThingy {
     }
 
     public static class YadsComment {
-        public boolean isOneLine = true;
+        public boolean isOneLine;
         public String text;
 
         public YadsComment(boolean isOneLine, String text) {
@@ -47,14 +56,36 @@ public class YadsThingy {
                     ", text='" + text + '\'' +
                     '}';
         }
-    }
-    //do we need this ?
-    public static class YadsCommentedData {
-        public Object obj;
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+            YadsComment that = (YadsComment) o;
+            return isOneLine == that.isOneLine && Objects.equals(text, that.text);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(isOneLine, text);
+        }
     }
 
     @Override
     public String toString() {
-        return "YadsThingy{" + (name == null ? "" : "name='" + name + "', ") + "children=" + children + '}';
+        return "YadsEntity{" + (name == null ? "" : "name='" + name + "', ") + "children=" + children + '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        YadsEntity that = (YadsEntity) o;
+        return Objects.equals(name, that.name) && Objects.equals(children, that.children);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(name, children);
     }
 }

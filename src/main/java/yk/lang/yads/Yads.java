@@ -20,22 +20,22 @@ import static yk.ycollections.YArrayList.al;
  */
 public class Yads {
 
-    public static Object parseYadsThingy(String s) {
-        return YadsThingyResolver.toYadsList(YadsObjectParser.parse(s).getNodeList(ARGS)).assertSize(1).first();
+    public static Object parseYadsEntity(String s) {
+        return YadsEntityResolver.toYadsList(YadsObjectParser.parse(s).getNodeList(ARGS)).assertSize(1).first();
     }
 
-    public static YList<Object> parseYadsThingyBody(String s) {
-        return YadsThingyResolver.toYadsList(YadsObjectParser.parse(s).getNodeList(ARGS));
+    public static YList<Object> parseYadsEntityBody(String s) {
+        return YadsEntityResolver.toYadsList(YadsObjectParser.parse(s).getNodeList(ARGS));
     }
 
-    public static String printYadsThingy(Object s) {
-        return new YadsThingyOutput().yadsListToString(s);
+    public static String printYadsEntity(Object s) {
+        return new YadsEntityOutput().yadsListToString(s);
     }
 
-    public static String printYadsThingy(Object s, int maxWidth) {
-        YadsThingyOutput yadsThingyOutput = new YadsThingyOutput();
-        yadsThingyOutput.maxWidth = maxWidth;
-        return yadsThingyOutput.yadsListToString(s);
+    public static String printYadsEntity(Object s, int maxWidth) {
+        YadsEntityOutput yadsEntityOutput = new YadsEntityOutput();
+        yadsEntityOutput.maxWidth = maxWidth;
+        return yadsEntityOutput.yadsListToString(s);
     }
 
     /**

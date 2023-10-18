@@ -5,6 +5,7 @@ import yk.ycollections.YList;
 import yk.ycollections.YMap;
 
 import java.util.List;
+import java.util.Objects;
 
 import static yk.lang.yads.utils.YadsWords.*;
 import static yk.ycollections.YArrayList.al;
@@ -176,5 +177,18 @@ public class YadsObject {
 
     public Object get(String key) {
         return map.get(key);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        YadsObject that = (YadsObject) o;
+        return Objects.equals(map, that.map);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(map);
     }
 }
