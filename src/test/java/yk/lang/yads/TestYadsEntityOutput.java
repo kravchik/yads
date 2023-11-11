@@ -15,7 +15,7 @@ import static junit.framework.TestCase.assertEquals;
 public class TestYadsEntityOutput {
     @Test
     public void test1() {
-        YList<Object> yl = Yads.parseYadsEntityBody(readResource("formatting.cases.yads"));
+        YList<Object> yl = Yads.readYadsEntityBody(UtilsForTests.readResource("formatting.cases.yads"));
         int maxWidth = 100;
         for (Object o : yl) {
             if (o instanceof Tuple) {
@@ -24,18 +24,11 @@ public class TestYadsEntityOutput {
                 } else BadException.notImplemented("o");
             } else if (o instanceof String) {
                 String s = (String) o;
-                assertEquals(s, "\n" + Yads.printYadsEntity(Yads.parseYadsEntity(s), maxWidth) + "\n");
+                assertEquals(s, "\n" + new YadsEntityOutput().setMaxWidth(maxWidth).print(Yads.readYadsEntity(s)) + "\n");
             }
         }
     }
 
-    public static String readResource(String path) {
-        String content = resourceAsString(path);
-        if (content == null) {
-            throw BadException.die("File " + path + " not found");
-        }
-        return content;
-    }
     public static String resourceAsString(String name) {
         return streamToString(resourceAsStream(name));
     }

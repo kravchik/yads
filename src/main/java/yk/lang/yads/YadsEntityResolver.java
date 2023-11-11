@@ -8,7 +8,8 @@ import static yk.lang.yads.YadsObjectResolver.DELIMITER;
 import static yk.lang.yads.utils.BadException.die;
 import static yk.lang.yads.utils.YadsWords.*;
 import static yk.ycollections.YArrayList.al;
-
+//YadsObject -> YadsEntity
+//TODO parser to generate YadsEntity
 public class YadsEntityResolver {
     public static Object toYadsList(YadsObject node) {
         if (node.isType(CONST)) return node.get(VALUE);

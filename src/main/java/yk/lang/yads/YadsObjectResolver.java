@@ -9,7 +9,7 @@ import java.util.Map;
 import static yk.lang.yads.utils.YadsWords.*;
 import static yk.ycollections.YArrayList.al;
 import static yk.ycollections.YHashMap.hm;
-
+//TODO parser -> YadsEntity -> YadsObject
 public class YadsObjectResolver {
     public static final String DELIMITER = "=";
 

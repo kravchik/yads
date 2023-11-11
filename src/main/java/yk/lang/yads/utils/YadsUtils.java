@@ -1,12 +1,11 @@
 package yk.lang.yads.utils;
 
 import yk.lang.yads.YadsObject;
-import yk.ycollections.YSet;
+import yk.ycollections.YMap;
 
 import java.io.StringWriter;
 
 import static yk.lang.yads.utils.YadsWords.*;
-import static yk.ycollections.YHashSet.hs;
 
 public class YadsUtils {
 
@@ -32,28 +31,24 @@ public class YadsUtils {
     //                        })
     //        );
 
-    public static final YSet<Character> ESCAPED = hs('\\', '\b', '\n', '\r', '\f', '\t');
-    public static final YSet<Character> DOUBLE_QUOTES_ESCAPED = ESCAPED.with('\"');
-    public static final YSet<Character> SINGLE_QUOTES_ESCAPED = hs('\'');
-
     private static String handleQuotes(String s) {
         return s.substring(1, s.length() - 1);
     }
 
     public static String unescapeDoubleQuotes(String s) {
-        return unescape(handleQuotes(s), DOUBLE_QUOTES_ESCAPED);
+        return unescapeQuotes(handleQuotes(s), '"');
     }
 
     public static String unescapeSingleQuotes(String s) {
-        return unescape(handleQuotes(s), SINGLE_QUOTES_ESCAPED);
+        return unescapeQuotes(handleQuotes(s), '\'');
     }
 
     public static String escapeDoubleQuotes(String s) {
-        return escape(s, DOUBLE_QUOTES_ESCAPED);
+        return escapeQuotes(s, '"');
     }
 
     public static String escapeSingleQuotes(String s) {
-        return escape(s, SINGLE_QUOTES_ESCAPED);
+        return escapeQuotes(s, '\'');
     }
 
     //public static final CharSequenceTranslator UNESCAPE_YADS_DOUBLE_QUOTES =
@@ -79,7 +74,7 @@ public class YadsUtils {
 
     //TODO OCTAL
     //TODO UNICODE
-    public static String unescape(String input, YSet<Character> toEscape) {
+    public static String unescape(String input, YMap<Character, Character> unescapes) {
         StringWriter out = new StringWriter();
 
         for (int i = 0; i < input.length(); i++) {
@@ -88,7 +83,25 @@ public class YadsUtils {
                 i++;
                 if (i >= input.length()) throw new RuntimeException("Uncompleted escape sequence");
                 c = input.charAt(i);
-                if (!toEscape.contains(c)) throw new RuntimeException("Unexpected escaped character: " + c);
+                if (!unescapes.containsKey(c)) throw new RuntimeException("Unexpected escaped character: " + c);
+                out.write(unescapes.get(c));
+            } else {
+                out.write(c);
+            }
+        }
+        return out.toString();
+    }
+
+    public static String unescapeQuotes(String input, char quote) {
+        StringWriter out = new StringWriter();
+
+        for (int i = 0; i < input.length(); i++) {
+            char c = input.charAt(i);
+            if (c == '\\') {
+                i++;
+                if (i >= input.length()) throw new RuntimeException("Uncompleted escape sequence");
+                c = input.charAt(i);
+                if (c != quote) out.write('\\');
                 out.write(c);
             } else {
                 out.write(c);
@@ -97,11 +110,21 @@ public class YadsUtils {
         return out.toString();
     }
 
-    public static String escape(String input, YSet<Character> toEscape) {
+    public static String escape(String input, YMap<Character, Character> toEscape) {
         StringWriter out = new StringWriter();
         for (int i = 0; i < input.length(); i++) {
             char c = input.charAt(i);
-            if (toEscape.contains(c)) out.write("\\" + c);
+            if (toEscape.containsKey(c)) out.write("\\" + toEscape.get(c));
+            else out.write(c);
+        }
+        return out.toString();
+    }
+
+    public static String escapeQuotes(String input, char q) {
+        StringWriter out = new StringWriter();
+        for (int i = 0; i < input.length(); i++) {
+            char c = input.charAt(i);
+            if (q == c) out.write("\\" + c);
             else out.write(c);
         }
         return out.toString();

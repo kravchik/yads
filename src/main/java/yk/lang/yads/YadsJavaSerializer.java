@@ -20,6 +20,7 @@ import static yk.ycollections.YHashMap.hm;
 import static yk.ycollections.YHashSet.hs;
 
 //objects -> YadsObject
+//TODO java -> YadsEntity (and a little syntax change)
 public class YadsJavaSerializer {
     private YSet<String> imports = hs();
     private YSet<String> defaultImports = hs();
@@ -116,6 +117,9 @@ public class YadsJavaSerializer {
         } else if (object instanceof Map) {//TODO better
             return node(YADS_MAP, NAMED_ARGS, serializeMap((Map<?, ?>) object));
         } else if (object instanceof String) {
+
+            //двинуть escaping сюда
+
             return node(CONST, VALUE, object);
         } else if (object instanceof Short && !(knownType == Short.class || knownType == short.class)) {
             imports.add("java.lang.Short");

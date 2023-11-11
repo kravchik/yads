@@ -2,6 +2,7 @@ package yk.lang.yads;
 
 import yk.lang.yads.utils.Caret;
 import yk.lang.yads.utils.Reflector;
+import yk.lang.yads.utils.YadsUtils;
 import yk.ycollections.*;
 
 import java.lang.reflect.Constructor;
@@ -15,7 +16,8 @@ import static yk.ycollections.YArrayList.al;
 import static yk.ycollections.YHashMap.hm;
 import static yk.ycollections.YHashSet.hs;
 
-//YadsObject -> objects
+//YadsObject -> java
+//TODO YadsEntity -> java
 public class YadsJavaDeserializer {
 
     private YList<Caret> caretStack = al();
@@ -116,6 +118,11 @@ public class YadsJavaDeserializer {
                     result = s.charAt(0);
                 }
             }
+
+            if (result instanceof String) {
+                result = YadsUtils.unescape((String) result, YadsObjectOutput.JAVA_UNESCAPES);
+            }
+
             if (refIndex > 0) refs.put(refIndex, result);
         } else {
             if (knownType == null) {

@@ -3,39 +3,23 @@ package yk.lang.yads;
 import org.junit.Test;
 import yk.ycollections.YList;
 
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 
 import static org.junit.Assert.*;
-import static yk.lang.yads.TestYadsEntityOutput.readResource;
-import static yk.lang.yads.Yads.deserialize;
-import static yk.lang.yads.Yads.serialize;
+import static yk.lang.yads.UtilsForTests.readResource;
+import static yk.lang.yads.YadsJava.deserialize;
+import static yk.lang.yads.YadsJava.serialize;
 import static yk.ycollections.YArrayList.al;
 import static yk.ycollections.YHashMap.hm;
 
-public class TestYadsSerialization {
+public class TestJavaYadsSerialization {
     //TODO ? remove operators ?
     //  ((a=1) but (a= -1) or won't deserialize)
-    //TODO get rid of commons.lang3
-
-    //TODO Object[], Object[][][], byte[], byte[][][]
-    //TODO typed array
     //TODO typed map
     //TODO called constructor for List<String> but we have List<Int>
-    //TODO common words instead of YADS_*
-
     //TODO custom serializers
-    //TODO implement/test array with numbers of different types
     //TODO simple convertions for constructor/function
-
-    //TODO readme
-
-    @Test
-    public void someTest() {
-        System.out.println(Yads.serialize(LocalDateTime.now()));
-        System.out.println(Yads.deserialize("import java.time.LocalDateTime LocalDateTime(date=(year=2020 month=1 day=6) time=(hour=17 minute=26 second=35 nano=401000000))"));
-    }
 
     @Test
     public void testS12() {
@@ -56,13 +40,6 @@ public class TestYadsSerialization {
 
         assertS12(al(al(hm("a", "b", "c", al(al(hm()))))), "(((a=b c=(((=))))))");
         assertS12(al(al(hm(al(al(hm())), "a", "b", "c"))), "((((((=)))=a b=c)))");
-
-        assertS12(al((String)null), "(null)");
-        assertS12(al(null, null), "(null null)");
-        assertS12(hm("a", null), "(a=null)");
-        assertS12(hm(null, "b"), "(null=b)");
-        assertS12(al("null"), "('null')");
-        assertS12(null, "null");
 
         assertEquals("import java.lang.Object\nObject()", serialize(new Object()));
         assertTrue(deserialize("import java.lang.Object\nObject()").getClass() == Object.class);
@@ -101,11 +78,17 @@ public class TestYadsSerialization {
         assertException("TestClass(tc2 = 1f)", al("yk.lang.yads.TestClass"),
                 "Error at 1:17, Expected type class yk.lang.yads.TestClass2, but was class java.lang.Float");
 
-        assertEquals("import yk.lang.yads.TestClass\nTestClass()", Yads.serialize(new TestClass().setSomeTransient(5)));
+        assertEquals("import yk.lang.yads.TestClass\nTestClass()", YadsJava.serialize(new TestClass().setSomeTransient(5)));
 
-        assertEquals("import yk.lang.yads.Vec2f\nVec2f(x=1f y=1f)", Yads.serialize(Vec2f.v2(1, 1)));
-        assertEquals("import yk.lang.yads.Vec2f\nVec2f(x=1f y= -0.5f)", Yads.serialize(Vec2f.v2(1, -0.5f)));
-        assertS12(al("N--------N--------", "N--------N--------N--------"), "('N--------N--------' 'N--------N--------N--------')");
+        assertEquals("import yk.lang.yads.Vec2f\nVec2f(x=1f y=1f)", YadsJava.serialize(Vec2f.v2(1, 1)));
+
+        assertS12(Vec2f.v2(1, -0.5f), "import yk.lang.yads.Vec2f\nVec2f(x=1f y= -0.5f)");
+        //assertS12(Vec2f.v2(1, -0.5f), "import yk.lang.yads.Vec2f\nVec2f(x=1f y=-0.5f)");
+        assertEquals("import yk.lang.yads.Vec2f\nVec2f(x=1f y= -0.5f)", YadsJava.serialize(Vec2f.v2(1, -0.5f)));
+
+        assertS12(al("N--------N--------", "N--------N--------N--------"),
+                "(\"N--------N--------\" \"N--------N--------N--------\")",
+                "('N--------N--------' 'N--------N--------N--------')");
     }
 
     @Test
@@ -163,28 +146,103 @@ public class TestYadsSerialization {
                 al("yk.lang.yads.TestClass"),
                 "import yk.lang.yads.TestClass TestClass(tc2 = (1f))");
 
-        System.out.println(Yads.serializeBody(al(new TestClass().setTc2(new TestClass2(1)))));
+        System.out.println(YadsJava.serializeBody(al(new TestClass().setTc2(new TestClass2(1)))));
 
         //assertEquals(hm("a", new TestClass().setTc2(new TestClass25(1)), "b", new TestClass().setTc2(new TestClass25(1))),
         //        deserializeBody("a=b c d"));
     }
 
     @Test
-    public void testDataTypes() {
-        assertS12(al("a \" ' b"), "(\"a \\\" ' b\")", "('a \" \\' b')");
-        assertS12(al("a ' b"), "(\"a ' b\")", "('a \\' b')");
-        assertS12(al("a \" b"), "('a \" b')", "(\"a \\\" b\")");
+    public void testPrimitiveTypes() {
         assertS12(al("Hello"), "(Hello)", "('Hello')", "(\"Hello\")");
 
+        //strings
+        assertEquals("\"\\t \\b \\n \\r \\f \\\" \\\\\"", serialize("\t \b \n \r \f \" \\"));
+        assertS12(al("\t \b \n \r \f \" \\ '"), "(\"\\t \\b \\n \\r \\f \\\" \\\\ '\")",
+                "('\\t \\b \\n \\r \\f \" \\\\ \\'')");
+
+        //booleans
+        assertS12(al("true"), "(\"true\")", "('true')");
+        assertS12(al("false"), "(\"false\")", "('false')");
+        assertS12(al(true), "(true)");
+        assertS12(al(false), "(false)");
+
+        //numbers
         assertS12(al(1), "(1)", "(01)");
+        assertS12(al(1L), "(1l)", "(1L)");
         assertS12(al(1.0f), "(1f)", "(1.0)", "(1.0f)", "(1.0F)", "(1.f)", "(1.F)");
-        assertS12(1.0f, "1f", "1.0", "1.0f", "1.0F", "1.f", "1.F");
+        assertS12(al(0.01f), "(0.01f)", "(0.01)", "(0.01F)", "(.01F)", "(1.0E-2F)", "(1.0E-2f)");
+        assertS12(al(0.01d), "(0.01d)", "(0.01D)", "(.01D)", "(1.0E-2D)", "(1.0E-2d)");
 
-        assertS12(1L, "1l", "1L");
+        assertS12(al(-1), "(-1)", "(-01)");
+        assertS12(al(-1L), "(-1l)", "(-1L)");
+        assertS12(al(-1.0f), "(-1f)", "(-1.0)", "(-1.0f)", "(-1.0F)", "(-1.f)", "(-1.F)");
+        assertS12(al(-0.01f), "(-0.01f)", "(-0.01)", "(-0.01F)", "(-.01F)", "(-1.0E-2F)", "(-1.0E-2f)");
+        assertS12(al(-0.01d), "(-0.01d)", "(-0.01D)", "(-.01D)", "(-1.0E-2D)", "(-1.0E-2d)");
 
-        assertS12(al(0.00001d), "(1.0E-5d)");
-        assertS12(al(1.0d), "(1d)");
-        assertS12(al(1.0d), "(1d)", "(1.0d)", "(1.0D)");
+        assertS12(al(1, -1), "(1 -1)", "(1 -01)");
+        assertS12(al(1, -1L), "(1 -1l)", "(1 -1L)");
+        assertS12(al(1, -1.0f), "(1 -1f)", "(1 -1.0)", "(1 -1.0f)", "(1 -1.0F)", "(1 -1.f)", "(1 -1.F)");
+        assertS12(al(1, -0.01f), "(1 -0.01f)", "(1 -0.01)", "(1 -0.01F)", "(1 -.01F)", "(1 -1.0E-2F)", "(1 -1.0E-2f)");
+        assertS12(al(1, -0.01d), "(1 -0.01d)", "(1 -0.01D)", "(1 -.01D)", "(1 -1.0E-2D)", "(1 -1.0E-2d)");
+
+        assertS12(al(0), "(0)", "(00)", "(00000)");//is it ok ?
+        assertS12(al(Integer.MIN_VALUE), "(-2147483648)");
+        assertS12(al(Integer.MAX_VALUE), "(2147483647)");
+
+        assertS12(al(0L), "(0l)", "(0L)", "(00l)", "(00L)", "(00000l)");//is it ok ?
+        assertS12(al(Long.MIN_VALUE), "(-9223372036854775808l)", "(-9223372036854775808L)");
+        assertS12(al(Long.MAX_VALUE), "(9223372036854775807l)", "(9223372036854775807L)");
+
+        assertS12(al(0f), "(0f)", "(0F)", "(00f)", "(00F)", "(00000f)", "(.0f)", "(.0F)", "(0.0f)", "(0.0F)");
+        assertS12(al(Float.MIN_VALUE), "(1.4E-45f)", "(1.4E-45F)");
+        assertS12(al(Float.MAX_VALUE), "(3.4028235E38f)", "(3.4028235E38F)", "(3.4028235E+38f)", "(3.4028235E+38F)");
+
+        assertS12(al(0d), "(0d)", "(0D)", "(00d)", "(00D)", "(00000d)", "(.0d)", "(.0D)", "(0.0d)", "(0.0D)");
+        assertS12(al(Double.MIN_VALUE), "(4.9E-324d)", "(4.9E-324D)");
+        assertS12(al(Double.MAX_VALUE), "(1.7976931348623157E308d)", "(1.7976931348623157E308D)", "(1.7976931348623157E+308d)", "(1.7976931348623157E+308D)");
+
+        //TODO numbers NaNs
+        //TODO implement byte, short
+        //assertS12(al((byte)0), "(0b)");
+        //assertS12(al((byte)1), "('a')");
+        //assertS12(al((byte)-1), "('a')");
+        //assertS12(al(1, (byte)-1), "('a')");
+        //assertS12(al(Byte.MAX_VALUE), "('a')");
+        //assertS12(al(Byte.MIN_VALUE), "('a')");
+        //
+        //assertS12(al((short)0), "(0)");
+        //assertS12(al((short)1), "('a')");
+        //assertS12(al((short)-1), "('a')");
+        //assertS12(al(1, (short)-1), "('a')");
+        //assertS12(al(Short.MAX_VALUE), "('a')");
+        //assertS12(al(Short.MIN_VALUE), "('a')");
+
+        assertS12(al((String)null), "(null)");
+        assertS12(al(null, null), "(null null)");
+        assertS12(hm("a", null), "(a=null)");
+        assertS12(hm(null, "b"), "(null=b)");
+        assertS12(al("null"), "(\"null\")");
+        assertS12(null, "null");
+
+        //TODO char
+        //assertS12(al('a'), "('a')");
+
+        //TODO arrays
+        //TODO multidimensional arrays
+        //TODO [byte]
+        //TODO [short]
+        //TODO [int]
+        //TODO [long]
+        //TODO [float]
+        //TODO [double]
+        //TODO [char]
+        //TODO [boolean]
+        //TODO [String]
+        //TODO [Int, Long, Float, Double]
+        //TODO [Object]
+
+
 
         assertS12(new TestClassNumbers(),
                 "import yk.lang.yads.TestClassNumbers\nTestClassNumbers()");
@@ -229,9 +287,9 @@ public class TestYadsSerialization {
                 "import yk.lang.yads.TestClassNumbers\nTestClassNumbers(B=1)");
 
         assertS12(new TestClassNumbers().setC(' '),
-                "import yk.lang.yads.TestClassNumbers\nTestClassNumbers(c=' ')");
+                "import yk.lang.yads.TestClassNumbers\nTestClassNumbers(c=\" \")");
         assertS12(new TestClassNumbers().setC((Character)' '),
-                "import yk.lang.yads.TestClassNumbers\nTestClassNumbers(C=' ')");
+                "import yk.lang.yads.TestClassNumbers\nTestClassNumbers(C=\" \")");
         assertException("import yk.lang.yads.TestClassNumbers\nTestClassNumbers(C='  ')",
                 "Error at 2:20, Expected string with one symbol to convert it to char, but was'  '");
 
@@ -243,16 +301,6 @@ public class TestYadsSerialization {
         //TODO unicode
         //assertS12(new TestClassNumbers().setC((char)13), "import yk.lang.yads.TestClassNumbers\nTestClassNumbers(c='\\u000D')");
 
-
-        assertS12(al("true"), "('true')");
-        assertS12(al("false"), "('false')");
-
-        assertS12(al(-5), "(-5)");
-        assertS12(al(-5f), "(-5f)", "(-5.0)");
-        assertS12(al(-5d), "(-5d)");
-
-        assertS12(al(true), "(true)");
-        assertS12(al(false), "(false)");
 
         //TODO fix after simple constructors cast
         //assertS12(al((short) 5), "import java.lang.Short\n(Short(5))", "(Short(value=5))");
@@ -286,7 +334,7 @@ public class TestYadsSerialization {
             assertEquals("ref(1 TestClass(tc=ref(1)))",
                 serialize(al("yk.lang.yads.TestClass"), testClass));
 
-            TestClass des12ed = (TestClass) Yads.deserialize(al("yk.lang.yads.TestClass"), "ref(1 TestClass(tc=ref(1)))");
+            TestClass des12ed = (TestClass) YadsJava.deserialize(al("yk.lang.yads.TestClass"), "ref(1 TestClass(tc=ref(1)))");
             assertTrue(des12ed.tc == des12ed);
         }
 
@@ -298,7 +346,7 @@ public class TestYadsSerialization {
             assertEquals("(ref(1 TestClass(tc=ref(2 (tc=ref(1))))) ref(2))",
                     serialize(al("yk.lang.yads.TestClass"), al(testClass1, testClass2)));
 
-            YList des12ed = (YList) Yads.deserialize(al("yk.lang.yads.TestClass"),
+            YList des12ed = (YList) YadsJava.deserialize(al("yk.lang.yads.TestClass"),
                     "(ref(1 TestClass(tc=ref(2 (tc=ref(1))))) ref(2))");
 
             TestClass res1 = (TestClass) des12ed.first();
@@ -339,9 +387,9 @@ public class TestYadsSerialization {
     }
 
     private static void assertRefInPrint(Object a, Object b, boolean haveRef, boolean exact) {
-        String text = Yads.print(al(a, b));
+        String text = YadsJava.print(al(a, b));
         assertTrue(text.contains("ref") == haveRef);
-        YList des12ed = (YList) Yads.deserialize(text);
+        YList des12ed = (YList) YadsJava.deserialize(text);
         assertTrue((des12ed.get(0) == des12ed.get(1) == exact));
     }
 
@@ -350,18 +398,10 @@ public class TestYadsSerialization {
     }
 
     private static void assertRefInSerialize(Object a, Object b, boolean haveRef, boolean exact) {
-        String text = Yads.serialize(al(a, b));
+        String text = YadsJava.serialize(al(a, b));
         assertTrue(text.contains("ref") == haveRef);
-        YList des12ed = (YList) Yads.deserialize(text);
+        YList des12ed = (YList) YadsJava.deserialize(text);
         assertTrue((des12ed.get(0) == des12ed.get(1) == exact));
-    }
-
-
-    
-    private static void assertNotReferencing(Object instance, final String text) {
-        assertFalse(serialize(al("yk.lang.yads.TestClass2"), al(instance, instance)).contains("ref"));
-        YList des12ed = (YList) Yads.deserialize(al("yk.lang.yads.TestClass2"), "(ref(1 " + text + ") ref(1))");
-        assertTrue(des12ed.get(0) == des12ed.get(1));
     }
 
     private static void assertException(String text, String errorText) {
@@ -375,7 +415,7 @@ public class TestYadsSerialization {
 
     private static void assertException(String text, YList<String> imports, String exceptionText) {
         try {
-            Yads.deserialize(imports, text);
+            YadsJava.deserialize(imports, text);
             fail();
         } catch (RuntimeException re) {
             if (!exceptionText.equals(re.getMessage())) {
@@ -396,50 +436,50 @@ public class TestYadsSerialization {
     private static void assertS12(Object expectedObject, String expectedText, YList<String> imports, String... variants) {
         if (expectedText != null) {
             assertEquals(expectedText, serialize(imports, expectedObject));
-            assertEquals(expectedObject, Yads.deserialize(imports, expectedText));
+            assertEquals(expectedObject, YadsJava.deserialize(imports, expectedText));
         }
-        for (String s : variants) assertEquals(expectedObject, Yads.deserialize(imports, s));
+        for (String s : variants) assertEquals(expectedObject, YadsJava.deserialize(imports, s));
     }
 
     private static void assertBodyS12(Object expectedObject, String expectedText, String... variants) {
         if (expectedText != null) {
-            assertEquals(expectedText, Yads.serializeBody(expectedObject));
-            assertEquals(expectedObject, Yads.deserializeBody(expectedObject.getClass(), expectedText));
+            assertEquals(expectedText, YadsJava.serializeBody(expectedObject));
+            assertEquals(expectedObject, YadsJava.deserializeBody(expectedObject.getClass(), expectedText));
         }
         for (String s : variants) {
-            assertEquals(expectedObject, Yads.deserializeBody(expectedObject.getClass(), s));
+            assertEquals(expectedObject, YadsJava.deserializeBody(expectedObject.getClass(), s));
             if (expectedObject instanceof Map) {
-                assertEquals(expectedObject, Yads.deserializeBody(s));
-                assertEquals(expectedObject, Yads.deserializeMapBody(s));
+                assertEquals(expectedObject, YadsJava.deserializeBody(s));
+                assertEquals(expectedObject, YadsJava.deserializeMapBody(s));
             }
             if (expectedObject instanceof List) {
-                assertEquals(expectedObject, Yads.deserializeBody(s));
-                assertEquals(expectedObject, Yads.deserializeListBody(s));
+                assertEquals(expectedObject, YadsJava.deserializeBody(s));
+                assertEquals(expectedObject, YadsJava.deserializeListBody(s));
             }
         }
     }
 
     private static void assertBodyS12(Object expectedObject, String expectedText, YList<String> imports, String... variants) {
         if (expectedText != null) {
-            assertEquals(expectedText, Yads.serializeBody(imports, expectedObject));
-            assertEquals(expectedObject, Yads.deserializeBody(imports, expectedObject.getClass(), expectedText));
+            assertEquals(expectedText, YadsJava.serializeBody(imports, expectedObject));
+            assertEquals(expectedObject, YadsJava.deserializeBody(imports, expectedObject.getClass(), expectedText));
         }
         for (String s : variants) {
-            assertEquals(expectedObject, Yads.deserializeBody(imports, expectedObject.getClass(), s));
+            assertEquals(expectedObject, YadsJava.deserializeBody(imports, expectedObject.getClass(), s));
             if (expectedObject instanceof Map) {
-                assertEquals(expectedObject, Yads.deserializeBody(imports, s));
-                assertEquals(expectedObject, Yads.deserializeMapBody(imports, s));
+                assertEquals(expectedObject, YadsJava.deserializeBody(imports, s));
+                assertEquals(expectedObject, YadsJava.deserializeMapBody(imports, s));
             }
             if (expectedObject instanceof List) {
-                assertEquals(expectedObject, Yads.deserializeBody(imports, s));
-                assertEquals(expectedObject, Yads.deserializeListBody(imports, s));
+                assertEquals(expectedObject, YadsJava.deserializeBody(imports, s));
+                assertEquals(expectedObject, YadsJava.deserializeListBody(imports, s));
             }
         }
     }
 
     private static void assertS12Exception(Object someObject, String exceptionText) {
         try {
-            Yads.serializeBody(someObject);
+            YadsJava.serializeBody(someObject);
             fail();
         } catch (RuntimeException re) {
             assertEquals(exceptionText, re.getMessage());
