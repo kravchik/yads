@@ -11,7 +11,7 @@ public class Yads {
         return YadsEntityResolver.toYadsList(YadsObjectParser.parse(s).getNodeList(ARGS)).assertSize(1).first();
     }
 
-    public static YList<Object> readYadsEntityBody(String s) {
+    public static YList<Object> readYadsEntities(String s) {
         return YadsEntityResolver.toYadsList(YadsObjectParser.parse(s).getNodeList(ARGS));
     }
     //TODO test
@@ -19,8 +19,8 @@ public class Yads {
         return new YadsEntityOutput().print(s);
     }
     //TODO test
-    public static String printYadsEntityBody(YadsEntity s) {
-        return new YadsEntityOutput().printBody(s);
+    public static String printYadsEntities(YList<Object> entities) {
+        return new YadsEntityOutput().printBody(entities);
     }
 
     /**

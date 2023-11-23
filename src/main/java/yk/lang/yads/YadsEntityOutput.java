@@ -95,9 +95,8 @@ public class YadsEntityOutput {
         return print(0, o).toString("\n");
     }
 
-    public String printBody(YadsEntity o) {
-        if (o.name != null) BadException.die("Not expecting defined name (%s) when printing body only", o.name);
-        return print(0, o, null, null, false).toString("\n");
+    public String printBody(YList<Object> objects) {
+        return print(objects, 0, null, null, false).toString("\n");
     }
 
     private YList<String> print(int startAt, Object o) {
@@ -112,16 +111,16 @@ public class YadsEntityOutput {
             return result;
         } else if (o instanceof YadsEntity) {
             YadsEntity ye = (YadsEntity) o;
-            return print(startAt, ye, (ye.name == null ? "" : ye.name) + "(", ")", true);
+            return print(ye.children, startAt, (ye.name == null ? "" : ye.name) + "(", ")", true);
         } else return al(valueToString(o));
     }
 
-    private YList<String> print(int startAt, YadsEntity yl, String l1, String ln, boolean addTabs) {
+    private YList<String> print(YList<Object> objects, int startAt, String l1, String ln, boolean addTabs) {
         if ((l1 == null) != (ln == null)) BadException.die("Both prefix and suffix should either null, or not");
         boolean tryCompact = true;
         YList<String> cc = al();
         int commonLength = 0;
-        for (Object child : yl.children) {
+        for (Object child : objects) {
             if (child instanceof YadsEntity.YadsComment) {
                 YadsEntity.YadsComment c = (YadsEntity.YadsComment) child;
                 if (c.isOneLine) {

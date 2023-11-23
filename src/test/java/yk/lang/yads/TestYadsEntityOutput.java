@@ -15,7 +15,7 @@ import static junit.framework.TestCase.assertEquals;
 public class TestYadsEntityOutput {
     @Test
     public void test1() {
-        YList<Object> yl = Yads.readYadsEntityBody(UtilsForTests.readResource("formatting.cases.yads"));
+        YList<Object> yl = Yads.readYadsEntities(UtilsForTests.readResource("formatting.cases.yads"));
         int maxWidth = 100;
         for (Object o : yl) {
             if (o instanceof Tuple) {
