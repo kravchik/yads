@@ -328,6 +328,11 @@ public class TestJavaYadsSerialization {
         assertRefInSerialize("h", true, true);
         assertRefInSerialize(true, false, true);//we never want ref Boolean, because it always is cached in Java
 
+        //TODO add enum cases
+        //TODO fix, enums should be deserialized into one instance
+        //assertRefInSerialize(TestEnum.ENUM1, false, false, true);
+        //assertRefInSerialize(TestEnum.ENUM1, true, false, true);
+
         {//self-reference
             TestClass testClass = new TestClass();
             testClass.tc = testClass;
@@ -394,14 +399,30 @@ public class TestJavaYadsSerialization {
     }
 
     private static void assertRefInSerialize(Object a, boolean haveRef, boolean exact) {
-        assertRefInSerialize(a, a, haveRef, exact);
+        assertRefInSerialize(a, a, true, haveRef, exact);
+    }
+
+    private static void assertRefInSerialize(Object a, boolean strict, boolean haveRef, boolean exact) {
+        assertRefInSerialize(a, a, strict, haveRef, exact);
     }
 
     private static void assertRefInSerialize(Object a, Object b, boolean haveRef, boolean exact) {
-        String text = YadsJava.serialize(al(a, b));
-        assertTrue(text.contains("ref") == haveRef);
+        assertRefInSerialize(a, b, true, haveRef, exact);
+    }
+
+    private static void assertRefInSerialize(Object a, Object b, boolean strict, boolean haveRef, boolean exact) {
+        String text = new YadsObjectOutput().toString(new YadsJavaSerializer(strict).serialize(al(a, b)));
+        if (haveRef) {
+            assertTrue("Expected contains reference", text.contains("ref"));
+        } else {
+            assertFalse("Expected NO reference", text.contains("ref"));
+        }
         YList des12ed = (YList) YadsJava.deserialize(text);
-        assertTrue((des12ed.get(0) == des12ed.get(1) == exact));
+        if (exact) {
+            assertSame(des12ed.get(0), des12ed.get(1));
+        } else {
+            assertNotSame(des12ed.get(0), des12ed.get(1));
+        }
     }
 
     private static void assertException(String text, String errorText) {

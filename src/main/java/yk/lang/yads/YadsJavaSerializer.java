@@ -92,7 +92,9 @@ public class YadsJavaSerializer {
         }
         Tuple<YadsObject, Integer> tuple = new Tuple<>(null, 0);
 
-        if (object == null || object instanceof Boolean
+        if (object == null
+                || object instanceof Boolean
+                || object.getClass().isEnum()
                 || knownType != null && knownType.isPrimitive()
                 || !strictReferencing && (object instanceof String || object instanceof Number));
         else identity.put(object, tuple);

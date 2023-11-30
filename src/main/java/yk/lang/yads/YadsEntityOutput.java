@@ -62,7 +62,7 @@ public class YadsEntityOutput {
             value = valObj.toString();
         } else {
             throw new RuntimeException(String.format("Not implemented const type. Class: %s, Value: %s",
-                    valObj.getClass().toString(), valObj));
+                    valObj.getClass(), valObj));
         }
         return value;
     }

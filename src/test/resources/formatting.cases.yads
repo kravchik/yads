@@ -11,6 +11,10 @@ hello
 hello()
 '
 
+'
+(hello ? world)
+'
+
 maxWidth = 1
 
 '
