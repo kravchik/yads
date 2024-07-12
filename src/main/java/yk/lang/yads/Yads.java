@@ -14,11 +14,11 @@ public class Yads {
     public static YList<Object> readYadsEntities(String s) {
         return YadsEntityResolver.toYadsList(YadsObjectParser.parse(s).getNodeList(ARGS));
     }
-    //TODO test
+
     public static String printYadsEntity(Object s) {
         return new YadsEntityOutput().print(s);
     }
-    //TODO test
+
     public static String printYadsEntities(YList<Object> entities) {
         return new YadsEntityOutput().printBody(entities);
     }

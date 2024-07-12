@@ -101,8 +101,9 @@ public class YadsUtils {
                 i++;
                 if (i >= input.length()) throw new RuntimeException("Uncompleted escape sequence");
                 c = input.charAt(i);
-                if (c != quote) out.write('\\');
-                out.write(c);
+                if (c == quote) out.write(c);
+                else if (c == '\\') out.write(c);
+                else throw new RuntimeException("Unsupported escaped symbol " + c);
             } else {
                 out.write(c);
             }
@@ -124,7 +125,8 @@ public class YadsUtils {
         StringWriter out = new StringWriter();
         for (int i = 0; i < input.length(); i++) {
             char c = input.charAt(i);
-            if (q == c) out.write("\\" + c);
+            if (c == q) out.write("\\" + c);
+            else if (c == '\\') out.write("\\\\");
             else out.write(c);
         }
         return out.toString();
