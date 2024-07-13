@@ -1,5 +1,6 @@
 package yk.lang.yads;
 
+import yk.lang.yads.utils.BadException;
 import yk.lang.yads.utils.Reflector;
 import yk.ycollections.Tuple;
 import yk.ycollections.YList;
@@ -24,6 +25,7 @@ import static yk.ycollections.YHashSet.hs;
 public class YadsJavaSerializer {
     private YSet<String> imports = hs();
     private YSet<String> defaultImports = hs();
+    private boolean skipDefaultValues = true;
 
     public YadsJavaSerializer addDefaultImports(YList<String> imports) {
         defaultImports.addAll(imports);
@@ -84,7 +86,7 @@ public class YadsJavaSerializer {
         }
     }
 
-    private YadsObject serializeImpl(Object object, Class knownType) {
+    public YadsObject serializeImpl(Object object, Class knownType) {
         if (identity.containsKey(object)) {
             Tuple<YadsObject, Integer> tuple = identity.get(object);
             if (tuple.b == 0) tuple.b = nextRefId++;
@@ -109,19 +111,12 @@ public class YadsJavaSerializer {
             return node(CONST, VALUE, null);
         } else if (object instanceof List) {//TODO better
             return node(YADS_ARRAY, ARGS, toYList(((List) object)).map(o -> serializeImpl(o, null)));
-
-            //TODO fix, can't ship like that!
-            //TODO fix, can't ship like that!
-            //TODO fix, can't ship like that!
-
         } else if (object instanceof Set) {//TODO FIX!
             return node(YADS_ARRAY, ARGS, toYList(((Set) object)).map(o -> serializeImpl(o, null)));
         } else if (object instanceof Map) {//TODO better
             return node(YADS_MAP, NAMED_ARGS, serializeMap((Map<?, ?>) object));
         } else if (object instanceof String) {
-
-            //двинуть escaping сюда
-
+            //TODO move escaping here
             return node(CONST, VALUE, object);
         } else if (object instanceof Short && !(knownType == Short.class || knownType == short.class)) {
             imports.add("java.lang.Short");
@@ -138,10 +133,14 @@ public class YadsJavaSerializer {
                     ARGS, named.array == null ? null : named.array.map(o -> serializeImpl(o, null)),
                     NAMED_ARGS, named.map == null ? null : serializeMap(named.map));
         } else {
+            if (object.getClass().isArray()) {
+                BadException.die("Not implemented serialization of arrays");
+            }
+
             //TO DO use constructor ?
             if (object.getClass() != knownType) imports.add(object.getClass().getCanonicalName());
             YMap<YadsObject, YadsObject> fields = hm();
-            Object defaults = newInstanceArgless(object.getClass());
+            Object defaults = skipDefaultValues ? newInstanceArgless(object.getClass()) : null;
             for (Field field : Reflector.getAllFieldsInHierarchy(object.getClass())) {
                 field.setAccessible(true);
                 if (Modifier.isStatic(field.getModifiers())) continue;
@@ -150,9 +149,7 @@ public class YadsJavaSerializer {
                 if (defaults != null) {
                     Object defaultValue = Reflector.get(defaults, field);
                     if (value == defaultValue) continue;
-                    if (value != null) {
-                        if (value.equals(defaultValue)) continue;
-                    }
+                    if (value != null && value.equals(defaultValue)) continue;
                 }
                 fields.put(node(CONST, VALUE, field.getName()), serializeImpl(value, field.getType()));
             }
@@ -173,5 +170,8 @@ public class YadsJavaSerializer {
         return result;
     }
 
-
+    public YadsJavaSerializer skipDefaultValues(boolean skipDefaultValues) {
+        this.skipDefaultValues = skipDefaultValues;
+        return this;
+    }
 }

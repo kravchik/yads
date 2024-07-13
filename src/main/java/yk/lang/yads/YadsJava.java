@@ -122,7 +122,13 @@ public class YadsJava {
     }
 
     public static String print(Object someObject) {
-        return new YadsObjectOutput().toString(new YadsJavaSerializer(false).serialize(someObject));
+        return new YadsObjectOutput()
+            .toString(al(new YadsJavaSerializer(false).skipDefaultValues(false).serializeImpl(someObject, null)));
+    }
+
+    public static String printNoLn(Object someObject) {
+        return new YadsObjectOutput().withMaxWidth(Integer.MAX_VALUE)
+            .toString(al(new YadsJavaSerializer(false).skipDefaultValues(false).serializeImpl(someObject, null)));
     }
 
     /**
