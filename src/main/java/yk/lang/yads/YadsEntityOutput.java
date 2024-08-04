@@ -4,19 +4,23 @@ import yk.lang.yads.utils.BadException;
 import yk.lang.yads.utils.YadsUtils;
 import yk.ycollections.Tuple;
 import yk.ycollections.YList;
+import yk.ycollections.YMap;
 
 import java.io.ByteArrayInputStream;
 import java.nio.charset.StandardCharsets;
+import java.util.List;
 
+import static yk.ycollections.Tuple.tuple;
 import static yk.ycollections.YArrayList.al;
 
 @SuppressWarnings("rawtypes")
 public class YadsEntityOutput {
     //to do: property closeParensSameLine
     //to do: property firstElementSameLine (if unnamed)
-    //to do: 'floating' maxWidth
     public int maxWidth = 100;
+    public int maxLocalWidth = 100;
     public String tab = "  ";
+    public int compactFromLevel = 0;
 
     public static String valueToString(Object valObj) {
         String value;
@@ -112,10 +116,26 @@ public class YadsEntityOutput {
         } else if (o instanceof YadsEntity) {
             YadsEntity ye = (YadsEntity) o;
             return print(ye.children, startAt, (ye.name == null ? "" : ye.name) + "(", ")", true);
+
+        //TODO fix asymmetry
+        } else if (o instanceof YMap) {
+            return print(((YMap) o).mapToList((k, v) -> tuple(k, v)), startAt, "map(", ")", true);
+        //TODO fix asymmetry
+        } else if (o instanceof List) {
+            return print((List) o, startAt, "list(", ")", true);
+
         } else return al(valueToString(o));
     }
 
-    private YList<String> print(YList<Object> objects, int startAt, String l1, String ln, boolean addTabs) {
+    private int level = 0;
+    private YList<String> print(List<Object> objects, int startAt, String l1, String ln, boolean addTabs) {
+        level++;
+        YList<String> res = printImp(objects, startAt, l1, ln, addTabs);
+        level--;
+        return res;
+    }
+
+    private YList<String> printImp(List<Object> objects, int startAt, String l1, String ln, boolean addTabs) {
         if ((l1 == null) != (ln == null)) BadException.die("Both prefix and suffix should either null, or not");
         boolean tryCompact = true;
         YList<String> cc = al();
@@ -137,10 +157,10 @@ public class YadsEntityOutput {
             if (childStrings.size() > 1) tryCompact = false;
             else commonLength += childStrings.first().length();
         }
-        if (tryCompact) {
+        if (tryCompact && level >= compactFromLevel) {
             int estimatedLen = commonLength + Math.max(0, (cc.size() - 1));
             if (l1 != null) estimatedLen += l1.length() + ln.length();
-            if (estimatedLen + startAt <= maxWidth) {
+            if (estimatedLen + startAt <= maxWidth && estimatedLen <= maxLocalWidth) {
 
                 String result = l1 == null ? cc.toString(" ") : (l1 + cc.toString(" ") + ln);
                 if (result.length() != estimatedLen) {
@@ -161,6 +181,16 @@ public class YadsEntityOutput {
 
     public YadsEntityOutput setMaxWidth(int maxWidth) {
         this.maxWidth = maxWidth;
+        return this;
+    }
+
+    public YadsEntityOutput setMaxLocalWidth(int maxLocalWidth) {
+        this.maxLocalWidth = maxLocalWidth;
+        return this;
+    }
+
+    public YadsEntityOutput setCompactFromLevel(int compactFromLevel) {
+        this.compactFromLevel = compactFromLevel;
         return this;
     }
 

@@ -5,6 +5,8 @@ import yk.ycollections.YList;
 
 import java.util.Objects;
 
+import static yk.ycollections.Tuple.tuple;
+
 //TODO rename
 //  Node
 //  Entity
@@ -19,9 +21,9 @@ public class YadsEntity {
     //Tuple<null, Object> - child
     //Object - child
     //YadsComment - comment
-    public YList<Object> children;
+    public YList children;
 
-    public YadsEntity(String name, YList<Object> children) {
+    public YadsEntity(String name, YList children) {
         this.name = name;
         this.children = children;
     }
@@ -31,13 +33,19 @@ public class YadsEntity {
     }
 
     public Object get(Object k) {
-        Object result = children.first(o -> o instanceof Tuple && k.equals(((Tuple<?, ?>) o).a));
+        Object result = children.find(o -> o instanceof Tuple && k.equals(((Tuple<?, ?>) o).a));
         return result == null ? null : ((Tuple)result).b;
     }
 
     public Object getOr(Object k, Object or) {
-        Object result = children.first(o -> o instanceof Tuple && k.equals(((Tuple<?, ?>) o).a));
+        Object result = children.find(o -> o instanceof Tuple && k.equals(((Tuple<?, ?>) o).a));
         return result == null ? or : ((Tuple)result).b;
+    }
+
+    public YadsEntity withReplace(String key, Object value) {
+        if (key == null) throw new RuntimeException("key is null");
+        return new YadsEntity(name,
+            children.map(c -> c instanceof Tuple && key.equals(((Tuple) c).a) ? tuple(key, value) : c));
     }
 
     public static class YadsComment {

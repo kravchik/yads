@@ -49,7 +49,7 @@ public class YadsJavaDeserializer {
     void handleException(RuntimeException re) {
         if (caretStack.notEmpty()) {
             if (caretStack.last() == null) {
-                Caret atCaret = caretStack.first(c -> c != null);
+                Caret atCaret = caretStack.find(c -> c != null);
                 if (atCaret != null) throw new RuntimeException("Error somewhere inside " + atCaret.toStringInside() + ", " + re.getMessage(), re);
                 else throw new RuntimeException("Error somewhere inside file" + ", " + re.getMessage(), re);
             } else {
@@ -57,7 +57,7 @@ public class YadsJavaDeserializer {
             }
         }
 
-        Caret atCaret = caretStack.first(c -> c != null);
+        Caret atCaret = caretStack.find(c -> c != null);
         throw new RuntimeException("Error at " + atCaret + ", " + re.getMessage(), re);
     }
 
