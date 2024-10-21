@@ -17,10 +17,16 @@ import static yk.ycollections.Tuple.tuple;
 public class YadsEntity {
     //can be null
     public String name;
-    //Tuple<String, Object> - field
-    //Tuple<null, Object> - child
-    //Object - child
-    //YadsComment - comment
+
+    /**                         
+     *
+     * <pre>{@code
+     * Tuple<String, Object> - field
+     * Tuple<null, Object> - child
+     * Object - child
+     * YadsComment - comment
+     * }
+     */
     public YList children;
 
     public YadsEntity(String name, YList children) {
