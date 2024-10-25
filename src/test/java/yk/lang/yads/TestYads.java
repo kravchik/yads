@@ -56,15 +56,18 @@ public class TestYads {
     public void testEscapes() {
         testStrings("", "''", "\"\"");
         testStrings(" ", "' '", "\" \"");
-        testStrings("' \" \\ \\t\\n", "\"' \\\" \\\\ \\\\t\\\\n\"", "'\\' \" \\\\ \\\\t\\\\n'");
 
-        testStrings("\n", "'\n'", "\"\n\"");
-        testStrings("\t", "'\t'", "\"\t\"");
-        testStrings("\\", "'\\\\'", "\"\\\\\"");
+        testStrings(" \\ ", "' \\\\ '",     "' \\\\ '");
+        testStrings(" \t ", "' \t '",       "\" \t \"", "\" \\t \"", "' \\t '");
+        testStrings(" \n ", "' \n '",       "\" \n \"", "\" \\n \"", "' \\n '");
+        testStrings(" \b ", "' \b '",       "\" \b \"", "\" \\b \"", "' \\b '");
+        testStrings(" \r ", "' \r '",       "\" \r \"", "\" \\r \"", "' \\r '");
+        testStrings(" \f ", "' \f '",       "\" \f \"", "\" \\f \"", "' \\f '");
 
-        testStrings("hello", "hello", "\"hello\"");
-        testStrings("hello", "hello", "'hello'");
+        testStrings(" ' ", "\" ' \"",       "' \\' '", "\" \\' \"");
+        testStrings(" \" ", "' \" '",       "\" \\\" \"", "' \\\" '");
 
+        testStrings("hello", "hello", "\"hello\"", "'hello'");
         testStrings("hello world", "'hello world'", "\"hello world\"");
     }
 
@@ -75,20 +78,22 @@ public class TestYads {
         assertEquals(expected, Yads.readYadsEntity(s));
     }
 
-    private static void testStrings(String j, String out, String alt) {
-        assertEquals(j, Yads.readYadsEntity(alt));
-        assertEquals(al(j), Yads.readYadsEntities(alt));
-        assertEquals(al(j, j), Yads.readYadsEntities(alt + " " + alt));
-        assertEquals(al(j, j), Yads.readYadsEntities(alt + "\n" + alt));
+    private static void testStrings(String data, String canonicForm, String... alternativeForms) {
+        assertEquals(data, Yads.readYadsEntity(canonicForm));
+        assertEquals(al(data), Yads.readYadsEntities(canonicForm));
+        assertEquals(al(data, data), Yads.readYadsEntities(canonicForm + " " + canonicForm));
+        assertEquals(al(data, data), Yads.readYadsEntities(canonicForm + "\n" + canonicForm));
 
-        assertEquals(j, Yads.readYadsEntity(out));
-        assertEquals(al(j), Yads.readYadsEntities(out));
-        assertEquals(al(j, j), Yads.readYadsEntities(out + " " + out));
-        assertEquals(al(j, j), Yads.readYadsEntities(out + "\n" + out));
+        assertEquals(canonicForm, Yads.printYadsEntity(data));
+        assertEquals(canonicForm, Yads.printYadsEntities(al(data)));
+        assertEquals(canonicForm + " " + canonicForm, Yads.printYadsEntities(al(data, data)));
 
-        assertEquals(out, Yads.printYadsEntity(j));
-        assertEquals(out, Yads.printYadsEntities(al(j)));
-        assertEquals(out + " " + out, Yads.printYadsEntities(al(j, j)));
+        for (String alt : alternativeForms) {
+            assertEquals(data, Yads.readYadsEntity(alt));
+            assertEquals(al(data), Yads.readYadsEntities(alt));
+            assertEquals(al(data, data), Yads.readYadsEntities(alt + " " + alt));
+            assertEquals(al(data, data), Yads.readYadsEntities(alt + "\n" + alt));
+        }
     }
 
     public static YadsEntity entity() {

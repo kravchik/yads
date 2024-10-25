@@ -13,19 +13,19 @@ public class TestYadsEntityResolver {
         assertEquals("YadsEntity{children=[]}", getYadsList("()"));
         assertEquals("YadsEntity{children=[a]}", getYadsList("(a)"));
         assertEquals("YadsEntity{children=[a, b]}", getYadsList("(a b)"));
-        assertEquals("YadsEntity{children=[Tuple{a=a, b=b}]}", getYadsList("(a=b)"));
-        assertEquals("YadsEntity{children=[a, Tuple{a=b, b=c}]}", getYadsList("(a b=c)"));
-        assertEquals("YadsEntity{children=[Tuple{a=b, b=c}, d]}", getYadsList("(b=c d)"));
-        assertEquals("YadsEntity{children=[Tuple{a=a, b=b}, Tuple{a=c, b=d}]}", getYadsList("(a=b c=d)"));
-        assertEquals("YadsEntity{children=[Tuple{a=a, b=b}, e, Tuple{a=c, b=d}]}", getYadsList("(a=b e c=d)"));
-        assertEquals("YadsEntity{children=[Tuple{a=a, b=b}, e, Tuple{a=c, b=d}, f]}", getYadsList("(a=b e c=d f)"));
-        assertEquals("YadsEntity{children=[Tuple{a=a, b=b}, Tuple{a=c, b=d}, f]}", getYadsList("(a=b c=d f)"));
+        assertEquals("YadsEntity{children=[tuple(a b)]}", getYadsList("(a=b)"));
+        assertEquals("YadsEntity{children=[a, tuple(b c)]}", getYadsList("(a b=c)"));
+        assertEquals("YadsEntity{children=[tuple(b c), d]}", getYadsList("(b=c d)"));
+        assertEquals("YadsEntity{children=[tuple(a b), tuple(c d)]}", getYadsList("(a=b c=d)"));
+        assertEquals("YadsEntity{children=[tuple(a b), e, tuple(c d)]}", getYadsList("(a=b e c=d)"));
+        assertEquals("YadsEntity{children=[tuple(a b), e, tuple(c d), f]}", getYadsList("(a=b e c=d f)"));
+        assertEquals("YadsEntity{children=[tuple(a b), tuple(c d), f]}", getYadsList("(a=b c=d f)"));
 
-        assertEquals("YadsEntity{children=[Tuple{a=a, b==}]}", getYadsList("(a='=')"));
-        assertEquals("YadsEntity{children=[Tuple{a=null, b=value}]}", getYadsList("(null=value)"));
-        assertEquals("YadsEntity{children=[Tuple{a=key, b=null}]}", getYadsList("(key=null)"));
-        assertEquals("YadsEntity{children=[Tuple{a=key, b=false}]}", getYadsList("(key=false)"));
-        assertEquals("YadsEntity{children=[Tuple{a=true, b=false}]}", getYadsList("(true=false)"));
+        assertEquals("YadsEntity{children=[tuple(a =)]}", getYadsList("(a='=')"));
+        assertEquals("YadsEntity{children=[tuple(null value)]}", getYadsList("(null=value)"));
+        assertEquals("YadsEntity{children=[tuple(key null)]}", getYadsList("(key=null)"));
+        assertEquals("YadsEntity{children=[tuple(key false)]}", getYadsList("(key=false)"));
+        assertEquals("YadsEntity{children=[tuple(true false)]}", getYadsList("(true=false)"));
 
         assertEquals("YadsEntity{name='name', children=[]}", getYadsList("name()"));
         assertEquals("YadsEntity{name='name', children=[a]}", getYadsList("name(a)"));
@@ -51,9 +51,9 @@ public class TestYadsEntityResolver {
         assertEquals("YadsEntity{children=[" + exectedComment + ", a]}", getYadsList("(" + srcComment + " a)"));
         assertEquals("YadsEntity{children=[a, " + exectedComment + ", b]}", getYadsList("(a " + srcComment + " b)"));
 
-        assertEquals("YadsEntity{children=[Tuple{a=a, b=b}, " + exectedComment + "]}", getYadsList("(a = b" + srcComment + ")"));
-        assertEquals("YadsEntity{children=[" + exectedComment + ", Tuple{a=a, b=b}]}", getYadsList("(" + srcComment + "a = b)"));
-        assertEquals("YadsEntity{children=[Tuple{a=a, b=b}, " + exectedComment + ", Tuple{a=c, b=d}]}", getYadsList("(a = b" + srcComment + "c = d)"));
+        assertEquals("YadsEntity{children=[tuple(a b), " + exectedComment + "]}", getYadsList("(a = b" + srcComment + ")"));
+        assertEquals("YadsEntity{children=[" + exectedComment + ", tuple(a b)]}", getYadsList("(" + srcComment + "a = b)"));
+        assertEquals("YadsEntity{children=[tuple(a b), " + exectedComment + ", tuple(c d)]}", getYadsList("(a = b" + srcComment + "c = d)"));
     }
 
     @Test

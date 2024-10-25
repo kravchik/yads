@@ -2,7 +2,6 @@ package yk.lang.yads;
 
 import yk.lang.yads.utils.Caret;
 import yk.lang.yads.utils.Reflector;
-import yk.lang.yads.utils.YadsUtils;
 import yk.ycollections.*;
 
 import java.lang.reflect.Constructor;
@@ -117,10 +116,6 @@ public class YadsJavaDeserializer {
                     if (s.length() != 1) throw new RuntimeException("Expected string with one symbol to convert it to char, but was'" + s + "'");
                     result = s.charAt(0);
                 }
-            }
-
-            if (result instanceof String) {
-                result = YadsUtils.unescape((String) result, YadsObjectOutput.JAVA_UNESCAPES);
             }
 
             if (refIndex > 0) refs.put(refIndex, result);

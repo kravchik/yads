@@ -1,6 +1,7 @@
 package yk.lang.yads.utils;
 
 import yk.lang.yads.YadsObject;
+import yk.lang.yads.YadsObjectOutput;
 import yk.ycollections.YMap;
 
 import java.io.StringWriter;
@@ -103,6 +104,8 @@ public class YadsUtils {
                 c = input.charAt(i);
                 if (c == quote) out.write(c);
                 else if (c == '\\') out.write(c);
+                //hack for Java deserialization, support additional unescapes
+                else if (YadsObjectOutput.JAVA_UNESCAPES.containsKey(c)) out.write(YadsObjectOutput.JAVA_UNESCAPES.get(c));
                 else throw new RuntimeException("Unsupported escaped symbol " + c);
             } else {
                 out.write(c);

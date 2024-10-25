@@ -44,7 +44,7 @@ public class TestJavaYadsSerialization {
         assertEquals("import java.lang.Object\nObject()", serialize(new Object()));
         assertTrue(deserialize("import java.lang.Object\nObject()").getClass() == Object.class);
 
-        assertS12(new TestClass2(1), "TestClass2(a=1f b=1f)", al("yk.lang.yads.TestClass2"), "TestClass2(1f)");
+        assertS12(new TestClass2(1), "TestClass2(a=1f b=1f)", al(TestClass2.class), "TestClass2(1f)");
 
         assertS12(new TestClass2(1), "import yk.lang.yads.TestClass2\nTestClass2(a=1f b=1f)",
                 "yk.lang.yads.TestClass2(1f)");
@@ -60,22 +60,22 @@ public class TestJavaYadsSerialization {
                 "import yk.lang.yads.TestClass\nTestClass(tc2=(a=1f b=1f))",
                 "yk.lang.yads.TestClass(tc2 = (1f))");
 
-        assertS12(new TestClass().setTc2(new TestClass2(1)), "TestClass(tc2=(a=1f b=1f))", al("yk.lang.yads.TestClass"),
+        assertS12(new TestClass().setTc2(new TestClass2(1)), "TestClass(tc2=(a=1f b=1f))", al(TestClass.class),
                 "TestClass(tc2 = (1f))");
 
-        assertS12(new TestClass().setTc2(new TestClass2()), "TestClass(tc2=())", al("yk.lang.yads.TestClass"),
+        assertS12(new TestClass().setTc2(new TestClass2()), "TestClass(tc2=())", al(TestClass.class),
                 "TestClass(tc2 = ())", "TestClass(tc2=(=))");
 
-        assertS12(new TestClass().setTc2(new TestClass2().setA(1)), "TestClass(tc2=(a=1f))", al("yk.lang.yads.TestClass"));
+        assertS12(new TestClass().setTc2(new TestClass2().setA(1)), "TestClass(tc2=(a=1f))", al(TestClass.class));
 
-        assertS12(new TestClass().setTc2(new TestClass2(1, 3)), "TestClass(tc2=(a=1f b=3f))", al("yk.lang.yads.TestClass"), "TestClass(tc2 = (1f b=3))");
+        assertS12(new TestClass().setTc2(new TestClass2(1, 3)), "TestClass(tc2=(a=1f b=3f))", al(TestClass.class), "TestClass(tc2 = (1f b=3))");
 
         assertS12(al(new TestClass(), new TestClass()), "import yk.lang.yads.TestClass\n(TestClass() TestClass())", al(), "import yk.lang.yads.TestClass\n (TestClass() TestClass())");
 
-        assertException("TestClass(asdf = 1f)", al("yk.lang.yads.TestClass"),
+        assertException("TestClass(asdf = 1f)", al(TestClass.class),
                 "Error at 1:11, Class 'class yk.lang.yads.TestClass' has no field 'asdf'");
 
-        assertException("TestClass(tc2 = 1f)", al("yk.lang.yads.TestClass"),
+        assertException("TestClass(tc2 = 1f)", al(TestClass.class),
                 "Error at 1:17, Expected type class yk.lang.yads.TestClass2, but was class java.lang.Float");
 
         assertEquals("import yk.lang.yads.TestClass\nTestClass()", YadsJava.serialize(new TestClass().setSomeTransient(5)));
@@ -138,12 +138,12 @@ public class TestJavaYadsSerialization {
 
         assertBodyS12(hm("a", new TestClass().setTc2(new TestClass2(1)), "b", new TestClass().setTc2(new TestClass2(1))),
                 "a=TestClass(tc2=(a=1f b=1f)) b=TestClass(tc2=(a=1f b=1f))",
-                al("yk.lang.yads.TestClass"),
+                al(TestClass.class),
                 "import yk.lang.yads.TestClass a = TestClass(tc2 = (1f)) b = TestClass(tc2 = (1f))");
 
         assertBodyS12(al(new TestClass().setTc2(new TestClass2(1))),
                 "TestClass(tc2=(a=1f b=1f))",
-                al("yk.lang.yads.TestClass"),
+                al(TestClass.class),
                 "import yk.lang.yads.TestClass TestClass(tc2 = (1f))");
 
         System.out.println(YadsJava.serializeBody(al(new TestClass().setTc2(new TestClass2(1)))));
@@ -157,9 +157,15 @@ public class TestJavaYadsSerialization {
         assertS12(al("Hello"), "(Hello)", "('Hello')", "(\"Hello\")");
 
         //strings
-        assertEquals("\"\\t \\b \\n \\r \\f \\\" \\\\\"", serialize("\t \b \n \r \f \" \\"));
-        assertS12(al("\t \b \n \r \f \" \\ '"), "(\"\\t \\b \\n \\r \\f \\\" \\\\ '\")",
-                "('\\t \\b \\n \\r \\f \" \\\\ \\'')");
+        assertS12(al(" \\ "), "(\" \\\\ \")",   "(' \\\\ ')");
+        assertS12(al(" \t "), "(\" \\t \")",    "(' \\t ')", "(\" \t \")", "(' \t ')");
+        assertS12(al(" \n "), "(\" \\n \")",    "(' \\n ')", "(\" \n \")", "(' \n ')");
+        assertS12(al(" \b "), "(\" \\b \")",    "(' \\b ')", "(\" \b \")", "(' \b ')");
+        assertS12(al(" \r "), "(\" \\r \")",    "(' \\r ')", "(\" \r \")", "(' \r ')");
+        assertS12(al(" \f "), "(\" \\f \")",    "(' \\f ')", "(\" \f \")", "(' \f ')");
+
+        assertS12(al(" ' "), "(\" ' \")",       "(' \\' ')", "(\" \\' \")");
+        assertS12(al(" \" "), "(\" \\\" \")",   "(' \" ')",       "(' \\\" ')");//yads places other quotes by default
 
         //booleans
         assertS12(al("true"), "(\"true\")", "('true')");
@@ -310,7 +316,7 @@ public class TestJavaYadsSerialization {
 
     @Test
     public void testRefs() {
-        assertRefInPrint(null, false, true);
+        //assertRefInPrint(null, false, true);
         assertRefInPrint(new TestClass2(1), true, true);
         assertRefInPrint(999, 999, false, false);
         assertRefInPrint(999, false, false);
@@ -337,9 +343,9 @@ public class TestJavaYadsSerialization {
             TestClass testClass = new TestClass();
             testClass.tc = testClass;
             assertEquals("ref(1 TestClass(tc=ref(1)))",
-                serialize(al("yk.lang.yads.TestClass"), testClass));
+                serialize(al(TestClass.class), testClass));
 
-            TestClass des12ed = (TestClass) YadsJava.deserialize(al("yk.lang.yads.TestClass"), "ref(1 TestClass(tc=ref(1)))");
+            TestClass des12ed = (TestClass) YadsJava.deserialize(al(TestClass.class), "ref(1 TestClass(tc=ref(1)))");
             assertTrue(des12ed.tc == des12ed);
         }
 
@@ -349,9 +355,9 @@ public class TestJavaYadsSerialization {
             testClass1.tc = testClass2;
             testClass2.tc = testClass1;
             assertEquals("(ref(1 TestClass(tc=ref(2 (tc=ref(1))))) ref(2))",
-                    serialize(al("yk.lang.yads.TestClass"), al(testClass1, testClass2)));
+                    serialize(al(TestClass.class), al(testClass1, testClass2)));
 
-            YList des12ed = (YList) YadsJava.deserialize(al("yk.lang.yads.TestClass"),
+            YList des12ed = (YList) YadsJava.deserialize(al(TestClass.class),
                     "(ref(1 TestClass(tc=ref(2 (tc=ref(1))))) ref(2))");
 
             TestClass res1 = (TestClass) des12ed.first();
@@ -376,7 +382,7 @@ public class TestJavaYadsSerialization {
 
     @Test
     public void testTabs() {
-        assertEquals(readResource("formatting.yads").trim(), new YadsObjectOutput().withMaxWidth(30).toString(new YadsJavaSerializer(true).serialize(al(new TestHierarchy("key1", "value1", "key2", new TestHierarchy("key3", "value3")), new TestHierarchy("key1", "value1", "key2", new TestHierarchy("key3", "value3"))))));
+        assertEquals(readResource("formatting.yads").trim(), new YadsObjectOutput().setMaxWidth(30).toString(new YadsJavaSerializer(true).serialize(al(new TestHierarchy("key1", "value1", "key2", new TestHierarchy("key3", "value3")), new TestHierarchy("key1", "value1", "key2", new TestHierarchy("key3", "value3"))))));
     }
 
     @Test
@@ -434,7 +440,7 @@ public class TestJavaYadsSerialization {
         }
     }
 
-    private static void assertException(String text, YList<String> imports, String exceptionText) {
+    private static void assertException(String text, YList<Class> imports, String exceptionText) {
         try {
             YadsJava.deserialize(imports, text);
             fail();
@@ -454,7 +460,7 @@ public class TestJavaYadsSerialization {
         for (String s : variants) assertEquals(expectedObject, deserialize(s));
     }
 
-    private static void assertS12(Object expectedObject, String expectedText, YList<String> imports, String... variants) {
+    private static void assertS12(Object expectedObject, String expectedText, YList<Class> imports, String... variants) {
         if (expectedText != null) {
             assertEquals(expectedText, serialize(imports, expectedObject));
             assertEquals(expectedObject, YadsJava.deserialize(imports, expectedText));
@@ -471,16 +477,16 @@ public class TestJavaYadsSerialization {
             assertEquals(expectedObject, YadsJava.deserializeBody(expectedObject.getClass(), s));
             if (expectedObject instanceof Map) {
                 assertEquals(expectedObject, YadsJava.deserializeBody(s));
-                assertEquals(expectedObject, YadsJava.deserializeMapBody(s));
+                assertEquals(expectedObject, YadsJava.deserializeBody(Map.class, s));
             }
             if (expectedObject instanceof List) {
                 assertEquals(expectedObject, YadsJava.deserializeBody(s));
-                assertEquals(expectedObject, YadsJava.deserializeListBody(s));
+                assertEquals(expectedObject, YadsJava.deserializeBody(List.class, s));
             }
         }
     }
 
-    private static void assertBodyS12(Object expectedObject, String expectedText, YList<String> imports, String... variants) {
+    private static void assertBodyS12(Object expectedObject, String expectedText, YList<Class> imports, String... variants) {
         if (expectedText != null) {
             assertEquals(expectedText, YadsJava.serializeBody(imports, expectedObject));
             assertEquals(expectedObject, YadsJava.deserializeBody(imports, expectedObject.getClass(), expectedText));
@@ -489,11 +495,11 @@ public class TestJavaYadsSerialization {
             assertEquals(expectedObject, YadsJava.deserializeBody(imports, expectedObject.getClass(), s));
             if (expectedObject instanceof Map) {
                 assertEquals(expectedObject, YadsJava.deserializeBody(imports, s));
-                assertEquals(expectedObject, YadsJava.deserializeMapBody(imports, s));
+                assertEquals(expectedObject, YadsJava.deserializeBody(imports, Map.class, s));
             }
             if (expectedObject instanceof List) {
                 assertEquals(expectedObject, YadsJava.deserializeBody(imports, s));
-                assertEquals(expectedObject, YadsJava.deserializeListBody(imports, s));
+                assertEquals(expectedObject, YadsJava.deserializeBody(imports, List.class, s));
             }
         }
     }

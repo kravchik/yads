@@ -17,10 +17,13 @@ import static yk.ycollections.YHashMap.hm;
 //TODO YadsObject -> YadsEntity
 public class YadsObjectOutput {
     public static final YMap<Character, Character> JAVA_ESCAPES = hm(
-            '\t', 't', '\b', 'b', '\n', 'n', '\r', 'r', '\f', 'f', '\"', '\"', '\\', '\\');
-    public static final YMap<Character, Character> JAVA_UNESCAPES = JAVA_ESCAPES.map((k, v) -> v, (k, v) -> k);
-    private int maxWidth = 100;
-    private String tab = "  ";
+        '\t', 't', '\b', 'b', '\n', 'n', '\r', 'r', '\f', 'f', '\"', '\"', '\\', '\\');
+    public static final YMap<Character, Character> JAVA_UNESCAPES = JAVA_ESCAPES
+        .map((k, v) -> v, (k, v) -> k)
+        .with('\'', '\'');
+
+    public int maxWidth = 100;
+    public String tab = "  ";
 
     public String toString(YList<YadsObject> nodes) {
         return nodes.map(n -> toString(0, n).toString("\n")).toString("\n");
@@ -40,7 +43,7 @@ public class YadsObjectOutput {
         return (si.equals("") ? "" : (si + "\n")) + result.toString("\n");
     }
 
-    public YList<String> toString(int width, YadsObject node) {
+    private YList<String> toString(int width, YadsObject node) {
         if (node.isType(IMPORT)) return al("import " + node.getString(VALUE));
         if (node.isType(CONST)) return al(valueToString(node.map.get(VALUE)));
 
@@ -69,7 +72,7 @@ public class YadsObjectOutput {
         throw new RuntimeException("Not implemented for " + node);
     }
 
-    public static String valueToString(Object valObj) {
+    private static String valueToString(Object valObj) {
         String value;
         if (valObj == null) {
             value = "null";
@@ -79,6 +82,8 @@ public class YadsObjectOutput {
             boolean woQuotes = withoutQuotes(value1);
             if (!woQuotes) {
                 //always serialize java strings as "", so that easy copy-paste
+                //TODO fix, don't need this as not-java-escapes are used
+                //value1 = "\"" + YadsUtils.escapeDoubleQuotes(value1) + "\"";
                 value1 = "\"" + YadsUtils.escape(value1, YadsObjectOutput.JAVA_ESCAPES) + "\"";
             }
             value = value1;
@@ -136,13 +141,13 @@ public class YadsObjectOutput {
         return possibleMerge;
     }
 
-    public static boolean needSpaceBetween(String prev, String next) {
+    private static boolean needSpaceBetween(String prev, String next) {
         if (prev.endsWith("(")) return false;
         if (next.startsWith(")")) return false;
         return true;
     }
 
-    public static int estimateLength(YList<String> ss) {
+    private static int estimateLength(YList<String> ss) {
         int total = 0;
         String last = null;
         for (String s : ss) {
@@ -172,7 +177,7 @@ public class YadsObjectOutput {
         return al(compact(ss));
     }
 
-    public YadsObjectOutput withMaxWidth(int maxWidth) {
+    public YadsObjectOutput setMaxWidth(int maxWidth) {
         this.maxWidth = maxWidth;
         return this;
     }
