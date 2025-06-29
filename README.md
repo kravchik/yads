@@ -3,7 +3,12 @@ YADS
 
 **Y**ads **A**bstract **D**ata **S**yntax
 
-Mark-up language like JSON and YAML, but better, and with built-in serialization.
+Mark-up language (like JSON/YAML), but with optional quotes, no commas, and multi-line strings.
+
+TODO simple example
+                   
+
+
 
 With this library, you can parse YADS data into Abstract Syntax Tree, or you can use Yads class to serialize/deserialize data directly from/to Java classes.
 

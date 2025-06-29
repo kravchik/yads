@@ -153,7 +153,7 @@ public class TestYadsCstOutput {
         
         // Empty map
         Map<String, Object> emptyMap = new HashMap<>();
-        assertEquals("()", output.print(emptyMap).trim());
+        assertEquals("(=)", output.print(emptyMap).trim());
         
         // Simple map
         Map<String, Object> simpleMap = new HashMap<>();

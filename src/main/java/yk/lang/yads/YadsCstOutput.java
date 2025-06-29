@@ -86,6 +86,10 @@ public class YadsCstOutput {
         } else if (obj instanceof Map) {
             // Map -> unnamed class with key = value pairs
             Map<?, ?> map = (Map<?, ?>) obj;
+            if (map.isEmpty()) {
+                // Empty map special case -> (=)
+                return al("(=)");
+            }
             YList<Object> objects = al();
             for (Map.Entry<?, ?> entry : map.entrySet()) {
                 objects.add(tuple(entry.getKey(), entry.getValue()));

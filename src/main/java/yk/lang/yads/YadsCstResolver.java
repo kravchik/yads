@@ -5,6 +5,7 @@ import yk.ycollections.YList;
 
 import static yk.ycollections.Tuple.tuple;
 import static yk.ycollections.YArrayList.al;
+import static yk.ycollections.YHashMap.hm;
 
 /**
  * Deserializer that converts YadsCst back to concrete data objects
@@ -28,7 +29,12 @@ public class YadsCstResolver {
                                       resolveList(node.childByField.get("body").children));
                 
             case "UNNAMED_CLASS":
-                return new YadsEntity(null, resolveList(node.childByField.get("body").children));
+                YList<YadsCst> bodyChildren = node.childByField.get("body").children;
+                // Special case: (=) means empty map - return YHashMap directly
+                if (bodyChildren.size() == 1 && isDelimiter(bodyChildren.get(0))) {
+                    return hm(); // Return empty YHashMap directly
+                }
+                return new YadsEntity(null, resolveList(bodyChildren));
                 
             case "COMMENT_SINGLE_LINE":
                 // Convert to YadsComment - remove "//" prefix
