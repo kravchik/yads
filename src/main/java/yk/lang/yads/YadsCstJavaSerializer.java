@@ -1,9 +1,11 @@
 package yk.lang.yads;
 
+import yk.lang.yads.utils.Reflector;
 import yk.ycollections.YList;
 
-import java.util.List;
-import java.util.Map;
+import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
+import java.util.*;
 
 import static yk.ycollections.Tuple.tuple;
 import static yk.ycollections.YArrayList.al;
@@ -19,8 +21,20 @@ import static yk.ycollections.YArrayList.al;
  * - Primitives (Integer, Long, Float, Double, Boolean, Character): pass through unchanged
  * - List: converts to YList (without wrapper)
  * - Map: converts to YadsEntity without name, all elements as Tuple
+ * - Objects: converts to YadsEntity with class simple name and field tuples (only for explicitly allowed classes)
  */
 public class YadsCstJavaSerializer {
+    
+    private final Set<Class<?>> availableClasses;
+    
+    /**
+     * Constructor that specifies which classes are allowed for object serialization.
+     * 
+     * @param classes classes that can be serialized as objects
+     */
+    public YadsCstJavaSerializer(Class<?>... classes) {
+        this.availableClasses = new HashSet<>(Arrays.asList(classes));
+    }
     
     /**
      * Main entry point for serialization.
@@ -28,7 +42,7 @@ public class YadsCstJavaSerializer {
      * @param obj Java object to serialize
      * @return YadsEntity representation or the object unchanged if it's a primitive
      */
-    public static Object serialize(Object obj) {
+    public Object serialize(Object obj) {
         if (obj == null) {
             return null;
         }
@@ -52,6 +66,11 @@ public class YadsCstJavaSerializer {
             return serializeMap((Map<?, ?>) obj);
         }
         
+        // Check if this is a supported object class
+        if (availableClasses.contains(obj.getClass())) {
+            return serializeObject(obj);
+        }
+        
         // Throw exception for unsupported types
         throw new RuntimeException("Unsupported object type for serialization: " + obj.getClass().getName() + ", value: " + obj);
     }
@@ -62,7 +81,7 @@ public class YadsCstJavaSerializer {
      * @param list the List to serialize
      * @return YList with serialized children
      */
-    private static YList<Object> serializeList(List<?> list) {
+    private YList<Object> serializeList(List<?> list) {
         YList<Object> serializedChildren = al();
         
         for (Object item : list) {
@@ -80,7 +99,7 @@ public class YadsCstJavaSerializer {
      * @param map the Map to serialize
      * @return YadsEntity with serialized key-value pairs as Tuples, or the Map itself if empty
      */
-    private static Object serializeMap(Map<?, ?> map) {
+    private Object serializeMap(Map<?, ?> map) {
         if (map.isEmpty()) {
             // Return the map directly so YadsCstOutput can print it as (=)
             return map;
@@ -96,5 +115,30 @@ public class YadsCstJavaSerializer {
         }
         
         return new YadsEntity(null, serializedChildren);
+    }
+    
+    /**
+     * Serializes an object to YadsEntity with class simple name and field tuples.
+     * 
+     * @param obj the object to serialize
+     * @return YadsEntity with class name and field tuples
+     */
+    private YadsEntity serializeObject(Object obj) {
+        YList<Object> children = al();
+        
+        // Get all fields using reflection
+        for (Field field : Reflector.getAllFieldsInHierarchy(obj.getClass())) {
+            // Skip static and transient fields
+            if (Modifier.isStatic(field.getModifiers())) continue;
+            if (Modifier.isTransient(field.getModifiers())) continue;
+            
+            field.setAccessible(true);
+            Object value = Reflector.get(obj, field);
+            Object serializedValue = serialize(value); // recursive serialization
+            
+            children.add(tuple(field.getName(), serializedValue));
+        }
+        
+        return new YadsEntity(obj.getClass().getSimpleName(), children);
     }
 }

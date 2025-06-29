@@ -19,40 +19,21 @@ import static yk.ycollections.YHashMap.hm;
  */
 public class TestYadsCstJavaSerialization {
 
-    /**
-     * Performs a complete round-trip test of serialization and deserialization.
-     * 
-     * @param original the original Java object
-     * @return the restored object after round-trip
-     */
-    private Object roundTrip(Object original) {
-        // Step 1: Serialize Java object to YadsEntity
-        Object serialized = YadsCstJavaSerializer.serialize(original);
-        
-        // Step 2: Print YadsEntity to text using existing infrastructure
-        String text = new YadsCstOutput().print(serialized);
-        
-        // Step 3: Parse text back to YadsCst using existing infrastructure
-        YadsCst parsed = YadsCstParser.parse(text);
-        
-        // Step 4: Resolve YadsCst to YadsEntity using existing infrastructure
-        Object resolved = YadsCstResolver.resolveList(parsed.children).get(0);
-        
-        // Step 5: Deserialize YadsEntity back to Java object
-        Object deserialized = YadsCstJavaDeserializer.deserialize(resolved);
-        
-        return deserialized;
-    }
     
     /**
      * Performs a complete round-trip test with assertions.
      * 
      * @param original the original Java object
      * @param expectedSerialized the expected serialized text format
+     * @param availableClasses classes allowed for object serialization/deserialization
      */
-    private void roundTripAssert(Object original, String expectedSerialized) {
+    private void roundTripAssert(Object original, String expectedSerialized, Class<?>... availableClasses) {
+        // Create serializer and deserializer instances
+        YadsCstJavaSerializer serializer = new YadsCstJavaSerializer(availableClasses);
+        YadsCstJavaDeserializer deserializer = new YadsCstJavaDeserializer(availableClasses);
+        
         // Step 1: Serialize Java object to YadsEntity
-        Object serialized = YadsCstJavaSerializer.serialize(original);
+        Object serialized = serializer.serialize(original);
         
         // Step 2: Print YadsEntity to text using existing infrastructure
         String text = new YadsCstOutput().print(serialized);
@@ -65,10 +46,17 @@ public class TestYadsCstJavaSerialization {
         Object resolved = YadsCstResolver.resolveList(parsed.children).get(0);
         
         // Step 5: Deserialize YadsEntity back to Java object
-        Object deserialized = YadsCstJavaDeserializer.deserialize(resolved);
+        Object deserialized = deserializer.deserialize(resolved);
         
         // Assert the content - type check is implicit in equals
         assertEquals("Round-trip should preserve data", original, deserialized);
+    }
+    
+    /**
+     * Convenience method for testing primitives without available classes.
+     */
+    private void roundTripAssert(Object original, String expectedSerialized) {
+        roundTripAssert(original, expectedSerialized, new Class<?>[0]);
     }
 
     @Test
@@ -86,11 +74,22 @@ public class TestYadsCstJavaSerialization {
         roundTripAssert(true, "true");
         roundTripAssert(false, "false");
         
-        // Character becomes string (known limitation)
-        Object charResult = roundTrip('a');
+        // Character becomes string (known limitation) - test manually
+        YadsCstJavaSerializer serializer = new YadsCstJavaSerializer();
+        YadsCstJavaDeserializer deserializer = new YadsCstJavaDeserializer();
+        
+        Object serialized = serializer.serialize('a');
+        String text = new YadsCstOutput().print(serialized);
+        YadsCst parsed = YadsCstParser.parse(text);
+        Object resolved = YadsCstResolver.resolveList(parsed.children).get(0);
+        Object charResult = deserializer.deserialize(resolved);
         assertEquals("Character should become string", "a", charResult);
         
-        charResult = roundTrip(' ');
+        serialized = serializer.serialize(' ');
+        text = new YadsCstOutput().print(serialized);
+        parsed = YadsCstParser.parse(text);
+        resolved = YadsCstResolver.resolveList(parsed.children).get(0);
+        charResult = deserializer.deserialize(resolved);
         assertEquals("Space character should become string", " ", charResult);
     }
     
@@ -164,9 +163,10 @@ public class TestYadsCstJavaSerialization {
     public void testUnsupportedSerializationType() {
         // Test that unsupported types throw exceptions during serialization
         Object unsupported = new java.util.Date();
+        YadsCstJavaSerializer serializer = new YadsCstJavaSerializer(); // no Date.class allowed
         
         try {
-            YadsCstJavaSerializer.serialize(unsupported);
+            serializer.serialize(unsupported);
             fail("Expected RuntimeException for unsupported serialization type");
         } catch (RuntimeException e) {
             assertTrue("Should mention unsupported object type", 
@@ -179,9 +179,10 @@ public class TestYadsCstJavaSerialization {
         // Test that unsupported entity types throw exceptions during deserialization
         YadsEntity unsupportedEntity = new YadsEntity("com.unknown.Class", 
                                                         al("data"));
+        YadsCstJavaDeserializer deserializer = new YadsCstJavaDeserializer(); // no unknown classes allowed
         
         try {
-            YadsCstJavaDeserializer.deserialize(unsupportedEntity);
+            deserializer.deserialize(unsupportedEntity);
             fail("Expected RuntimeException for unsupported deserialization type");
         } catch (RuntimeException e) {
             assertTrue("Should have expected error message", 
@@ -196,13 +197,80 @@ public class TestYadsCstJavaSerialization {
         YadsEntity invalidMapEntity = new YadsEntity(null, 
                                                       al(tuple("key", "value"), "invalid_string_in_map"));
         
+        YadsCstJavaDeserializer deserializer = new YadsCstJavaDeserializer(); // no classes needed for map test
+        
         try {
-            YadsCstJavaDeserializer.deserialize(invalidMapEntity);
+            deserializer.deserialize(invalidMapEntity);
             fail("Expected RuntimeException for invalid map element");
         } catch (RuntimeException e) {
             assertEquals("Should have expected error message", 
                         "Invalid element in map deserialization: java.lang.String, value: invalid_string_in_map", 
                         e.getMessage());
         }
+    }
+    
+    // Test classes for object serialization
+    public static class Person {
+        public String name;
+        public int age;
+        public Address address;
+        
+        // Override equals for testing
+        @Override
+        public boolean equals(Object obj) {
+            if (this == obj) return true;
+            if (!(obj instanceof Person)) return false;
+            Person other = (Person) obj;
+            return age == other.age && 
+                   java.util.Objects.equals(name, other.name) && 
+                   java.util.Objects.equals(address, other.address);
+        }
+    }
+    
+    public static class Address {
+        public String street;
+        public String city;
+        
+        // Override equals for testing
+        @Override
+        public boolean equals(Object obj) {
+            if (this == obj) return true;
+            if (!(obj instanceof Address)) return false;
+            Address other = (Address) obj;
+            return java.util.Objects.equals(street, other.street) && 
+                   java.util.Objects.equals(city, other.city);
+        }
+    }
+    
+    @Test
+    public void testSimpleObjectRoundTrip() {
+        Person person = new Person();
+        person.name = "John";
+        person.age = 30;
+        
+        roundTripAssert(person, "Person(name = John age = 30 address = null)", Person.class);
+    }
+    
+    @Test
+    public void testNestedObjectRoundTrip() {
+        Address address = new Address();
+        address.street = "Main St";
+        address.city = "NYC";
+        
+        Person person = new Person();
+        person.name = "John";
+        person.age = 25;
+        person.address = address;
+        
+        roundTripAssert(person, "Person(name = John age = 25 address = Address(street = 'Main St' city = NYC))", Person.class, Address.class);
+    }
+    
+    @Test
+    public void testObjectWithPrimitivesRoundTrip() {
+        Person person = new Person();
+        person.name = "Alice";
+        person.age = 0; // default int value
+        
+        roundTripAssert(person, "Person(name = Alice age = 0 address = null)", Person.class);
     }
 }
