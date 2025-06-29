@@ -65,7 +65,7 @@ public class YadsEntityOutput {
         } else if (valObj instanceof Boolean) {
             value = valObj.toString();
         } else {
-            throw new RuntimeException(String.format("Not implemented const type. Class: %s, Value: %s",
+            throw new RuntimeException(String.format("Unsupported const type. Class: %s, Value: %s",
                     valObj.getClass(), valObj));
         }
         return value;

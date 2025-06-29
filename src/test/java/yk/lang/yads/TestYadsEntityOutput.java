@@ -1,6 +1,7 @@
 package yk.lang.yads;
 
 import org.junit.Test;
+import yk.lang.yads.congocc.YadsCstParser;
 import yk.lang.yads.utils.BadException;
 import yk.lang.yads.utils.Reflector;
 import yk.ycollections.Tuple;
@@ -15,6 +16,7 @@ import java.io.InputStreamReader;
 import java.util.Map;
 
 import static junit.framework.TestCase.assertEquals;
+import static yk.lang.yads.utils.YadsWords.ARGS;
 import static yk.ycollections.YHashSet.hs;
 
 public class TestYadsEntityOutput {
@@ -36,8 +38,16 @@ public class TestYadsEntityOutput {
                 for (Map.Entry<String, Integer> entry : settings.entrySet()) {
                     Reflector.set(output, entry.getKey(), entry.getValue());
                 }
+                YadsCstOutput cstOutput = new YadsCstOutput();
+                for (Map.Entry<String, Integer> entry : settings.entrySet()) {
+                    Reflector.set(cstOutput, entry.getKey(), entry.getValue());
+                }
 
-                assertEquals(s, "\n" + output.print(Yads.readYadsEntity(s)) + "\n");
+                //javacc stack
+                assertEquals(s, "\n" + output.print(YadsEntityResolver.toYadsList(YadsObjectParser.parse(s).getNodeList(ARGS)).assertSize(1).first()) + "\n");
+
+                //congocc stack
+                assertEquals(s, "\n" + cstOutput.print(YadsCstResolver.resolveList(YadsCstParser.parse(s).children).assertSize(1).first()) + "\n");
             }
         }
     }

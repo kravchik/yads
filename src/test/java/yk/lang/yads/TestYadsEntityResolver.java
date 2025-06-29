@@ -37,11 +37,11 @@ public class TestYadsEntityResolver {
         testComment("YadsComment{isOneLine=true, text=''}", "//\n");
         testComment("YadsComment{isOneLine=false, text=' '}", "/* */");
 
-        assertException("(a//\n = b)", "Comment instead of key at Caret{beginLine=1, beginColumn=3, endLine=1, endColumn=4}");
-        assertException("(a = //\nb)", "Comment instead of value at Caret{beginLine=1, beginColumn=6, endLine=1, endColumn=7}");
+        assertException("(a//\n = b)", "Comment instead of key at Caret{beginLine=1, beginColumn=3, endLine=1, endColumn=4, beginOffset=-1, endOffset=-1}");
+        assertException("(a = //\nb)", "Comment instead of value at Caret{beginLine=1, beginColumn=6, endLine=1, endColumn=7, beginOffset=-1, endOffset=-1}");
 
-        assertException("(a/**/ = b)", "Comment instead of key at Caret{beginLine=1, beginColumn=3, endLine=1, endColumn=6}");
-        assertException("(a = /**/b)", "Comment instead of value at Caret{beginLine=1, beginColumn=6, endLine=1, endColumn=9}");
+        assertException("(a/**/ = b)", "Comment instead of key at Caret{beginLine=1, beginColumn=3, endLine=1, endColumn=6, beginOffset=-1, endOffset=-1}");
+        assertException("(a = /**/b)", "Comment instead of value at Caret{beginLine=1, beginColumn=6, endLine=1, endColumn=9, beginOffset=-1, endOffset=-1}");
 
     }
 
@@ -59,19 +59,19 @@ public class TestYadsEntityResolver {
     @Test
     public void testErrors() {
         assertException("(=)",
-                "Expected key before = at Caret{beginLine=1, beginColumn=2, endLine=1, endColumn=2}");
+                "Expected key before = at Caret{beginLine=1, beginColumn=2, endLine=1, endColumn=2, beginOffset=-1, endOffset=-1}");
         assertException("(= a)",
-                "Expected key before = at Caret{beginLine=1, beginColumn=2, endLine=1, endColumn=2}");
+                "Expected key before = at Caret{beginLine=1, beginColumn=2, endLine=1, endColumn=2, beginOffset=-1, endOffset=-1}");
         assertException("(a =)",
-                "Expected value after = at Caret{beginLine=1, beginColumn=4, endLine=1, endColumn=4}");
+                "Expected value after = at Caret{beginLine=1, beginColumn=4, endLine=1, endColumn=4, beginOffset=-1, endOffset=-1}");
         assertException("(= =)",
-                "Expected key before = at Caret{beginLine=1, beginColumn=2, endLine=1, endColumn=2}");
+                "Expected key before = at Caret{beginLine=1, beginColumn=2, endLine=1, endColumn=2, beginOffset=-1, endOffset=-1}");
         assertException("(a = =)",
-                "Expected value at Caret{beginLine=1, beginColumn=6, endLine=1, endColumn=6}");
+                "Expected value at Caret{beginLine=1, beginColumn=6, endLine=1, endColumn=6, beginOffset=-1, endOffset=-1}");
         assertException("(a = b = c)",
-                "Expected key before = at Caret{beginLine=1, beginColumn=8, endLine=1, endColumn=8}");
+                "Expected key before = at Caret{beginLine=1, beginColumn=8, endLine=1, endColumn=8, beginOffset=-1, endOffset=-1}");
         assertException("(a = b =)",
-                "Expected key before = at Caret{beginLine=1, beginColumn=8, endLine=1, endColumn=8}");
+                "Expected key before = at Caret{beginLine=1, beginColumn=8, endLine=1, endColumn=8, beginOffset=-1, endOffset=-1}");
     }
 
     public static void assertException(String src, String errorText) {
