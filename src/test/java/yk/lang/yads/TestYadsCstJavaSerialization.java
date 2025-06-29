@@ -75,6 +75,29 @@ public class TestYadsCstJavaSerialization {
     public void testStringRoundTrip() {
         roundTripAssert("hello world", "'hello world'");
     }
+    
+    @Test
+    public void testPrimitivesRoundTrip() {
+        // Test various primitive types
+        roundTripAssert(42, "42");
+        roundTripAssert(123L, "123l");
+        roundTripAssert(3.14f, "3.14f");
+        roundTripAssert(2.71d, "2.71d");
+        roundTripAssert(true, "true");
+        roundTripAssert(false, "false");
+        
+        // Character becomes string (known limitation)
+        Object charResult = roundTrip('a');
+        assertEquals("Character should become string", "a", charResult);
+        
+        charResult = roundTrip(' ');
+        assertEquals("Space character should become string", " ", charResult);
+    }
+    
+    @Test
+    public void testMixedPrimitivesListRoundTrip() {
+        roundTripAssert(Arrays.asList(42, "hello", true, 3.14f), "(42 hello true 3.14f)");
+    }
 
     @Test
     public void testEmptyListRoundTrip() {

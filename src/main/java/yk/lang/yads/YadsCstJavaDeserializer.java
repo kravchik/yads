@@ -17,6 +17,7 @@ import static yk.ycollections.YHashMap.hm;
  * 
  * Current support:
  * - String: passes through unchanged
+ * - Primitives (Integer, Long, Float, Double, Boolean, Character): pass through unchanged
  * - YList/List: converts to YArrayList
  * - YadsEntity without name: treats as lists if no Tuples, as YHashMap if contains Tuples
  */

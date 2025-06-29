@@ -16,6 +16,7 @@ import static yk.ycollections.YArrayList.al;
  * 
  * Current support:
  * - String: passes through unchanged
+ * - Primitives (Integer, Long, Float, Double, Boolean, Character): pass through unchanged
  * - List: converts to YList (without wrapper)
  * - Map: converts to YadsEntity without name, all elements as Tuple
  */
@@ -34,6 +35,12 @@ public class YadsCstJavaSerializer {
         
         if (obj instanceof String) {
             // Strings pass through unchanged
+            return obj;
+        }
+        
+        // Primitive types pass through unchanged
+        if (obj instanceof Integer || obj instanceof Long || obj instanceof Float || 
+            obj instanceof Double || obj instanceof Boolean || obj instanceof Character) {
             return obj;
         }
         
