@@ -79,7 +79,7 @@ public class TestYadsCstOutput {
         YadsCstOutput output = new YadsCstOutput();
         String outputStr = output.print(result);
         
-        assertEquals("\"hello\nworld\"", outputStr.trim());
+        assertEquals("\"hello\\nworld\"", outputStr.trim());
     }
 
     @Test

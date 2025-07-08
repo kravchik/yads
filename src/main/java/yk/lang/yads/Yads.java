@@ -1,26 +1,25 @@
 package yk.lang.yads;
 
+import yk.lang.yads.congocc.YadsCstParser;
 import yk.lang.yads.utils.BadException;
 import yk.ycollections.YList;
-
-import static yk.lang.yads.utils.YadsWords.ARGS;
 
 public class Yads {
 
     public static Object readYadsEntity(String s) {
-        return YadsEntityResolver.toYadsList(YadsObjectParser.parse(s).getNodeList(ARGS)).assertSize(1).first();
+        return YadsCstResolver.resolveList(YadsCstParser.parse(s).children).assertSize(1).first();
     }
 
     public static YList<Object> readYadsEntities(String s) {
-        return YadsEntityResolver.toYadsList(YadsObjectParser.parse(s).getNodeList(ARGS));
+        return YadsCstResolver.resolveList(YadsCstParser.parse(s).children);
     }
 
     public static String printYadsEntity(Object s) {
-        return new YadsEntityOutput().print(s);
+        return new YadsCstOutput().print(s);
     }
 
     public static String printYadsEntities(YList<Object> entities) {
-        return new YadsEntityOutput().printBody(entities);
+        return new YadsCstOutput().printBody(entities);
     }
 
     /**

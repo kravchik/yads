@@ -5,6 +5,7 @@ import yk.lang.yads.congocc.YadsCstParser;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 import static org.junit.Assert.*;
 import static yk.ycollections.Tuple.tuple;
@@ -151,7 +152,6 @@ public class TestYadsCstJavaSerialization {
 
     @Test
     public void testOutputFormat() {
-        // This test is now covered by the individual roundTripAssert calls
         // Test simple list format
         roundTripAssert(Arrays.asList("hello", "world"), "(hello world)");
         
@@ -214,6 +214,7 @@ public class TestYadsCstJavaSerialization {
         public String name;
         public int age;
         public Address address;
+        public Person friend; // For circular reference testing
         
         // Override equals for testing
         @Override
@@ -223,7 +224,8 @@ public class TestYadsCstJavaSerialization {
             Person other = (Person) obj;
             return age == other.age && 
                    java.util.Objects.equals(name, other.name) && 
-                   java.util.Objects.equals(address, other.address);
+                   java.util.Objects.equals(address, other.address) &&
+                   java.util.Objects.equals(friend, other.friend);
         }
     }
     
@@ -248,7 +250,7 @@ public class TestYadsCstJavaSerialization {
         person.name = "John";
         person.age = 30;
         
-        roundTripAssert(person, "Person(name = John age = 30 address = null)", Person.class);
+        roundTripAssert(person, "Person(name = John age = 30)", Person.class);
     }
     
     @Test
@@ -271,6 +273,221 @@ public class TestYadsCstJavaSerialization {
         person.name = "Alice";
         person.age = 0; // default int value
         
-        roundTripAssert(person, "Person(name = Alice age = 0 address = null)", Person.class);
+        roundTripAssert(person, "Person(name = Alice)", Person.class);
+    }
+    
+    @Test
+    public void testSharedObjectReferences() {
+        // Create shared address object
+        Address sharedAddress = new Address();
+        sharedAddress.street = "Shared St";
+        sharedAddress.city = "Boston";
+        
+        // Create two people sharing the same address
+        Person person1 = new Person();
+        person1.name = "John";
+        person1.age = 30;
+        person1.address = sharedAddress;
+        
+        Person person2 = new Person();
+        person2.name = "Jane";
+        person2.age = 28;
+        person2.address = sharedAddress; // Same address object
+        
+        // Create a list with both people
+        List<Person> people = Arrays.asList(person1, person2);
+        
+        // Serialize and deserialize
+        YadsCstJavaSerializer serializer = new YadsCstJavaSerializer(Person.class, Address.class);
+        YadsCstJavaDeserializer deserializer = new YadsCstJavaDeserializer(Person.class, Address.class);
+        
+        Object serialized = serializer.serialize(people);
+        String text = new YadsCstOutput().print(serialized);
+        
+        // Verify that the serialized form contains references
+        assertTrue("Should contain reference", text.contains("ref("));
+        
+        // Parse and deserialize
+        YadsCst parsed = YadsCstParser.parse(text);
+        Object resolved = YadsCstResolver.resolveList(parsed.children).get(0);
+        @SuppressWarnings("unchecked")
+        List<Person> result = (List<Person>) deserializer.deserialize(resolved);
+        
+        // Verify structure is preserved
+        assertEquals("Should have 2 people", 2, result.size());
+        assertEquals("First person name", "John", result.get(0).name);
+        assertEquals("Second person name", "Jane", result.get(1).name);
+        
+        // Most importantly: verify that both people share the same address object
+        assertSame("Both people should share the same address object", 
+                  result.get(0).address, result.get(1).address);
+        assertEquals("Shared address street", "Shared St", result.get(0).address.street);
+    }
+    
+    @Test
+    public void testCircularReferences() {
+        // Create objects with circular references
+        Person person = new Person();
+        person.name = "Bob";
+        person.age = 25;
+        
+        // Create a list containing the person and reference it from the person
+        List<Object> data = new ArrayList<>();
+        data.add(person);
+        data.add("some string");
+        
+        // This would create a circular reference, but since Person doesn't have a list field,
+        // let's create a simpler test with shared objects
+        Address address1 = new Address();
+        address1.street = "First St";
+        
+        Address address2 = new Address();
+        address2.street = "Second St";
+        
+        // Create a list with duplicate addresses
+        List<Address> addresses = Arrays.asList(address1, address2, address1); // address1 appears twice
+        
+        // Test round-trip
+        YadsCstJavaSerializer serializer = new YadsCstJavaSerializer(Address.class);
+        YadsCstJavaDeserializer deserializer = new YadsCstJavaDeserializer(Address.class);
+        
+        Object serialized = serializer.serialize(addresses);
+        String text = new YadsCstOutput().print(serialized);
+        
+        // Should contain references for duplicate address1
+        assertTrue("Should contain reference for duplicate object", text.contains("ref("));
+        
+        YadsCst parsed = YadsCstParser.parse(text);
+        Object resolved = YadsCstResolver.resolveList(parsed.children).get(0);
+        @SuppressWarnings("unchecked")
+        List<Address> result = (List<Address>) deserializer.deserialize(resolved);
+        
+        // Verify that first and third elements are the same object
+        assertEquals("Should have 3 addresses", 3, result.size());
+        assertSame("First and third should be same object", result.get(0), result.get(2));
+        assertEquals("First address street", "First St", result.get(0).street);
+        assertEquals("Second address street", "Second St", result.get(1).street);
+    }
+    
+    @Test
+    public void testTrueCircularReferences() {
+        // Create a person who is their own friend (self-reference)
+        Person person = new Person();
+        person.name = "Alice";
+        person.age = 30;
+        person.friend = person; // Circular reference to self!
+        
+        // Test round-trip serialization
+        YadsCstJavaSerializer serializer = new YadsCstJavaSerializer(Person.class);
+        YadsCstJavaDeserializer deserializer = new YadsCstJavaDeserializer(Person.class);
+        
+        Object serialized = serializer.serialize(person);
+        String text = new YadsCstOutput().print(serialized);
+        
+        // Verify that the serialized form contains references
+        assertTrue("Should contain reference for circular self-reference", text.contains("ref("));
+        
+        // Parse and deserialize
+        YadsCst parsed = YadsCstParser.parse(text);
+        Object resolved = YadsCstResolver.resolveList(parsed.children).get(0);
+        Person result = (Person) deserializer.deserialize(resolved);
+        
+        // Verify that the circular reference is preserved
+        assertEquals("Name should be preserved", "Alice", result.name);
+        assertEquals("Age should be preserved", 30, result.age);
+        assertSame("Person should be their own friend", result, result.friend);
+    }
+    
+    @Test
+    public void testMutualCircularReferences() {
+        // Create two people who are friends with each other (mutual circular reference)
+        Person alice = new Person();
+        alice.name = "Alice";
+        alice.age = 25;
+        
+        Person bob = new Person();
+        bob.name = "Bob";
+        bob.age = 30;
+        
+        // Set up mutual friendship
+        alice.friend = bob;
+        bob.friend = alice;
+        
+        // Create a list with both people
+        List<Person> friends = Arrays.asList(alice, bob);
+        
+        // Test round-trip serialization
+        YadsCstJavaSerializer serializer = new YadsCstJavaSerializer(Person.class);
+        YadsCstJavaDeserializer deserializer = new YadsCstJavaDeserializer(Person.class);
+        
+        Object serialized = serializer.serialize(friends);
+        String text = new YadsCstOutput().print(serialized);
+        
+        // Verify that the serialized form contains references
+        assertTrue("Should contain references for circular references", text.contains("ref("));
+        
+        // Parse and deserialize
+        YadsCst parsed = YadsCstParser.parse(text);
+        Object resolved = YadsCstResolver.resolveList(parsed.children).get(0);
+        @SuppressWarnings("unchecked")
+        List<Person> result = (List<Person>) deserializer.deserialize(resolved);
+        
+        // Verify that the circular references are preserved
+        assertEquals("Should have 2 people", 2, result.size());
+        
+        Person resultAlice = result.get(0);
+        Person resultBob = result.get(1);
+        
+        assertEquals("Alice's name should be preserved", "Alice", resultAlice.name);
+        assertEquals("Bob's name should be preserved", "Bob", resultBob.name);
+        
+        // Most importantly: verify mutual circular references
+        assertSame("Alice's friend should be Bob", resultBob, resultAlice.friend);
+        assertSame("Bob's friend should be Alice", resultAlice, resultBob.friend);
+    }
+    
+    @Test
+    public void testSkipDefaultValues() {
+        Person person = new Person();
+        person.name = "Charlie";
+        // age = 0 (default), address = null (default), friend = null (default)
+        
+        // Test with skipDefaultValues = true (default behavior)
+        YadsCstJavaSerializer serializerSkip = new YadsCstJavaSerializer(Person.class);
+        Object serializedSkip = serializerSkip.serialize(person);
+        String textSkip = new YadsCstOutput().print(serializedSkip);
+        
+        // Test with skipDefaultValues = false
+        YadsCstJavaSerializer serializerNoSkip = new YadsCstJavaSerializer(Person.class).setSkipDefaultValues(false);
+        Object serializedNoSkip = serializerNoSkip.serialize(person);
+        String textNoSkip = new YadsCstOutput().print(serializedNoSkip);
+        
+        // With skipDefaultValues = true, should only show non-default fields
+        assertEquals("With skipDefaultValues=true", "Person(name = Charlie)", textSkip);
+        
+        // With skipDefaultValues = false, should show all fields
+        assertEquals("With skipDefaultValues=false", "Person(name = Charlie age = 0 address = null friend = null)", textNoSkip);
+        
+        // Both should deserialize to the same result
+        YadsCstJavaDeserializer deserializer = new YadsCstJavaDeserializer(Person.class);
+        
+        YadsCst parsedSkip = YadsCstParser.parse(textSkip);
+        Object resolvedSkip = YadsCstResolver.resolveList(parsedSkip.children).get(0);
+        Person resultSkip = (Person) deserializer.deserialize(resolvedSkip);
+        
+        YadsCst parsedNoSkip = YadsCstParser.parse(textNoSkip);
+        Object resolvedNoSkip = YadsCstResolver.resolveList(parsedNoSkip.children).get(0);
+        Person resultNoSkip = (Person) deserializer.deserialize(resolvedNoSkip);
+        
+        // Both results should be equivalent
+        assertEquals("Both should have same name", "Charlie", resultSkip.name);
+        assertEquals("Both should have same age", 0, resultSkip.age);
+        assertNull("Both should have null address", resultSkip.address);
+        assertNull("Both should have null friend", resultSkip.friend);
+        
+        assertEquals("Results should be equal", resultSkip.name, resultNoSkip.name);
+        assertEquals("Results should be equal", resultSkip.age, resultNoSkip.age);
+        assertEquals("Results should be equal", resultSkip.address, resultNoSkip.address);
+        assertEquals("Results should be equal", resultSkip.friend, resultNoSkip.friend);
     }
 }

@@ -1,7 +1,5 @@
 package yk.lang.yads.utils;
 
-import yk.lang.yads.JavaCharStream;
-
 public class Caret {
 
     public int beginLine;
@@ -31,22 +29,6 @@ public class Caret {
         this.endColumn = endColumn;
         this.beginOffset = beginOffset;
         this.endOffset = endOffset;
-    }
-
-    //TODO don't use JavaCharStream
-    public static Caret create(JavaCharStream stream) {
-        return new Caret(stream.getBeginLine(), stream.getBeginColumn(), stream.getEndLine(), stream.getEndColumn());
-    }
-
-    //TODO don't use JavaCharStream
-    public static Caret begin(JavaCharStream stream) {
-        return new Caret(stream.getBeginLine(), stream.getBeginColumn(), 0, 0);
-    }
-
-    public Caret setEnd(JavaCharStream stream) {
-        endLine = stream.getEndLine();
-        endColumn = stream.getEndColumn();
-        return this;
     }
 
     public static Caret startEnd(Caret startCaret, Caret endCaret) {

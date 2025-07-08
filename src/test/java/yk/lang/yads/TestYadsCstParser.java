@@ -312,50 +312,104 @@ public class TestYadsCstParser {
 
     @Test
     public void testStringLiterals() {
-        // Double quoted with escapes
-        YadsCst result = parseList("\"hello\\nworld\"");
+        // Double quoted with quote escape (SQL-style: "" -> ")
+        YadsCst result = parseList("\"Say \"\"Hello\"\"\"");
         YadsCst child = result.children.get(0);
         assertCstType("STRING_LITERAL_DQ", child);
         assertCstPosition(child);
-        assertEquals("hello\nworld", child.value); // Should be unescaped
+        assertEquals("Say \"Hello\"", child.value); // Should be unescaped
 
-        // Single quoted with escapes
-        result = parseList("'hello\\tworld'");
+        // Single quoted with quote escape (SQL-style: '' -> ')
+        result = parseList("'Don''t'");
         child = result.children.get(0);
         assertCstType("STRING_LITERAL_SQ", child);
         assertCstPosition(child);
-        assertEquals("hello\tworld", child.value); // Should be unescaped
-
-        // Double quoted with quote escape
-        result = parseList("\"Say \\\"Hello\\\"\"");
-        child = result.children.get(0);
-        assertCstType("STRING_LITERAL_DQ", child);
-        assertEquals("Say \"Hello\"", child.value); // Should be unescaped
-
-        // Single quoted with quote escape
-        result = parseList("'Don\\'t'");
-        child = result.children.get(0);
-        assertCstType("STRING_LITERAL_SQ", child);
         assertEquals("Don't", child.value); // Should be unescaped
 
-        // String with backslash escape
-        result = parseList("\"Path\\\\to\\\\file\"");
+        // Double quoted with multiple quote escapes
+        result = parseList("\"\"\"Start\"\" middle \"\"End\"\"\"");
         child = result.children.get(0);
         assertCstType("STRING_LITERAL_DQ", child);
-        assertEquals("Path\\to\\file", child.value); // Should be unescaped
+        assertEquals("\"Start\" middle \"End\"", child.value); // Should be unescaped
 
-        // String with multiple escapes
-        result = parseList("\"Line1\\nTab\\tQuote\\\"End\"");
+        // Single quoted with multiple quote escapes
+        result = parseList("'''Start'' middle ''End'''");
         child = result.children.get(0);
-        assertCstType("STRING_LITERAL_DQ", child);
-        assertEquals("Line1\nTab\tQuote\"End", child.value); // Should be unescaped
+        assertCstType("STRING_LITERAL_SQ", child);
+        assertEquals("'Start' middle 'End'", child.value); // Should be unescaped
 
         // String without escapes
         result = parseList("\"Simple string\"");
         child = result.children.get(0);
         assertCstType("STRING_LITERAL_DQ", child);
         assertEquals("Simple string", child.value);
+
+        // Single quoted string without escapes
+        result = parseList("'Simple string'");
+        child = result.children.get(0);
+        assertCstType("STRING_LITERAL_SQ", child);
+        assertEquals("Simple string", child.value);
+
+        // Strings with literal backslashes (no escaping in SQL-style)
+        result = parseList("\"Path\\to\\file\"");
+        child = result.children.get(0);
+        assertCstType("STRING_LITERAL_DQ", child);
+        assertEquals("Path\\to\\file", child.value); // Backslashes should be literal
+
+        // Strings with literal newline characters (no \n escaping)
+        result = parseList("\"Line1\\nTab\\tEnd\"");
+        child = result.children.get(0);
+        assertCstType("STRING_LITERAL_DQ", child);
+        assertEquals("Line1\\nTab\\tEnd", child.value); // Should be literal text
     }
+
+    //c-style escapes
+    //@Test
+    //public void testStringLiterals() {
+    //    // Double quoted with escapes
+    //    YadsCst result = parseList("\"hello\\nworld\"");
+    //    YadsCst child = result.children.get(0);
+    //    assertCstType("STRING_LITERAL_DQ", child);
+    //    assertCstPosition(child);
+    //    assertEquals("hello\nworld", child.value); // Should be unescaped
+    //
+    //    // Single quoted with escapes
+    //    result = parseList("'hello\\tworld'");
+    //    child = result.children.get(0);
+    //    assertCstType("STRING_LITERAL_SQ", child);
+    //    assertCstPosition(child);
+    //    assertEquals("hello\tworld", child.value); // Should be unescaped
+    //
+    //    // Double quoted with quote escape
+    //    result = parseList("\"Say \\\"Hello\\\"\"");
+    //    child = result.children.get(0);
+    //    assertCstType("STRING_LITERAL_DQ", child);
+    //    assertEquals("Say \"Hello\"", child.value); // Should be unescaped
+    //
+    //    // Single quoted with quote escape
+    //    result = parseList("'Don\\'t'");
+    //    child = result.children.get(0);
+    //    assertCstType("STRING_LITERAL_SQ", child);
+    //    assertEquals("Don't", child.value); // Should be unescaped
+    //
+    //    // String with backslash escape
+    //    result = parseList("\"Path\\\\to\\\\file\"");
+    //    child = result.children.get(0);
+    //    assertCstType("STRING_LITERAL_DQ", child);
+    //    assertEquals("Path\\to\\file", child.value); // Should be unescaped
+    //
+    //    // String with multiple escapes
+    //    result = parseList("\"Line1\\nTab\\tQuote\\\"End\"");
+    //    child = result.children.get(0);
+    //    assertCstType("STRING_LITERAL_DQ", child);
+    //    assertEquals("Line1\nTab\tQuote\"End", child.value); // Should be unescaped
+    //
+    //    // String without escapes
+    //    result = parseList("\"Simple string\"");
+    //    child = result.children.get(0);
+    //    assertCstType("STRING_LITERAL_DQ", child);
+    //    assertEquals("Simple string", child.value);
+    //}
 
     @Test
     public void testWhitespaceHandling() {
@@ -454,27 +508,6 @@ public class TestYadsCstParser {
         // The class should span the entire input
         assertEquals("Class should start at beginning", 0, clazz.caret.beginOffset);
         assertEquals("Class should end at end of input", input.length(), clazz.caret.endOffset);
-    }
-
-    @Test
-    public void testInvalidEscapeSequences() {
-        // Test invalid escape sequence in double quotes
-        try {
-            parseList("\"hello\\x\"");
-            fail("Expected RuntimeException for invalid escape sequence \\x");
-        } catch (RuntimeException e) {
-            assertTrue("Should contain 'Unsupported escaped symbol'", 
-                       e.getMessage().contains("Unsupported escaped symbol"));
-        }
-
-        // Test invalid escape sequence in single quotes
-        try {
-            parseList("'hello\\z'");
-            fail("Expected RuntimeException for invalid escape sequence \\z");
-        } catch (RuntimeException e) {
-            assertTrue("Should contain 'Unsupported escaped symbol'", 
-                       e.getMessage().contains("Unsupported escaped symbol"));
-        }
     }
 
     @Test

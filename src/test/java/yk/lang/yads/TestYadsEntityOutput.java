@@ -16,7 +16,6 @@ import java.io.InputStreamReader;
 import java.util.Map;
 
 import static junit.framework.TestCase.assertEquals;
-import static yk.lang.yads.utils.YadsWords.ARGS;
 import static yk.ycollections.YHashSet.hs;
 
 public class TestYadsEntityOutput {
@@ -24,9 +23,9 @@ public class TestYadsEntityOutput {
 
     @Test
     public void testCases() {
-        YMap<String, Integer> settings = INT_SETTINGS.toMap(s -> s, s -> Reflector.get(new YadsEntityOutput(), s));
+        YMap<String, Integer> settings = INT_SETTINGS.toMap(s -> s, s -> Reflector.get(new YadsCstOutput(), s));
 
-        YList<Object> yl = Yads.readYadsEntities(UtilsForTests.readResource("formatting.cases.yads"));
+        YList<Object> yl = Yads.readYadsEntities(UtilsForTests.readResource("formatting.cases.sql.style.yads"));
         for (Object o : yl) {
             if (o instanceof Tuple) {
                 Tuple t = (Tuple) o;
@@ -34,19 +33,20 @@ public class TestYadsEntityOutput {
                 else BadException.notImplemented(o + "");
             } else if (o instanceof String) {
                 String s = (String) o;
-                YadsEntityOutput output = new YadsEntityOutput();
-                for (Map.Entry<String, Integer> entry : settings.entrySet()) {
-                    Reflector.set(output, entry.getKey(), entry.getValue());
-                }
+                //YadsEntityOutput output = new YadsEntityOutput();
+                //for (Map.Entry<String, Integer> entry : settings.entrySet()) {
+                //    Reflector.set(output, entry.getKey(), entry.getValue());
+                //}
                 YadsCstOutput cstOutput = new YadsCstOutput();
                 for (Map.Entry<String, Integer> entry : settings.entrySet()) {
                     Reflector.set(cstOutput, entry.getKey(), entry.getValue());
                 }
 
                 //javacc stack
-                assertEquals(s, "\n" + output.print(YadsEntityResolver.toYadsList(YadsObjectParser.parse(s).getNodeList(ARGS)).assertSize(1).first()) + "\n");
+                //assertEquals(s, "\n" + output.print(YadsEntityResolver.toYadsList(YadsObjectParser.parse(s).getNodeList(ARGS)).assertSize(1).first()) + "\n");
 
                 //congocc stack
+                System.out.println(s);
                 assertEquals(s, "\n" + cstOutput.print(YadsCstResolver.resolveList(YadsCstParser.parse(s).children).assertSize(1).first()) + "\n");
             }
         }

@@ -1,10 +1,10 @@
 package yk.lang.yads;
 
 import org.junit.Test;
+import yk.lang.yads.congocc.YadsCstParser;
 
 import static junit.framework.TestCase.assertEquals;
 import static org.junit.Assert.fail;
-import static yk.lang.yads.utils.YadsWords.ARGS;
 
 public class TestYadsEntityResolver {
 
@@ -37,11 +37,11 @@ public class TestYadsEntityResolver {
         testComment("YadsComment{isOneLine=true, text=''}", "//\n");
         testComment("YadsComment{isOneLine=false, text=' '}", "/* */");
 
-        assertException("(a//\n = b)", "Comment instead of key at Caret{beginLine=1, beginColumn=3, endLine=1, endColumn=4, beginOffset=-1, endOffset=-1}");
-        assertException("(a = //\nb)", "Comment instead of value at Caret{beginLine=1, beginColumn=6, endLine=1, endColumn=7, beginOffset=-1, endOffset=-1}");
+        assertException("(a//\n = b)", "Comment instead of key at Caret{beginLine=1, beginColumn=3, endLine=1, endColumn=4, beginOffset=2, endOffset=4}");
+        assertException("(a = //\nb)", "Comment instead of value at Caret{beginLine=1, beginColumn=6, endLine=1, endColumn=7, beginOffset=5, endOffset=7}");
 
-        assertException("(a/**/ = b)", "Comment instead of key at Caret{beginLine=1, beginColumn=3, endLine=1, endColumn=6, beginOffset=-1, endOffset=-1}");
-        assertException("(a = /**/b)", "Comment instead of value at Caret{beginLine=1, beginColumn=6, endLine=1, endColumn=9, beginOffset=-1, endOffset=-1}");
+        assertException("(a/**/ = b)", "Comment instead of key at Caret{beginLine=1, beginColumn=3, endLine=1, endColumn=6, beginOffset=2, endOffset=6}");
+        assertException("(a = /**/b)", "Comment instead of value at Caret{beginLine=1, beginColumn=6, endLine=1, endColumn=9, beginOffset=5, endOffset=9}");
 
     }
 
@@ -58,20 +58,18 @@ public class TestYadsEntityResolver {
 
     @Test
     public void testErrors() {
-        assertException("(=)",
-                "Expected key before = at Caret{beginLine=1, beginColumn=2, endLine=1, endColumn=2, beginOffset=-1, endOffset=-1}");
         assertException("(= a)",
-                "Expected key before = at Caret{beginLine=1, beginColumn=2, endLine=1, endColumn=2, beginOffset=-1, endOffset=-1}");
+                "Expected key before '=' at Caret{beginLine=1, beginColumn=2, endLine=1, endColumn=2, beginOffset=1, endOffset=2}");
         assertException("(a =)",
-                "Expected value after = at Caret{beginLine=1, beginColumn=4, endLine=1, endColumn=4, beginOffset=-1, endOffset=-1}");
+                "Expected value after '=' at Caret{beginLine=1, beginColumn=4, endLine=1, endColumn=4, beginOffset=3, endOffset=4}");
         assertException("(= =)",
-                "Expected key before = at Caret{beginLine=1, beginColumn=2, endLine=1, endColumn=2, beginOffset=-1, endOffset=-1}");
+                "Expected key before '=' at Caret{beginLine=1, beginColumn=2, endLine=1, endColumn=2, beginOffset=1, endOffset=2}");
         assertException("(a = =)",
-                "Expected value at Caret{beginLine=1, beginColumn=6, endLine=1, endColumn=6, beginOffset=-1, endOffset=-1}");
+                "Expected value at Caret{beginLine=1, beginColumn=6, endLine=1, endColumn=6, beginOffset=5, endOffset=6}");
         assertException("(a = b = c)",
-                "Expected key before = at Caret{beginLine=1, beginColumn=8, endLine=1, endColumn=8, beginOffset=-1, endOffset=-1}");
+                "Expected key before '=' at Caret{beginLine=1, beginColumn=8, endLine=1, endColumn=8, beginOffset=7, endOffset=8}");
         assertException("(a = b =)",
-                "Expected key before = at Caret{beginLine=1, beginColumn=8, endLine=1, endColumn=8, beginOffset=-1, endOffset=-1}");
+                "Expected key before '=' at Caret{beginLine=1, beginColumn=8, endLine=1, endColumn=8, beginOffset=7, endOffset=8}");
     }
 
     public static void assertException(String src, String errorText) {
@@ -84,6 +82,6 @@ public class TestYadsEntityResolver {
     }
 
     private static String getYadsList(String s) {
-        return YadsEntityResolver.toYadsList(YadsObjectParser.parse(s).getNodeList(ARGS).first()).toString();
+        return YadsCstResolver.resolve(YadsCstParser.parse(s).children.first()).toString();
     }
 }

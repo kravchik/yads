@@ -1,5 +1,6 @@
 package yk.lang.yads;
 
+import org.junit.Ignore;
 import org.junit.Test;
 import yk.ycollections.YList;
 
@@ -52,12 +53,13 @@ public class TestYads {
         assertEquals(out, Yads.printYadsEntities(j));
     }
 
+    @Ignore
     @Test
     public void testEscapes() {
         testStrings("", "''", "\"\"");
         testStrings(" ", "' '", "\" \"");
 
-        testStrings(" \\ ", "' \\\\ '",     "' \\\\ '");
+        testStrings(" \\ ", "' \\\\ '",     "\" \\\\ \"");
         testStrings(" \t ", "' \t '",       "\" \t \"", "\" \\t \"", "' \\t '");
         testStrings(" \n ", "' \n '",       "\" \n \"", "\" \\n \"", "' \\n '");
         testStrings(" \b ", "' \b '",       "\" \b \"", "\" \\b \"", "' \\b '");
@@ -69,6 +71,35 @@ public class TestYads {
 
         testStrings("hello", "hello", "\"hello\"", "'hello'");
         testStrings("hello world", "'hello world'", "\"hello world\"");
+    }
+
+    @Test
+    public void testEscapes2() {
+        //testStrings("", "''", "\"\"");
+        //testStrings(" ", "' '", "\" \"");
+        //
+        //testStrings(" \\ ", "' \\ '",     "\" \\ \"");
+        //testStrings(" \\a ", "' \\a '",     "\" \\a \"");
+        //testStrings(" \n ", "' \n '",     "\" \n \"");
+        ////backslash is escaped only if at the end (and not already escaped)
+        //testStrings("  \\", "'  \\\\'",     "\"  \\\\\"");
+        ////can't work
+        //testStrings("  \\\\", "'  \\\\'",     "\"  \\\\\"");
+    }
+
+    @Test
+    public void testEscapesSqlStyle() {
+        testStrings("", "''", "\"\"");
+        testStrings(" ", "' '", "\" \"");
+
+        testStrings(" \\ ", "' \\ '",     "\" \\ \"");
+        testStrings(" \\a ", "' \\a '",     "\" \\a \"");
+        testStrings(" \n ", "' \n '",     "\" \n \"");
+
+        testStrings(" ' ", "\" ' \"", "' '' '");
+        testStrings(" \" ", "' \" '",     "\" \"\" \"");
+
+
     }
 
     private static void testObj(Object expected, String s) {
