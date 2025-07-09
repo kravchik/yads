@@ -110,17 +110,13 @@ public class YadsCstOutput {
                 return printObjectList(cst.children, startAt, null, null, false);
             
             case "NAMED_CLASS":
-                // Use convenient field access
                 String className = getTokenText(cst.childByField.get("name"));
                 YadsCst namedBody = cst.childByField.get("body");
-                YList<YadsCst> nodes1 = al(namedBody);
-                return printObjectList(nodes1, startAt, className + "(", ")", true);
+                return printObjectList(namedBody.children, startAt, className + "(", ")", true);
             
             case "UNNAMED_CLASS":
-                // Use convenient field access
                 YadsCst unnamedBody = cst.childByField.get("body");
-                YList<YadsCst> nodes = al(unnamedBody);
-                return printObjectList(nodes, startAt, "(", ")", true);
+                return printObjectList(unnamedBody.children, startAt, "(", ")", true);
             
             case "COMMENT_SINGLE_LINE":
                 return al("//" + getTokenText(cst));

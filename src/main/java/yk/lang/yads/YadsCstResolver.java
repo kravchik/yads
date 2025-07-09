@@ -9,7 +9,6 @@ import static yk.ycollections.YHashMap.hm;
 
 /**
  * Deserializer that converts YadsCst back to concrete data objects
- * Similar to YadsEntityResolver but works with YadsCst from the CongoCC parser
  */
 public class YadsCstResolver {
     public static final String DELIMITER = "=";
