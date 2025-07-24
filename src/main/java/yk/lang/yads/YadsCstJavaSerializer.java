@@ -30,6 +30,9 @@ public class YadsCstJavaSerializer {
     private IdentityHashMap<Object, Tuple<YadsEntity, Integer>> identity = new IdentityHashMap<>();
     private int nextRefId = 1;
     public boolean skipDefaultValues = true;
+    //TODO test
+    //TODO true by default
+    public boolean allClassesAvailable = false;
     
     /**
      * Constructor that specifies which classes are allowed for object serialization.
@@ -82,7 +85,7 @@ public class YadsCstJavaSerializer {
         }
         
         // For reference-tracked objects (Lists, Maps, Objects), check if already serialized
-        if (obj instanceof List || obj instanceof Map || availableClasses.contains(obj.getClass())) {
+        if (obj instanceof List || obj instanceof Map || availableClasses.contains(obj.getClass()) || allClassesAvailable) {
             if (identity.containsKey(obj)) {
                 Tuple<YadsEntity, Integer> tuple = identity.get(obj);
                 if (tuple.b == 0) {
@@ -221,4 +224,8 @@ public class YadsCstJavaSerializer {
         return this;
     }
 
+    public YadsCstJavaSerializer setAllClassesAvailable(boolean allClassesAvailable) {
+        this.allClassesAvailable = allClassesAvailable;
+        return this;
+    }
 }
