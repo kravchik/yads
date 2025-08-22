@@ -44,7 +44,7 @@ public class TestYadsCstJavaSerialization {
         YadsCst parsed = YadsCstParser.parse(text);
         
         // Step 4: Resolve YadsCst to YadsEntity using existing infrastructure
-        Object resolved = YadsCstResolver.resolveList(parsed.children).get(0);
+        Object resolved = YadsCstResolver.resolveKeyValues(parsed.children).get(0);
         
         // Step 5: Deserialize YadsEntity back to Java object
         Object deserialized = deserializer.deserialize(resolved);
@@ -82,14 +82,14 @@ public class TestYadsCstJavaSerialization {
         Object serialized = serializer.serialize('a');
         String text = new YadsCstOutput().print(serialized);
         YadsCst parsed = YadsCstParser.parse(text);
-        Object resolved = YadsCstResolver.resolveList(parsed.children).get(0);
+        Object resolved = YadsCstResolver.resolveKeyValues(parsed.children).get(0);
         Object charResult = deserializer.deserialize(resolved);
         assertEquals("Character should become string", "a", charResult);
         
         serialized = serializer.serialize(' ');
         text = new YadsCstOutput().print(serialized);
         parsed = YadsCstParser.parse(text);
-        resolved = YadsCstResolver.resolveList(parsed.children).get(0);
+        resolved = YadsCstResolver.resolveKeyValues(parsed.children).get(0);
         charResult = deserializer.deserialize(resolved);
         assertEquals("Space character should become string", " ", charResult);
     }
@@ -309,7 +309,7 @@ public class TestYadsCstJavaSerialization {
         
         // Parse and deserialize
         YadsCst parsed = YadsCstParser.parse(text);
-        Object resolved = YadsCstResolver.resolveList(parsed.children).get(0);
+        Object resolved = YadsCstResolver.resolveKeyValues(parsed.children).get(0);
         @SuppressWarnings("unchecked")
         List<Person> result = (List<Person>) deserializer.deserialize(resolved);
         
@@ -358,7 +358,7 @@ public class TestYadsCstJavaSerialization {
         assertTrue("Should contain reference for duplicate object", text.contains("ref("));
         
         YadsCst parsed = YadsCstParser.parse(text);
-        Object resolved = YadsCstResolver.resolveList(parsed.children).get(0);
+        Object resolved = YadsCstResolver.resolveKeyValues(parsed.children).get(0);
         @SuppressWarnings("unchecked")
         List<Address> result = (List<Address>) deserializer.deserialize(resolved);
         
@@ -389,7 +389,7 @@ public class TestYadsCstJavaSerialization {
         
         // Parse and deserialize
         YadsCst parsed = YadsCstParser.parse(text);
-        Object resolved = YadsCstResolver.resolveList(parsed.children).get(0);
+        Object resolved = YadsCstResolver.resolveKeyValues(parsed.children).get(0);
         Person result = (Person) deserializer.deserialize(resolved);
         
         // Verify that the circular reference is preserved
@@ -428,7 +428,7 @@ public class TestYadsCstJavaSerialization {
         
         // Parse and deserialize
         YadsCst parsed = YadsCstParser.parse(text);
-        Object resolved = YadsCstResolver.resolveList(parsed.children).get(0);
+        Object resolved = YadsCstResolver.resolveKeyValues(parsed.children).get(0);
         @SuppressWarnings("unchecked")
         List<Person> result = (List<Person>) deserializer.deserialize(resolved);
         
@@ -472,11 +472,11 @@ public class TestYadsCstJavaSerialization {
         YadsCstJavaDeserializer deserializer = new YadsCstJavaDeserializer(Person.class);
         
         YadsCst parsedSkip = YadsCstParser.parse(textSkip);
-        Object resolvedSkip = YadsCstResolver.resolveList(parsedSkip.children).get(0);
+        Object resolvedSkip = YadsCstResolver.resolveKeyValues(parsedSkip.children).get(0);
         Person resultSkip = (Person) deserializer.deserialize(resolvedSkip);
         
         YadsCst parsedNoSkip = YadsCstParser.parse(textNoSkip);
-        Object resolvedNoSkip = YadsCstResolver.resolveList(parsedNoSkip.children).get(0);
+        Object resolvedNoSkip = YadsCstResolver.resolveKeyValues(parsedNoSkip.children).get(0);
         Person resultNoSkip = (Person) deserializer.deserialize(resolvedNoSkip);
         
         // Both results should be equivalent

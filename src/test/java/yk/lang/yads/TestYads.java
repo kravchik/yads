@@ -1,6 +1,5 @@
 package yk.lang.yads;
 
-import org.junit.Ignore;
 import org.junit.Test;
 import yk.ycollections.YList;
 
@@ -53,21 +52,24 @@ public class TestYads {
         assertEquals(out, Yads.printYadsEntities(j));
     }
 
-    @Ignore
     @Test
     public void testEscapes() {
         testStrings("", "''", "\"\"");
         testStrings(" ", "' '", "\" \"");
-
-        testStrings(" \\ ", "' \\\\ '",     "\" \\\\ \"");
-        testStrings(" \t ", "' \t '",       "\" \t \"", "\" \\t \"", "' \\t '");
-        testStrings(" \n ", "' \n '",       "\" \n \"", "\" \\n \"", "' \\n '");
-        testStrings(" \b ", "' \b '",       "\" \b \"", "\" \\b \"", "' \\b '");
-        testStrings(" \r ", "' \r '",       "\" \r \"", "\" \\r \"", "' \\r '");
-        testStrings(" \f ", "' \f '",       "\" \f \"", "\" \\f \"", "' \\f '");
-
         testStrings(" ' ", "\" ' \"",       "' \\' '", "\" \\' \"");
         testStrings(" \" ", "' \" '",       "\" \\\" \"", "' \\\" '");
+
+        testStrings(" \\ ", "' \\\\ '",     "\" \\\\ \"");
+        testStrings(" \t ", "' \\t '",      "\" \t \"", "' \t '", "\" \\t \"", "' \\t '");
+        testStrings(" \b ", "' \\b '",      "\" \b \"", "' \b '", "\" \\b \"", "' \\b '");
+        testStrings(" \n ", "' \n '",       "\" \n \"", "\" \\n \"", "' \\n '");
+
+        // \r is removed to enforce platform independence
+        testStrings(" \r ", "' \\r '");
+        testStrings("--", "--", "'-\r-'", "\"-\r-\"");
+        testStrings(" \n ", "' \n '", "' \n\r '", "\" \r\n \"");
+
+        testStrings(" \f ", "' \\f '",      "\" \f \"", "' \f '", "\" \\f \"", "' \\f '");
 
         testStrings("hello", "hello", "\"hello\"", "'hello'");
         testStrings("hello world", "'hello world'", "\"hello world\"");
@@ -75,31 +77,26 @@ public class TestYads {
 
     @Test
     public void testEscapes2() {
+        testStrings("", "''", "\"\"");
+        testStrings(" ", "' '", "\" \"");
+
+        testStrings(" \\ ", "' \\\\ '",     "\" \\\\ \"");
+        //testStrings(" \\a ", "' \\a '",     "\" \\a \"");
+        testStrings(" \n ", "' \n '",     "\" \n \"");
+        testStrings("  \\", "'  \\\\'",     "\"  \\\\\"");
+    }
+
+    @Test
+    public void testEscapesSqlStyle() {
         //testStrings("", "''", "\"\"");
         //testStrings(" ", "' '", "\" \"");
         //
         //testStrings(" \\ ", "' \\ '",     "\" \\ \"");
         //testStrings(" \\a ", "' \\a '",     "\" \\a \"");
         //testStrings(" \n ", "' \n '",     "\" \n \"");
-        ////backslash is escaped only if at the end (and not already escaped)
-        //testStrings("  \\", "'  \\\\'",     "\"  \\\\\"");
-        ////can't work
-        //testStrings("  \\\\", "'  \\\\'",     "\"  \\\\\"");
-    }
-
-    @Test
-    public void testEscapesSqlStyle() {
-        testStrings("", "''", "\"\"");
-        testStrings(" ", "' '", "\" \"");
-
-        testStrings(" \\ ", "' \\ '",     "\" \\ \"");
-        testStrings(" \\a ", "' \\a '",     "\" \\a \"");
-        testStrings(" \n ", "' \n '",     "\" \n \"");
-
-        testStrings(" ' ", "\" ' \"", "' '' '");
-        testStrings(" \" ", "' \" '",     "\" \"\" \"");
-
-
+        //
+        //testStrings(" ' ", "\" ' \"", "' '' '");
+        //testStrings(" \" ", "' \" '",     "\" \"\" \"");
     }
 
     private static void testObj(Object expected, String s) {

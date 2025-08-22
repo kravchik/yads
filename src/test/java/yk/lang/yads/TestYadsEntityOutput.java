@@ -47,7 +47,8 @@ public class TestYadsEntityOutput {
 
                 //congocc stack
                 System.out.println(s);
-                assertEquals(s, "\n" + cstOutput.print(YadsCstResolver.resolveList(YadsCstParser.parse(s).children).assertSize(1).first()) + "\n");
+                assertEquals(s, "\n" + cstOutput.print(YadsCstResolver.resolveKeyValues(YadsCstParser.parse(s).children)
+                    .assertSize(1).first()) + "\n");
             }
         }
     }

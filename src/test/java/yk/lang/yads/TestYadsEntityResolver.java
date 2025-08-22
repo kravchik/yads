@@ -45,15 +45,15 @@ public class TestYadsEntityResolver {
 
     }
 
-    private static void testComment(String exectedComment, String srcComment) {
-        assertEquals("YadsEntity{children=[" + exectedComment + "]}", getYadsList("(" + srcComment + ")"));
-        assertEquals("YadsEntity{children=[a, " + exectedComment + "]}", getYadsList("(a " + srcComment + ")"));
-        assertEquals("YadsEntity{children=[" + exectedComment + ", a]}", getYadsList("(" + srcComment + " a)"));
-        assertEquals("YadsEntity{children=[a, " + exectedComment + ", b]}", getYadsList("(a " + srcComment + " b)"));
+    private static void testComment(String expectedComment, String srcComment) {
+        assertEquals("YadsEntity{children=[" + expectedComment + "]}", getYadsList("(" + srcComment + ")"));
+        assertEquals("YadsEntity{children=[a, " + expectedComment + "]}", getYadsList("(a " + srcComment + ")"));
+        assertEquals("YadsEntity{children=[" + expectedComment + ", a]}", getYadsList("(" + srcComment + " a)"));
+        assertEquals("YadsEntity{children=[a, " + expectedComment + ", b]}", getYadsList("(a " + srcComment + " b)"));
 
-        assertEquals("YadsEntity{children=[tuple(a b), " + exectedComment + "]}", getYadsList("(a = b" + srcComment + ")"));
-        assertEquals("YadsEntity{children=[" + exectedComment + ", tuple(a b)]}", getYadsList("(" + srcComment + "a = b)"));
-        assertEquals("YadsEntity{children=[tuple(a b), " + exectedComment + ", tuple(c d)]}", getYadsList("(a = b" + srcComment + "c = d)"));
+        assertEquals("YadsEntity{children=[tuple(a b), " + expectedComment + "]}", getYadsList("(a = b" + srcComment + ")"));
+        assertEquals("YadsEntity{children=[" + expectedComment + ", tuple(a b)]}", getYadsList("(" + srcComment + "a = b)"));
+        assertEquals("YadsEntity{children=[tuple(a b), " + expectedComment + ", tuple(c d)]}", getYadsList("(a = b" + srcComment + "c = d)"));
     }
 
     @Test

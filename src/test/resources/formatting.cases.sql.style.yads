@@ -128,13 +128,13 @@ hello(
 
 //TODO test cases, source variants + expected
 '
-" hello''
+" hello\'
 world
 "
 '
 
 "
-'  hello ""
+'  hello \"
 world
 '
 "

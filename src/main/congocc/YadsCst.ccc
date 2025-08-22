@@ -5,6 +5,13 @@ NODE_PACKAGE = yk.lang.yads.congocc.nodes;
 JAVA_UNICODE_ESCAPE = true;
 TREE_BUILDING_ENABLED = false;
 
+INJECT YadsCstLexer : {
+    public YadsCstLexer(String inputSource, CharSequence input, LexicalState lexState, int startingLine, int startingColumn, boolean preserveLineEndings) {
+        super(inputSource, input, startingLine, startingColumn, 1, true, preserveLineEndings, true, "");
+        if (lexicalState != null) switchTo(lexState);
+    }
+}
+
 INJECT YadsCstParser : {
     import yk.ycollections.YList;
     import static yk.ycollections.YArrayList.al;
@@ -22,8 +29,9 @@ INJECT YadsCstParser :
      * @param s the string to parse
      * @return the parsed YadsCst
      */
+    //NOTE ! Should be preserveLineEndings == true
     public static YadsCst parse(String s) {
-        YadsCstParser parser = new YadsCstParser(s);
+        YadsCstParser parser = new YadsCstParser(new YadsCstLexer("input", s, YadsCstLexer.LexicalState.DEFAULT, 1, 1, true));
         return parser.parseListBody();
     }
 
@@ -96,18 +104,18 @@ TOKEN :
   | <#EXPONENT: ("-")?(["e","E"] (["+","-"])? (["0"-"9"])+)>
   | <ANY_LITERAL: (["a"-"z","A"-"Z","0"-"9",".","_","$"])+>
   | <ANY_OPERATOR: ((["+","-","/", "*","%","!","=","^","&","|", "<", ">", "?"])+)>
-//  | <STRING_LITERAL_DQ: "\""
-//      (   (~["\"","\\"])
-//        | ("\\" ~[])
-//      )*
-//      "\"">
-//  | <STRING_LITERAL_SQ: "'"
-//      (   (~["'","\\"])
-//        | ("\\" ~[])
-//      )*
-//      "'">
-  | <STRING_LITERAL_DQ: "\"" ( ~["\""] | "\"\"" )* "\"" >
-  | <STRING_LITERAL_SQ: "'" ( ~["'"] | "''" )* "'" >
+  | <STRING_LITERAL_DQ: "\""
+      (   (~["\"","\\"])
+        | ("\\" ~[])
+      )*
+      "\"">
+  | <STRING_LITERAL_SQ: "'"
+      (   (~["'","\\"])
+        | ("\\" ~[])
+      )*
+      "'">
+//  | <STRING_LITERAL_DQ: "\"" ( ~["\""] | "\"\"" )* "\"" >
+//  | <STRING_LITERAL_SQ: "'" ( ~["'"] | "''" )* "'" >
 ;
 
 

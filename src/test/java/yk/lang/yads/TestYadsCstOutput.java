@@ -79,7 +79,7 @@ public class TestYadsCstOutput {
         YadsCstOutput output = new YadsCstOutput();
         String outputStr = output.print(result);
         
-        assertEquals("\"hello\\nworld\"", outputStr.trim());
+        assertEquals("\"hello\nworld\"", outputStr.trim());
     }
 
     @Test
@@ -251,7 +251,7 @@ public class TestYadsCstOutput {
                        ") = npc(name = Foo))";
         
         YadsCst parsed = YadsCstParser.parse(input);
-        Object resolved = YadsCstResolver.resolveList(parsed.children).get(0);
+        Object resolved = YadsCstResolver.resolveKeyValues(parsed.children).get(0);
         
         YadsCstOutput output = new YadsCstOutput();
         output.maxWidth = 8;

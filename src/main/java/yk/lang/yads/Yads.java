@@ -7,11 +7,11 @@ import yk.ycollections.YList;
 public class Yads {
 
     public static Object readYadsEntity(String s) {
-        return YadsCstResolver.resolveList(YadsCstParser.parse(s).children).assertSize(1).first();
+        return YadsCstResolver.resolveKeyValues(YadsCstParser.parse(s).children).assertSize(1).first();
     }
 
     public static YList<Object> readYadsEntities(String s) {
-        return YadsCstResolver.resolveList(YadsCstParser.parse(s).children);
+        return YadsCstResolver.resolveKeyValues(YadsCstParser.parse(s).children);
     }
 
     public static String printYadsEntity(Object s) {
