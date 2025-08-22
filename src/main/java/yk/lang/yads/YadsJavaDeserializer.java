@@ -15,7 +15,7 @@ import static yk.ycollections.YHashMap.hm;
 /**
  * Deserializes YadsEntity objects back to Java objects.
  * 
- * Converts YadsEntity objects (created by YadsCstJavaSerializer or parsed from text)
+ * Converts YadsEntity objects (created by YadsJavaSerializer or parsed from text)
  * back to their original Java object representations.
  * 
  * Current support:
@@ -25,7 +25,7 @@ import static yk.ycollections.YHashMap.hm;
  * - YadsEntity without name: treats as lists if no Tuples, as YHashMap if contains Tuples
  * - YadsEntity with name: deserializes as object (only for explicitly allowed classes)
  */
-public class YadsCstJavaDeserializer {
+public class YadsJavaDeserializer {
     
     private final Map<String, Class<?>> classBySimpleName;
     private Map<Integer, Object> refs = new HashMap<>();
@@ -35,7 +35,7 @@ public class YadsCstJavaDeserializer {
      * 
      * @param classes classes that can be deserialized as objects
      */
-    public YadsCstJavaDeserializer(Class<?>... classes) {
+    public YadsJavaDeserializer(Class<?>... classes) {
         this.classBySimpleName = new HashMap<>();
         for (Class<?> clazz : classes) {
             classBySimpleName.put(clazz.getSimpleName(), clazz);

@@ -23,7 +23,7 @@ public class TestYadsEntityOutput {
 
     @Test
     public void testCases() {
-        YMap<String, Integer> settings = INT_SETTINGS.toMap(s -> s, s -> Reflector.get(new YadsCstOutput(), s));
+        YMap<String, Integer> settings = INT_SETTINGS.toMap(s -> s, s -> Reflector.get(new YadsCstPrinter(), s));
 
         YList<Object> yl = Yads.readYadsEntities(UtilsForTests.readResource("formatting.cases.sql.style.yads"));
         for (Object o : yl) {
@@ -37,7 +37,7 @@ public class TestYadsEntityOutput {
                 //for (Map.Entry<String, Integer> entry : settings.entrySet()) {
                 //    Reflector.set(output, entry.getKey(), entry.getValue());
                 //}
-                YadsCstOutput cstOutput = new YadsCstOutput();
+                YadsCstPrinter cstOutput = new YadsCstPrinter();
                 for (Map.Entry<String, Integer> entry : settings.entrySet()) {
                     Reflector.set(cstOutput, entry.getKey(), entry.getValue());
                 }
@@ -47,7 +47,7 @@ public class TestYadsEntityOutput {
 
                 //congocc stack
                 System.out.println(s);
-                assertEquals(s, "\n" + cstOutput.print(YadsCstResolver.resolveKeyValues(YadsCstParser.parse(s).children)
+                assertEquals(s, "\n" + cstOutput.print(YadsEntityDeserializer.resolveKeyValues(YadsCstParser.parse(s).children)
                     .assertSize(1).first()) + "\n");
             }
         }

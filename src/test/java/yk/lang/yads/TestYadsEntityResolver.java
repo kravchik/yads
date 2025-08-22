@@ -82,6 +82,6 @@ public class TestYadsEntityResolver {
     }
 
     private static String getYadsList(String s) {
-        return YadsCstResolver.resolve(YadsCstParser.parse(s).children.first()).toString();
+        return YadsEntityDeserializer.resolve(YadsCstParser.parse(s).children.first()).toString();
     }
 }

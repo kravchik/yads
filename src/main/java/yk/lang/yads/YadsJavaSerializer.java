@@ -14,8 +14,8 @@ import static yk.ycollections.YArrayList.al;
 /**
  * Serializes Java objects to YadsEntity representation.
  * 
- * Converts Java objects to YadsEntity objects that can be printed by YadsCstOutput
- * and later deserialized back by YadsCstJavaDeserializer.
+ * Converts Java objects to YadsEntity objects that can be printed by YadsCstPrinter
+ * and deserialized back by YadsJavaDeserializer.
  * 
  * Current support:
  * - String: passes through unchanged
@@ -24,7 +24,7 @@ import static yk.ycollections.YArrayList.al;
  * - Map: converts to YadsEntity without name, all elements as Tuple
  * - Objects: converts to YadsEntity with class simple name and field tuples (only for explicitly allowed classes)
  */
-public class YadsCstJavaSerializer {
+public class YadsJavaSerializer {
     
     private final Set<Class<?>> availableClasses;
     private IdentityHashMap<Object, Tuple<YadsEntity, Integer>> identity = new IdentityHashMap<>();
@@ -39,7 +39,7 @@ public class YadsCstJavaSerializer {
      * 
      * @param classes classes that can be serialized as objects
      */
-    public YadsCstJavaSerializer(Class<?>... classes) {
+    public YadsJavaSerializer(Class<?>... classes) {
         this.availableClasses = new HashSet<>(Arrays.asList(classes));
     }
     
@@ -142,14 +142,14 @@ public class YadsCstJavaSerializer {
     
     /**
      * Serializes a Map to YadsEntity without name, all elements as Tuple.
-     * For empty maps, returns the map directly so YadsCstOutput can handle the (=) special case.
+     * For empty maps, returns the map directly so YadsCstPrinter can handle the (=) special case.
      * 
      * @param map the Map to serialize
      * @return YadsEntity with serialized key-value pairs as Tuples, or the Map itself if empty
      */
     private Object serializeMap(Map<?, ?> map) {
         if (map.isEmpty()) {
-            // Return the map directly so YadsCstOutput can print it as (=)
+            // Return the map directly so YadsCstPrinter can print it as (=)
             return map;
         }
         
@@ -219,12 +219,12 @@ public class YadsCstJavaSerializer {
         }
     }
 
-    public YadsCstJavaSerializer setSkipDefaultValues(boolean skipDefaultValues) {
+    public YadsJavaSerializer setSkipDefaultValues(boolean skipDefaultValues) {
         this.skipDefaultValues = skipDefaultValues;
         return this;
     }
 
-    public YadsCstJavaSerializer setAllClassesAvailable(boolean allClassesAvailable) {
+    public YadsJavaSerializer setAllClassesAvailable(boolean allClassesAvailable) {
         this.allClassesAvailable = allClassesAvailable;
         return this;
     }

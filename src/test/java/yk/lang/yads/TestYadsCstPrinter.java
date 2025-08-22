@@ -11,16 +11,16 @@ import static yk.ycollections.Tuple.tuple;
 import static yk.ycollections.YArrayList.al;
 
 /**
- * Tests for YadsCstOutput with new value-based output
+ * Tests for YadsCstPrinter with new value-based output
  */
-public class TestYadsCstOutput {
+public class TestYadsCstPrinter {
 
     @Test
     public void testIntegerOutput() throws Exception {
         YadsCstParser parser = new YadsCstParser("42");
         YadsCst result = parser.parseListBody();
         
-        YadsCstOutput output = new YadsCstOutput();
+        YadsCstPrinter output = new YadsCstPrinter();
         String outputStr = output.print(result);
         
         assertEquals("42", outputStr.trim());
@@ -31,7 +31,7 @@ public class TestYadsCstOutput {
         YadsCstParser parser = new YadsCstParser("123L");
         YadsCst result = parser.parseListBody();
         
-        YadsCstOutput output = new YadsCstOutput();
+        YadsCstPrinter output = new YadsCstPrinter();
         String outputStr = output.print(result);
         
         assertEquals("123", outputStr.trim());
@@ -42,7 +42,7 @@ public class TestYadsCstOutput {
         YadsCstParser parser = new YadsCstParser("3.14f");
         YadsCst result = parser.parseListBody();
         
-        YadsCstOutput output = new YadsCstOutput();
+        YadsCstPrinter output = new YadsCstPrinter();
         String outputStr = output.print(result);
         
         // Float is default, no suffix in output
@@ -54,7 +54,7 @@ public class TestYadsCstOutput {
         YadsCstParser parser = new YadsCstParser("2.71d");
         YadsCst result = parser.parseListBody();
         
-        YadsCstOutput output = new YadsCstOutput();
+        YadsCstPrinter output = new YadsCstPrinter();
         String outputStr = output.print(result);
         
         assertEquals("2.71d", outputStr.trim());
@@ -65,7 +65,7 @@ public class TestYadsCstOutput {
         YadsCstParser parser = new YadsCstParser("\"hello world\"");
         YadsCst result = parser.parseListBody();
         
-        YadsCstOutput output = new YadsCstOutput();
+        YadsCstPrinter output = new YadsCstPrinter();
         String outputStr = output.print(result);
         
         assertEquals("\"hello world\"", outputStr.trim());
@@ -76,7 +76,7 @@ public class TestYadsCstOutput {
         YadsCstParser parser = new YadsCstParser("\"hello\\nworld\"");
         YadsCst result = parser.parseListBody();
         
-        YadsCstOutput output = new YadsCstOutput();
+        YadsCstPrinter output = new YadsCstPrinter();
         String outputStr = output.print(result);
         
         assertEquals("\"hello\nworld\"", outputStr.trim());
@@ -87,7 +87,7 @@ public class TestYadsCstOutput {
         YadsCstParser parser = new YadsCstParser("myClass(42 \"test\" 3.14)");
         YadsCst result = parser.parseListBody();
         
-        YadsCstOutput output = new YadsCstOutput();
+        YadsCstPrinter output = new YadsCstPrinter();
         String outputStr = output.print(result);
         
         // 3.14 without suffix parses as Float, outputs without suffix
@@ -96,7 +96,7 @@ public class TestYadsCstOutput {
 
     @Test
     public void testPrimitiveObjects() {
-        YadsCstOutput output = new YadsCstOutput();
+        YadsCstPrinter output = new YadsCstPrinter();
         
         // Test integers
         assertEquals("42", output.print(42).trim());
@@ -130,7 +130,7 @@ public class TestYadsCstOutput {
 
     @Test
     public void testListSerialization() {
-        YadsCstOutput output = new YadsCstOutput();
+        YadsCstPrinter output = new YadsCstPrinter();
         
         // Empty list
         assertEquals("()", output.print(al()).trim());
@@ -149,7 +149,7 @@ public class TestYadsCstOutput {
 
     @Test
     public void testMapSerialization() {
-        YadsCstOutput output = new YadsCstOutput();
+        YadsCstPrinter output = new YadsCstPrinter();
         
         // Empty map
         Map<String, Object> emptyMap = new HashMap<>();
@@ -169,7 +169,7 @@ public class TestYadsCstOutput {
 
     @Test
     public void testTupleSerialization() {
-        YadsCstOutput output = new YadsCstOutput();
+        YadsCstPrinter output = new YadsCstPrinter();
         
         // Simple tuple
         assertEquals("key = value", output.print(tuple("key", "value")).trim());
@@ -181,7 +181,7 @@ public class TestYadsCstOutput {
 
     @Test
     public void testYadsCommentSerialization() {
-        YadsCstOutput output = new YadsCstOutput();
+        YadsCstPrinter output = new YadsCstPrinter();
         
         // Single line comment
         YadsEntity.YadsComment singleComment = new YadsEntity.YadsComment(true, " This is a comment");
@@ -198,7 +198,7 @@ public class TestYadsCstOutput {
 
     @Test
     public void testYadsEntitySerialization() {
-        YadsCstOutput output = new YadsCstOutput();
+        YadsCstPrinter output = new YadsCstPrinter();
         
         // Unnamed entity
         YadsEntity unnamedEntity = new YadsEntity(null, al(1, 2, 3));
@@ -227,7 +227,7 @@ public class TestYadsCstOutput {
 
     @Test
     public void testUnsupportedObjectType() {
-        YadsCstOutput output = new YadsCstOutput();
+        YadsCstPrinter output = new YadsCstPrinter();
         
         // Try to serialize an unsupported object
         Object unsupported = new java.util.Date();
@@ -251,9 +251,9 @@ public class TestYadsCstOutput {
                        ") = npc(name = Foo))";
         
         YadsCst parsed = YadsCstParser.parse(input);
-        Object resolved = YadsCstResolver.resolveKeyValues(parsed.children).get(0);
+        Object resolved = YadsEntityDeserializer.resolveKeyValues(parsed.children).get(0);
         
-        YadsCstOutput output = new YadsCstOutput();
+        YadsCstPrinter output = new YadsCstPrinter();
         output.maxWidth = 8;
         String result = output.print(resolved);
         

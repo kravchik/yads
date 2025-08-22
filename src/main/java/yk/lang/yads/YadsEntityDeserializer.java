@@ -11,7 +11,7 @@ import static yk.ycollections.YHashMap.hm;
 /**
  * Deserializer that converts YadsCst back to YadsEntity, String, Number, Boolean
  */
-public class YadsCstResolver {
+public class YadsEntityDeserializer {
     public static final String DELIMITER = "=";
 
     /**

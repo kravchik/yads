@@ -13,7 +13,7 @@ import java.util.Map;
 import static yk.ycollections.Tuple.tuple;
 import static yk.ycollections.YArrayList.al;
 
-public class YadsCstOutput {
+public class YadsCstPrinter {
     public int maxWidth = 100;
     public int maxLocalWidth = 100;
     public String tab = "  ";
@@ -315,22 +315,22 @@ public class YadsCstOutput {
         }
     }
 
-    public YadsCstOutput setMaxWidth(int maxWidth) {
+    public YadsCstPrinter setMaxWidth(int maxWidth) {
         this.maxWidth = maxWidth;
         return this;
     }
 
-    public YadsCstOutput setMaxLocalWidth(int maxLocalWidth) {
+    public YadsCstPrinter setMaxLocalWidth(int maxLocalWidth) {
         this.maxLocalWidth = maxLocalWidth;
         return this;
     }
 
-    public YadsCstOutput setCompactFromLevel(int compactFromLevel) {
+    public YadsCstPrinter setCompactFromLevel(int compactFromLevel) {
         this.compactFromLevel = compactFromLevel;
         return this;
     }
 
-    public YadsCstOutput setTab(String tab) {
+    public YadsCstPrinter setTab(String tab) {
         this.tab = tab;
         return this;
     }

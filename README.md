@@ -7,7 +7,18 @@ Mark-up language (like JSON/YAML), but with optional quotes, no commas, and mult
 
 TODO simple example
                    
+TODO updated scheme
+   
+```
+text 
+  -> YadsCstParser -> (YadsCst) 
+    -> YadsEntityDeseralizer -> (YadsEntity and other types) 
+      -> YadsJavaDeserializer -> (pure java types) 
 
+text 
+  <- YadsCstPrinter <- (YadsCst, YadsEntity and other types)
+    <- YadsJavaSerializer <- (pure java types) 
+```
 
 
 With this library, you can parse YADS data into Abstract Syntax Tree, or you can use Yads class to serialize/deserialize data directly from/to Java classes.
