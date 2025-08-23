@@ -27,7 +27,7 @@ import static yk.ycollections.YHashMap.hm;
  */
 public class YadsJavaDeserializer {
     
-    private final Map<String, Class<?>> classBySimpleName;
+    private final Map<String, Class<?>> classByName;
     private Map<Integer, Object> refs = new HashMap<>();
     
     /**
@@ -36,12 +36,15 @@ public class YadsJavaDeserializer {
      * @param classes classes that can be deserialized as objects
      */
     public YadsJavaDeserializer(Class<?>... classes) {
-        this.classBySimpleName = new HashMap<>();
-        for (Class<?> clazz : classes) {
-            classBySimpleName.put(clazz.getSimpleName(), clazz);
-        }
+        this.classByName = new HashMap<>();
+        for (Class<?> clazz : classes) classByName.put(clazz.getSimpleName(), clazz);
     }
-    
+
+    public YadsJavaDeserializer addImport(String name, Class<?> clazz) {
+        classByName.put(name, clazz);
+        return this;
+    }
+
     /**
      * Main entry point for deserialization.
      * 
@@ -49,38 +52,18 @@ public class YadsJavaDeserializer {
      * @return Java object
      */
     public Object deserialize(Object obj) {
-        // Clear refs for each top-level deserialization
         refs.clear();
-        
-        return deserializeImpl(obj);
+        return deserializeImpl(null, obj);
     }
     
-    /**
-     * Internal deserialization with reference tracking.
-     * 
-     * @param obj YadsEntity or primitive to deserialize
-     * @return Java object
-     */
-    private Object deserializeImpl(Object obj) {
-        if (obj == null) {
-            return null;
-        }
-        
-        if (obj instanceof String) {
-            // Strings pass through unchanged
-            return obj;
-        }
-        
-        if (obj instanceof List) {
-            // Lists (without key-value pairs) are deserialized to YArrayList
-            return deserializeList(obj);
-        }
-        
-        if (obj instanceof Map) {
-            // Maps are passed through unchanged (already YHashMap from resolver)
-            return obj;
-        }
-        
+    private Object deserializeImpl(Integer refId, Object obj) {
+        if (obj == null) return null;
+        if (obj instanceof List) return deserializeList(refId, (List) obj);
+        if (obj instanceof Map) return obj;//special case, empty map returned as a map, not YadsEntity
+        if (obj instanceof String) return obj;
+        if (obj instanceof Number) return obj;
+        if (obj instanceof Boolean) return obj;
+
         if (obj instanceof YadsEntity) {
             YadsEntity entity = (YadsEntity) obj;
             
@@ -88,100 +71,67 @@ public class YadsJavaDeserializer {
             if (entity.name != null) {
                 // Handle references
                 if ("ref".equals(entity.name)) {
+                    if (refId != null) throw new RuntimeException("Ref inside a ref");
                     return handleReference(entity);
                 }
                 
                 // Check if this is a known class
-                if (classBySimpleName.containsKey(entity.name)) {
-                    return deserializeObject(entity);
+                if (classByName.containsKey(entity.name)) {
+                    Class<?> clazz = classByName.get(entity.name);
+                    if (clazz == null) throw new RuntimeException("Unknown class: " + entity.name);
+                    return deserializeObject(refId, entity, clazz);
                 }
                 // Throw exception for unknown named entities
                 throw new RuntimeException("Unsupported entity type for deserialization: " + entity.name + ", entity: " + entity);
             }
             
-            // Unnamed entities (name == null) can be lists or maps
-            // Check if contains Tuples - if so, it's a map
             boolean containsTuples = entity.children.isAny(child -> child instanceof Tuple);
             if (containsTuples) {
-                return deserializeMap(entity.children);
+                return deserializeMap(refId, entity.children);
             } else {
-                return deserializeList(entity.children);
+                return deserializeList(refId, entity.children);
             }
         }
-        
-        // For other objects (primitives, etc.), pass through unchanged
-        return obj;
+
+        throw new RuntimeException("Unsupported object type: " + obj.getClass());
     }
     
-    /**
-     * Deserializes a List back to YArrayList.
-     * 
-     * @param list List to deserialize
-     * @return YArrayList with deserialized children
-     */
-    private YList<Object> deserializeList(Object list) {
+    private YList<Object> deserializeList(Integer refId, List list) {
         YList<Object> result = al();
-        
-        if (list instanceof List) {
-            for (Object child : (List<?>) list) {
-                // Recursively deserialize each child
-                result.add(deserializeImpl(child));
-            }
+        if (refId != null) refs.put(refId, list);
+        for (Object child : (List<?>) list) {
+            if (child instanceof Tuple) throw new RuntimeException("Unexpecte list element type: " + child.getClass());
+            result.add(deserializeImpl(null, child));
         }
-        
         return result;
     }
     
     /**
      * Deserializes YList containing Tuples back to YHashMap.
-     * 
-     * @param children YList containing Tuple objects
-     * @return YHashMap with deserialized key-value pairs
      */
-    private Map<Object, Object> deserializeMap(YList<?> children) {
+    private Map<Object, Object> deserializeMap(Integer refId, YList<?> children) {
         Map<Object, Object> result = hm();
-        
+        if (refId != null) refs.put(refId, result);
+
         for (Object child : children) {
             if (child instanceof Tuple) {
-                Tuple<?, ?> tuple = (Tuple<?, ?>) child;
-                
-                // Recursively deserialize both key and value
-                Object deserializedKey = deserializeImpl(tuple.a);
-                Object deserializedValue = deserializeImpl(tuple.b);
-                result.put(deserializedKey, deserializedValue);
+                result.put(deserializeImpl(null, ((Tuple) child).a), deserializeImpl(null, ((Tuple) child).b));
             } else if (child instanceof YadsEntity.YadsComment) {
                 // Skip comments
-                continue;
-            } else {
-                // Everything else is invalid in map context
-                throw new RuntimeException("Invalid element in map deserialization: " + child.getClass().getName() + ", value: " + child);
-            }
+            } else throw new RuntimeException("Invalid element in map deserialization: "
+                    + child.getClass().getName() + ", value: " + child);
         }
         
         return result;
     }
-    
-    /**
-     * Deserializes YadsEntity with name back to Java object.
-     * 
-     * @param entity YadsEntity with class name and field tuples
-     * @return Java object with deserialized fields
-     */
-    private Object deserializeObject(YadsEntity entity) {
-        Class<?> clazz = classBySimpleName.get(entity.name);
-        if (clazz == null) {
-            throw new RuntimeException("Unknown class: " + entity.name);
-        }
-        
-        // Create instance without calling constructor
+
+    public Object deserializeObject(Integer refId, YadsEntity entity, Class<?> clazz) {
         Object instance = Reflector.newInstanceArgless(clazz);
-        
-        // Deserialize fields
+        if (refId != null) refs.put(refId, instance);
         deserializeObjectFields(instance, entity);
-        
         return instance;
     }
-    
+
     /**
      * Deserializes fields of an object from YadsEntity.
      * Separated method to allow proper reference handling.
@@ -197,17 +147,13 @@ public class YadsJavaDeserializer {
             if (child instanceof Tuple) {
                 Tuple<?, ?> tuple = (Tuple<?, ?>) child;
                 String fieldName = (String) tuple.a;
-                Object fieldValue = deserializeImpl(tuple.b); // recursive deserialization
+                Object fieldValue = deserializeImpl(null, tuple.b);
                 
                 Field field = Reflector.getField(clazz, fieldName);
-                if (field != null) {
-                    Reflector.set(instance, field, fieldValue);
-                } else {
-                    // Skip unknown fields (for forward compatibility)
-                }
+                if (field == null) throw new RuntimeException("Unknown field: " + fieldName);
+                Reflector.set(instance, field, fieldValue);
             } else if (child instanceof YadsEntity.YadsComment) {
                 // Skip comments
-                continue;
             } else {
                 // Everything else is invalid in object context
                 throw new RuntimeException("Invalid element in object deserialization: " + child.getClass().getName() + ", value: " + child);
@@ -217,53 +163,17 @@ public class YadsJavaDeserializer {
     
     /**
      * Handles reference entities: ref(id) or ref(id, object).
-     * 
-     * @param entity the reference entity
-     * @return the referenced object
      */
     private Object handleReference(YadsEntity entity) {
         if (entity.children.size() == 1) {
-            // ref(id) - return existing reference
-            int refId = (Integer) entity.children.get(0);
-            if (!refs.containsKey(refId)) {
-                throw new RuntimeException("Undefined reference id: " + refId);
-            }
+            Integer refId = (Integer) entity.children.get(0);
+            if (!refs.containsKey(refId)) throw new RuntimeException("Undefined reference id: " + refId);
             return refs.get(refId);
         } else if (entity.children.size() == 2) {
-            // ref(id, object) - create object and store reference before deserializing fields
-            int refId = (Integer) entity.children.get(0);
-            if (refs.containsKey(refId)) {
-                throw new RuntimeException("Reference id " + refId + " is already defined");
-            }
-            
-            Object objectToDeserialize = entity.children.get(1);
-            Object result;
-            
-            if (objectToDeserialize instanceof YadsEntity) {
-                YadsEntity objectEntity = (YadsEntity) objectToDeserialize;
-                
-                // If it's a named entity (object), create instance first and store in refs
-                if (objectEntity.name != null && classBySimpleName.containsKey(objectEntity.name)) {
-                    Class<?> clazz = classBySimpleName.get(objectEntity.name);
-                    result = Reflector.newInstanceArgless(clazz);
-                    refs.put(refId, result);
-                    
-                    // Now deserialize fields - this allows circular references
-                    deserializeObjectFields(result, objectEntity);
-                    return result;
-                } else if (objectEntity.name == null) {
-                    // Handle anonymous entities - these could be lists or maps that need reference tracking
-                    // For now, deserialize normally and store the reference
-                    result = deserializeImpl(objectToDeserialize);
-                    refs.put(refId, result);
-                    return result;
-                }
-            }
-            
-            // For other types, deserialize normally
-            result = deserializeImpl(objectToDeserialize);
-            refs.put(refId, result);
-            return result;
+            // ref(id, object), pass refId to store it BEFORE deserializing its body
+            Integer refId = (Integer) entity.children.get(0);
+            if (refs.containsKey(refId)) throw new RuntimeException("Reference id " + refId + " is already defined");
+            return deserializeImpl(refId, entity.children.get(1));
         } else {
             throw new RuntimeException("Unexpected number of arguments in ref: " + entity.children.size());
         }
