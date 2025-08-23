@@ -21,15 +21,25 @@ public class Yads {
         return new YadsCstPrinter().printBody(entities);
     }
 
-    public static Object readJava(String s) {
-        return new YadsJavaDeserializer().deserialize(readYadsEntity(s));
+    public static Object readJava(String s, Class... cc) {
+        return new YadsJavaDeserializer(cc).deserialize(readYadsEntity(s));
+    }
+
+    public static <T> T readJava(Class<T> clazz, String s, Class... cc) {
+        Object result = new YadsJavaDeserializer(cc).deserialize(readYadsEntity(s));
+        if (!clazz.isInstance(result)) throw new RuntimeException("Expected " + clazz.getSimpleName() + " but got " + result.getClass().getSimpleName());
+        return (T) result;
+    }
+
+    public static <T> T readJavaBody(Class<T> clazz, String text, Class... cc) {
+        return (T) new YadsJavaDeserializer(cc).deserializeObject(null, clazz, readYadsEntities(text));
     }
 
     public static String printJava(Object o) {
         return printYadsEntity(new YadsJavaSerializer().serialize(o));
     }
 
-    //TODO readJava(Class c, String s)
-    //TODO readJavaBody(Class c, String s)
-    //TODO printJavaBody(String s)
+    public static String printJavaBody(Object o) {
+        return printYadsEntities(((YadsEntity)new YadsJavaSerializer().serialize(o)).children);
+    }
 }

@@ -79,23 +79,19 @@ public class YadsJavaDeserializer {
                 if (classByName.containsKey(entity.name)) {
                     Class<?> clazz = classByName.get(entity.name);
                     if (clazz == null) throw new RuntimeException("Unknown class: " + entity.name);
-                    return deserializeObject(refId, entity, clazz);
+                    return deserializeObject(refId, clazz, entity.children);
                 }
                 // Throw exception for unknown named entities
                 throw new RuntimeException("Unsupported entity type for deserialization: " + entity.name + ", entity: " + entity);
             }
-            
-            boolean containsTuples = entity.children.isAny(child -> child instanceof Tuple);
-            if (containsTuples) {
-                return deserializeMap(refId, entity.children);
-            } else {
-                return deserializeList(refId, entity.children);
-            }
+
+            if (entity.children.isAny(child -> child instanceof Tuple)) return deserializeMap(refId, entity.children);
+            else return deserializeList(refId, entity.children);
         }
 
         throw new RuntimeException("Unsupported object type: " + obj.getClass());
     }
-    
+
     private YList<Object> deserializeList(Integer refId, List list) {
         YList<Object> result = al();
         if (refId != null) refs.put(refId, list);
@@ -125,25 +121,22 @@ public class YadsJavaDeserializer {
         return result;
     }
 
-    public Object deserializeObject(Integer refId, YadsEntity entity, Class<?> clazz) {
+    public Object deserializeObject(Integer refId, Class<?> clazz, YList children) {
         Object instance = Reflector.newInstanceArgless(clazz);
         if (refId != null) refs.put(refId, instance);
-        deserializeObjectFields(instance, entity);
+        deserializeObjectFields(instance, children);
         return instance;
     }
 
     /**
      * Deserializes fields of an object from YadsEntity.
      * Separated method to allow proper reference handling.
-     * 
-     * @param instance the object instance to populate
-     * @param entity YadsEntity with field tuples
      */
-    private void deserializeObjectFields(Object instance, YadsEntity entity) {
+    private void deserializeObjectFields(Object instance, YList children) {
         Class<?> clazz = instance.getClass();
         
         // Set fields from tuples
-        for (Object child : entity.children) {
+        for (Object child : children) {
             if (child instanceof Tuple) {
                 Tuple<?, ?> tuple = (Tuple<?, ?>) child;
                 String fieldName = (String) tuple.a;
