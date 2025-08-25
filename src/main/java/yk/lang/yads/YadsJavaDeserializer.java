@@ -45,6 +45,11 @@ public class YadsJavaDeserializer {
         return this;
     }
 
+    public YadsJavaDeserializer addImport(Class<?> clazz) {
+        classByName.put(clazz.getSimpleName(), clazz);
+        return this;
+    }
+
     /**
      * Main entry point for deserialization.
      * 
@@ -122,6 +127,10 @@ public class YadsJavaDeserializer {
     }
 
     public Object deserializeObject(Integer refId, Class<?> clazz, YList children) {
+        //fix for external call
+        if (List.class.isAssignableFrom(clazz)) return deserializeList(refId, children);
+        if (Map.class.isAssignableFrom(clazz)) return deserializeMap(refId, children);
+
         Object instance = Reflector.newInstanceArgless(clazz);
         if (refId != null) refs.put(refId, instance);
         deserializeObjectFields(instance, children);

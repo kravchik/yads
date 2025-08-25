@@ -9,6 +9,7 @@ import static yk.ycollections.Tuple.tuple;
 
 //TODO rename
 //  Node
+//  AstNode ?
 //  Entity
 //  Something, Smthng
 //  Item
@@ -17,12 +18,12 @@ import static yk.ycollections.Tuple.tuple;
 public class YadsEntity {
     //can be null
     public String name;
-
-    /**                         
+    //TODO Caret caret;
+    //TODO YList<Caret> childrenCarets;
+    /**
      *
      * <pre>{@code
      * Tuple<String, Object> - field
-     * Tuple<null, Object> - child
      * Object - child
      * YadsComment - comment
      * }

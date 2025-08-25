@@ -18,12 +18,12 @@ import java.util.Map;
 import static junit.framework.TestCase.assertEquals;
 import static yk.ycollections.YHashSet.hs;
 
-public class TestYadsEntityOutput {
+public class TestYadsPrinterCases {
     private static final YSet<String> INT_SETTINGS = hs("maxWidth", "maxLocalWidth", "compactFromLevel");
 
     @Test
     public void testCases() {
-        YMap<String, Integer> settings = INT_SETTINGS.toMap(s -> s, s -> Reflector.get(new YadsCstPrinter(), s));
+        YMap<String, Integer> settings = INT_SETTINGS.toMap(s -> s, s -> Reflector.get(new YadsPrinter(), s));
 
         YList<Object> yl = Yads.readYadsEntities(UtilsForTests.readResource("formatting.cases.sql.style.yads"));
         for (Object o : yl) {
@@ -37,7 +37,7 @@ public class TestYadsEntityOutput {
                 //for (Map.Entry<String, Integer> entry : settings.entrySet()) {
                 //    Reflector.set(output, entry.getKey(), entry.getValue());
                 //}
-                YadsCstPrinter cstOutput = new YadsCstPrinter();
+                YadsPrinter cstOutput = new YadsPrinter();
                 for (Map.Entry<String, Integer> entry : settings.entrySet()) {
                     Reflector.set(cstOutput, entry.getKey(), entry.getValue());
                 }
@@ -61,7 +61,7 @@ public class TestYadsEntityOutput {
         return streamToString(resourceAsStream(name));
     }
     public static InputStream resourceAsStream(String name) {
-        return TestYadsEntityOutput.class.getClassLoader().getResourceAsStream(name);
+        return TestYadsPrinterCases.class.getClassLoader().getResourceAsStream(name);
     }
     public static String streamToString(InputStream in) {
         if (in == null) return null;

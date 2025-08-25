@@ -3,10 +3,13 @@ package yk.lang.yads;
 import yk.lang.yads.utils.Reflector;
 import yk.ycollections.Tuple;
 import yk.ycollections.YList;
+import yk.ycollections.YMap;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
-import java.util.*;
+import java.util.IdentityHashMap;
+import java.util.List;
+import java.util.Map;
 
 import static yk.ycollections.Tuple.tuple;
 import static yk.ycollections.YArrayList.al;
@@ -14,7 +17,7 @@ import static yk.ycollections.YArrayList.al;
 /**
  * Serializes Java objects to YadsEntity representation.
  * 
- * Converts Java objects to YadsEntity objects that can be printed by YadsCstPrinter
+ * Converts Java objects to YadsEntity objects that can be printed by YadsPrinter
  * and deserialized back by YadsJavaDeserializer.
  * 
  * Current support:
@@ -26,7 +29,7 @@ import static yk.ycollections.YArrayList.al;
  */
 public class YadsJavaSerializer {
     
-    private final Set<Class<?>> availableClasses;
+    private final YMap<Class<?>, String> availableClasses;
     private IdentityHashMap<Object, Tuple<YadsEntity, Integer>> identity = new IdentityHashMap<>();
     private int nextRefId = 1;
     public boolean skipDefaultValues = true;
@@ -36,11 +39,16 @@ public class YadsJavaSerializer {
     
     /**
      * Constructor that specifies which classes are allowed for object serialization.
-     * 
+     *
      * @param classes classes that can be serialized as objects
      */
     public YadsJavaSerializer(Class<?>... classes) {
-        this.availableClasses = new HashSet<>(Arrays.asList(classes));
+        this.availableClasses = al(classes).toMap(v -> v, v -> v.getSimpleName());
+    }
+
+    public YadsJavaSerializer addImport(Class<?> clazz) {
+        availableClasses.put(clazz, clazz.getSimpleName());
+        return this;
     }
     
     /**
@@ -85,7 +93,7 @@ public class YadsJavaSerializer {
         }
         
         // For reference-tracked objects (Lists, Maps, Objects), check if already serialized
-        if (obj instanceof List || obj instanceof Map || availableClasses.contains(obj.getClass()) || allClassesAvailable) {
+        if (obj instanceof List || obj instanceof Map || availableClasses.containsKey(obj.getClass()) || allClassesAvailable) {
             if (identity.containsKey(obj)) {
                 Tuple<YadsEntity, Integer> tuple = identity.get(obj);
                 if (tuple.b == 0) {
@@ -142,14 +150,14 @@ public class YadsJavaSerializer {
     
     /**
      * Serializes a Map to YadsEntity without name, all elements as Tuple.
-     * For empty maps, returns the map directly so YadsCstPrinter can handle the (=) special case.
+     * For empty maps, returns the map directly so YadsPrinter can handle the (=) special case.
      * 
      * @param map the Map to serialize
      * @return YadsEntity with serialized key-value pairs as Tuples, or the Map itself if empty
      */
     private Object serializeMap(Map<?, ?> map) {
         if (map.isEmpty()) {
-            // Return the map directly so YadsCstPrinter can print it as (=)
+            // Return the map directly so YadsPrinter can print it as (=)
             return map;
         }
         
@@ -196,8 +204,9 @@ public class YadsJavaSerializer {
             Object serializedValue = serializeImpl(value); // recursive serialization
             children.add(tuple(field.getName(), serializedValue));
         }
-        
-        return new YadsEntity(obj.getClass().getSimpleName(), children);
+
+        String name = availableClasses.get(obj.getClass());
+        return new YadsEntity(name == null ? obj.getClass().getSimpleName() : name, children);
     }
     
     /**

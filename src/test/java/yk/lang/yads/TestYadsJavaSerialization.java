@@ -18,7 +18,7 @@ import static yk.ycollections.YHashMap.hm;
  * All tests follow the round-trip pattern:
  * originalData → serialize → YadsEntity → print → text → parse → resolve → YadsEntity → deserialize → restoredData
  */
-public class TestYadsCstJavaSerialization {
+public class TestYadsJavaSerialization {
 
     
     /**
@@ -37,7 +37,7 @@ public class TestYadsCstJavaSerialization {
         Object serialized = serializer.serialize(original);
         
         // Step 2: Print YadsEntity to text using existing infrastructure
-        String text = new YadsCstPrinter().print(serialized);
+        String text = new YadsPrinter().print(serialized);
         assertEquals("Serialized format should match expected", expectedSerialized, text);
         
         // Step 3: Parse text back to YadsCst using existing infrastructure
@@ -80,14 +80,14 @@ public class TestYadsCstJavaSerialization {
         YadsJavaDeserializer deserializer = new YadsJavaDeserializer();
         
         Object serialized = serializer.serialize('a');
-        String text = new YadsCstPrinter().print(serialized);
+        String text = new YadsPrinter().print(serialized);
         YadsCst parsed = YadsCstParser.parse(text);
         Object resolved = YadsEntityDeserializer.resolveKeyValues(parsed.children).get(0);
         Object charResult = deserializer.deserialize(resolved);
         assertEquals("Character should become string", "a", charResult);
         
         serialized = serializer.serialize(' ');
-        text = new YadsCstPrinter().print(serialized);
+        text = new YadsPrinter().print(serialized);
         parsed = YadsCstParser.parse(text);
         resolved = YadsEntityDeserializer.resolveKeyValues(parsed.children).get(0);
         charResult = deserializer.deserialize(resolved);
@@ -302,7 +302,7 @@ public class TestYadsCstJavaSerialization {
         YadsJavaDeserializer deserializer = new YadsJavaDeserializer(Person.class, Address.class);
         
         Object serialized = serializer.serialize(people);
-        String text = new YadsCstPrinter().print(serialized);
+        String text = new YadsPrinter().print(serialized);
         
         // Verify that the serialized form contains references
         assertTrue("Should contain reference", text.contains("ref("));
@@ -352,7 +352,7 @@ public class TestYadsCstJavaSerialization {
         YadsJavaDeserializer deserializer = new YadsJavaDeserializer(Address.class);
         
         Object serialized = serializer.serialize(addresses);
-        String text = new YadsCstPrinter().print(serialized);
+        String text = new YadsPrinter().print(serialized);
         
         // Should contain references for duplicate address1
         assertTrue("Should contain reference for duplicate object", text.contains("ref("));
@@ -382,7 +382,7 @@ public class TestYadsCstJavaSerialization {
         YadsJavaDeserializer deserializer = new YadsJavaDeserializer(Person.class);
         
         Object serialized = serializer.serialize(person);
-        String text = new YadsCstPrinter().print(serialized);
+        String text = new YadsPrinter().print(serialized);
         
         // Verify that the serialized form contains references
         assertTrue("Should contain reference for circular self-reference", text.contains("ref("));
@@ -421,7 +421,7 @@ public class TestYadsCstJavaSerialization {
         YadsJavaDeserializer deserializer = new YadsJavaDeserializer(Person.class);
         
         Object serialized = serializer.serialize(friends);
-        String text = new YadsCstPrinter().print(serialized);
+        String text = new YadsPrinter().print(serialized);
         
         // Verify that the serialized form contains references
         assertTrue("Should contain references for circular references", text.contains("ref("));
@@ -455,12 +455,12 @@ public class TestYadsCstJavaSerialization {
         // Test with skipDefaultValues = true (default behavior)
         YadsJavaSerializer serializerSkip = new YadsJavaSerializer(Person.class);
         Object serializedSkip = serializerSkip.serialize(person);
-        String textSkip = new YadsCstPrinter().print(serializedSkip);
+        String textSkip = new YadsPrinter().print(serializedSkip);
         
         // Test with skipDefaultValues = false
         YadsJavaSerializer serializerNoSkip = new YadsJavaSerializer(Person.class).setSkipDefaultValues(false);
         Object serializedNoSkip = serializerNoSkip.serialize(person);
-        String textNoSkip = new YadsCstPrinter().print(serializedNoSkip);
+        String textNoSkip = new YadsPrinter().print(serializedNoSkip);
         
         // With skipDefaultValues = true, should only show non-default fields
         assertEquals("With skipDefaultValues=true", "Person(name = Charlie)", textSkip);

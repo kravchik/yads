@@ -2,133 +2,85 @@ package yk.lang.yads;
 
 import org.junit.Test;
 import yk.ycollections.YList;
+import yk.ycollections.YMap;
 
 import static org.junit.Assert.assertEquals;
 import static yk.ycollections.YArrayList.al;
+import static yk.ycollections.YHashMap.hm;
 
-/**
- * 13.07.2024
- */
 public class TestYads {
-    @Test
-    public void testStructure() {
-        assertEquals(al(), Yads.readYadsEntities(""));
 
-        testObj(entity(), "()");
-        testObj(entity("foo"), "foo()");
-        testObj(entity("foo", "bar"), "foo(bar)");
-        testObj(entity("foo", entity()), "foo(())");
-        testObj(entity("foo", entity("bar", "hello")), "foo(bar(hello))");
-        testObj(entity("foo", "bar", entity(null, "hello")), "foo(bar (hello))");
-    }
-
-    @Test
-    public void testComments() {
-        testObj(new YadsEntity.YadsComment(false, "comment"), "/*comment*/");
-        Object oneLine = new YadsEntity.YadsComment(true, "comment");
-        assertEquals(al(oneLine), Yads.readYadsEntities("//comment"));
-        assertEquals(al(oneLine, oneLine), Yads.readYadsEntities("//comment" + "\n" + "//comment"));
-        assertEquals(oneLine, Yads.readYadsEntity("//comment"));
-    }
-
-    @Test
-    public void testNumbers() {
-        testNumbers(al(0, -0, 1, -1, 100, -100), "0 0 1 -1 100 -100", "0 -0 1 -1 100 -100");
-        testNumbers(al(0f, -0f, 1f, -1f, 100f, -100f, 0.1f, 1.1f, 100000f),
-            "0f -0f 1f -1f 100f -100f 0.1f 1.1f 100000f",
-            "0.0 -0.0 1.0 -1.0 100.0 -100.0 0.1 1.1 100000.0",
-            "0F -0F 1F -1F 100F -100F 0.1F 1.1F 1e5F"
-        );
-        testNumbers(al(0d, -0d, 1d, -1d, 100d, -100d, 0.1d, 1.1d, 100000d),
-            "0d -0d 1d -1d 100d -100d 0.1d 1.1d 100000d",
-            "0D -0D 1D -1D 100D -100D 0.1D 1.1D 1e5D"
-        );
-    }
-
-    private void testNumbers(YList<Object> j, String out, String... alts) {
-        for (String alt : alts) {
-            assertEquals(j, Yads.readYadsEntities(alt));
+    public static class Point {
+        public int x;
+        public int y;
+        
+        public Point() {}
+        
+        public Point(int x, int y) {
+            this.x = x;
+            this.y = y;
         }
-        assertEquals(out, Yads.printYadsEntities(j));
-    }
-
-    @Test
-    public void testEscapes() {
-        testStrings("", "''", "\"\"");
-        testStrings(" ", "' '", "\" \"");
-        testStrings(" ' ", "\" ' \"",       "' \\' '", "\" \\' \"");
-        testStrings(" \" ", "' \" '",       "\" \\\" \"", "' \\\" '");
-
-        testStrings(" \\ ", "' \\\\ '",     "\" \\\\ \"");
-        testStrings(" \t ", "' \\t '",      "\" \t \"", "' \t '", "\" \\t \"", "' \\t '");
-        testStrings(" \b ", "' \\b '",      "\" \b \"", "' \b '", "\" \\b \"", "' \\b '");
-        testStrings(" \n ", "' \n '",       "\" \n \"", "\" \\n \"", "' \\n '");
-
-        // \r is removed to enforce platform independence
-        testStrings(" \r ", "' \\r '");
-        testStrings("--", "--", "'-\r-'", "\"-\r-\"");
-        testStrings(" \n ", "' \n '", "' \n\r '", "\" \r\n \"");
-
-        testStrings(" \f ", "' \\f '",      "\" \f \"", "' \f '", "\" \\f \"", "' \\f '");
-
-        testStrings("hello", "hello", "\"hello\"", "'hello'");
-        testStrings("hello world", "'hello world'", "\"hello world\"");
-    }
-
-    @Test
-    public void testEscapes2() {
-        testStrings("", "''", "\"\"");
-        testStrings(" ", "' '", "\" \"");
-
-        testStrings(" \\ ", "' \\\\ '",     "\" \\\\ \"");
-        //testStrings(" \\a ", "' \\a '",     "\" \\a \"");
-        testStrings(" \n ", "' \n '",     "\" \n \"");
-        testStrings("  \\", "'  \\\\'",     "\"  \\\\\"");
-    }
-
-    @Test
-    public void testEscapesSqlStyle() {
-        //testStrings("", "''", "\"\"");
-        //testStrings(" ", "' '", "\" \"");
-        //
-        //testStrings(" \\ ", "' \\ '",     "\" \\ \"");
-        //testStrings(" \\a ", "' \\a '",     "\" \\a \"");
-        //testStrings(" \n ", "' \n '",     "\" \n \"");
-        //
-        //testStrings(" ' ", "\" ' \"", "' '' '");
-        //testStrings(" \" ", "' \" '",     "\" \"\" \"");
-    }
-
-    private static void testObj(Object expected, String s) {
-        assertEquals(al(expected), Yads.readYadsEntities(s));
-        assertEquals(al(expected, expected), Yads.readYadsEntities(s + " " + s));
-        assertEquals(al(expected, expected), Yads.readYadsEntities(s + "\n" + s));
-        assertEquals(expected, Yads.readYadsEntity(s));
-    }
-
-    private static void testStrings(String data, String canonicForm, String... alternativeForms) {
-        assertEquals(data, Yads.readYadsEntity(canonicForm));
-        assertEquals(al(data), Yads.readYadsEntities(canonicForm));
-        assertEquals(al(data, data), Yads.readYadsEntities(canonicForm + " " + canonicForm));
-        assertEquals(al(data, data), Yads.readYadsEntities(canonicForm + "\n" + canonicForm));
-
-        assertEquals(canonicForm, Yads.printYadsEntity(data));
-        assertEquals(canonicForm, Yads.printYadsEntities(al(data)));
-        assertEquals(canonicForm + " " + canonicForm, Yads.printYadsEntities(al(data, data)));
-
-        for (String alt : alternativeForms) {
-            assertEquals(data, Yads.readYadsEntity(alt));
-            assertEquals(al(data), Yads.readYadsEntities(alt));
-            assertEquals(al(data, data), Yads.readYadsEntities(alt + " " + alt));
-            assertEquals(al(data, data), Yads.readYadsEntities(alt + "\n" + alt));
+        
+        @Override
+        public boolean equals(Object obj) {
+            if (!(obj instanceof Point)) return false;
+            Point other = (Point) obj;
+            return x == other.x && y == other.y;
         }
     }
 
-    public static YadsEntity entity() {
-        return new YadsEntity(null, al());
+    @Test
+    public void testEnity() {
+        Object entity = Yads.readYadsEntity("hello(world)");
+        assertEquals(new YadsEntity("hello", al("world")), entity);
+        assertEquals("hello(world)", Yads.printYadsEntity(entity));
+
+        assertEquals(null, Yads.readYadsEntity("null"));
+        assertEquals("null", Yads.printYadsEntity(null));
     }
 
-    public static YadsEntity entity(String name, Object... values) {
-        return new YadsEntity(name, al(values));
+    @Test
+    public void testEnities() {
+        YadsEntity ye = new YadsEntity("hello", al("world"));
+
+        Object entity = Yads.readYadsEntities("hello(world) hello(world)");
+        assertEquals(al(ye, ye), entity);
+        assertEquals("hello(world) hello(world)", Yads.printYadsEntities(al(ye, ye)));
+
+        assertEquals(al(null, null), Yads.readYadsEntities("null null"));
+        assertEquals("null null", Yads.printYadsEntities(al(null, null)));
+    }
+
+    @Test
+    public void testJava() {
+        Point point = new Point(10, 20);
+        String serialized = Yads.printJava(point);
+        assertEquals("Point(x = 10 y = 20)", serialized);
+        assertEquals(point, Yads.readJava(Point.class, serialized));
+
+        serialized = Yads.printJava(al(point), Point.class);
+        assertEquals("(Point(x = 10 y = 20))", serialized);
+        assertEquals(al(point), Yads.readJava(YList.class, serialized, Point.class));
+
+        serialized = Yads.printJava(hm("a", point), Point.class);
+        assertEquals("(a = Point(x = 10 y = 20))", serialized);
+        assertEquals(hm("a", point), Yads.readJava(YMap.class, serialized, Point.class));
+    }
+
+    @Test
+    public void testJavaBody() {
+        Point point = new Point(5, 15);
+        
+        String bodyText = Yads.printJavaBody(point);
+        assertEquals("x = 5 y = 15", bodyText);
+        assertEquals(point, Yads.readJavaBody(Point.class, bodyText));
+
+        bodyText = Yads.printJavaBody(al(point, point), Point.class);
+        assertEquals("ref(1 Point(x = 5 y = 15)) ref(1)", bodyText);
+        assertEquals(al(point, point), Yads.readJavaBody(YList.class, bodyText, Point.class));
+
+        bodyText = Yads.printJavaBody(hm("a", point), Point.class);
+        assertEquals("a = Point(x = 5 y = 15)", bodyText);
+        assertEquals(hm("a", point), Yads.readJavaBody(YMap.class, bodyText, Point.class));
     }
 }

@@ -14,11 +14,11 @@ public class Yads {
     }
 
     public static String printYadsEntity(Object s) {
-        return new YadsCstPrinter().print(s);
+        return new YadsPrinter().print(s);
     }
 
     public static String printYadsEntities(YList<Object> entities) {
-        return new YadsCstPrinter().printBody(entities);
+        return new YadsPrinter().printBody(entities);
     }
 
     public static Object readJava(String s, Class... cc) {
@@ -26,7 +26,7 @@ public class Yads {
     }
 
     public static <T> T readJava(Class<T> clazz, String s, Class... cc) {
-        Object result = new YadsJavaDeserializer(cc).deserialize(readYadsEntity(s));
+        Object result = new YadsJavaDeserializer(cc).addImport(clazz).deserialize(readYadsEntity(s));
         if (!clazz.isInstance(result)) throw new RuntimeException("Expected " + clazz.getSimpleName() + " but got " + result.getClass().getSimpleName());
         return (T) result;
     }
@@ -35,11 +35,15 @@ public class Yads {
         return (T) new YadsJavaDeserializer(cc).deserializeObject(null, clazz, readYadsEntities(text));
     }
 
-    public static String printJava(Object o) {
-        return printYadsEntity(new YadsJavaSerializer().serialize(o));
+    public static String printJava(Object o, Class... knownClasses) {
+        YadsJavaSerializer serializer = new YadsJavaSerializer(knownClasses);
+        if (o != null) serializer.addImport(o.getClass());
+        return printYadsEntity(serializer.serialize(o));
     }
 
-    public static String printJavaBody(Object o) {
-        return printYadsEntities(((YadsEntity)new YadsJavaSerializer().serialize(o)).children);
+    public static String printJavaBody(Object o, Class... knownClasses) {
+        YadsJavaSerializer serializer = new YadsJavaSerializer(knownClasses);
+        if (o != null) serializer.addImport(o.getClass());
+        return printYadsEntities(((YadsEntity)serializer.serialize(o)).children);
     }
 }

@@ -310,60 +310,6 @@ public class TestYadsCstParser {
         }
     }
 
-    //sql style escapes
-    //@Test
-    //public void testStringLiterals() {
-    //    // Double quoted with quote escape (SQL-style: "" -> ")
-    //    YadsCst result = parseList("\"Say \"\"Hello\"\"\"");
-    //    YadsCst child = result.children.get(0);
-    //    assertCstType("STRING_LITERAL_DQ", child);
-    //    assertCstPosition(child);
-    //    assertEquals("Say \"Hello\"", child.value); // Should be unescaped
-    //
-    //    // Single quoted with quote escape (SQL-style: '' -> ')
-    //    result = parseList("'Don''t'");
-    //    child = result.children.get(0);
-    //    assertCstType("STRING_LITERAL_SQ", child);
-    //    assertCstPosition(child);
-    //    assertEquals("Don't", child.value); // Should be unescaped
-    //
-    //    // Double quoted with multiple quote escapes
-    //    result = parseList("\"\"\"Start\"\" middle \"\"End\"\"\"");
-    //    child = result.children.get(0);
-    //    assertCstType("STRING_LITERAL_DQ", child);
-    //    assertEquals("\"Start\" middle \"End\"", child.value); // Should be unescaped
-    //
-    //    // Single quoted with multiple quote escapes
-    //    result = parseList("'''Start'' middle ''End'''");
-    //    child = result.children.get(0);
-    //    assertCstType("STRING_LITERAL_SQ", child);
-    //    assertEquals("'Start' middle 'End'", child.value); // Should be unescaped
-    //
-    //    // String without escapes
-    //    result = parseList("\"Simple string\"");
-    //    child = result.children.get(0);
-    //    assertCstType("STRING_LITERAL_DQ", child);
-    //    assertEquals("Simple string", child.value);
-    //
-    //    // Single quoted string without escapes
-    //    result = parseList("'Simple string'");
-    //    child = result.children.get(0);
-    //    assertCstType("STRING_LITERAL_SQ", child);
-    //    assertEquals("Simple string", child.value);
-    //
-    //    // Strings with literal backslashes (no escaping in SQL-style)
-    //    result = parseList("\"Path\\to\\file\"");
-    //    child = result.children.get(0);
-    //    assertCstType("STRING_LITERAL_DQ", child);
-    //    assertEquals("Path\\to\\file", child.value); // Backslashes should be literal
-    //
-    //    // Strings with literal newline characters (no \n escaping)
-    //    result = parseList("\"Line1\\nTab\\tEnd\"");
-    //    child = result.children.get(0);
-    //    assertCstType("STRING_LITERAL_DQ", child);
-    //    assertEquals("Line1\\nTab\\tEnd", child.value); // Should be literal text
-    //}
-
     //c-style escapes
     @Test
     public void testStringLiterals() {
