@@ -28,17 +28,17 @@ public class TestYadsCstParser {
         assertEquals("CST type mismatch", expectedType, cst.type);
     }
 
-    private void assertCstPosition(YadsCst cst) {
+    private void assertCstPosition(YadsCst cst, int expectedBegin, int expectedEnd) {
         assertNotNull("CST should have caret", cst.caret);
-        assertTrue("Begin offset should be valid", cst.caret.beginOffset >= 0);
-        assertTrue("End offset should be valid", cst.caret.endOffset >= cst.caret.beginOffset);
+        assertEquals("Begin offset should match", expectedBegin, cst.caret.beginOffset);
+        assertEquals("End offset should match", expectedEnd, cst.caret.endOffset);
     }
 
     @Test
     public void testEmptyListBody() {
         YadsCst result = parseList("");
         assertCstType("LIST_BODY", result);
-        assertCstPosition(result);
+        assertCstPosition(result, 0, 0); // empty string has positions 0-0
         assertTrue("Empty list should have no children", result.children.isEmpty());
     }
 
@@ -51,41 +51,41 @@ public class TestYadsCstParser {
         
         YadsCst child = result.children.get(0);
         assertCstType("INTEGER_LITERAL", child);
-        assertCstPosition(child);
+        assertCstPosition(child, 0, 2); // "42" positions 0-2
         assertEquals("Integer value should be parsed correctly", 42, child.value);
 
         // Floating point literal
         result = parseList("3.14");
         child = result.children.get(0);
         assertCstType("FLOATING_POINT_LITERAL", child);
-        assertCstPosition(child);
+        assertCstPosition(child, 0, 4); // "3.14" positions 0-4
         assertEquals("Float value should be parsed correctly", 3.14f, (Float)child.value, 0.001f);
 
         // String literals
         result = parseList("\"hello\"");
         child = result.children.get(0);
         assertCstType("STRING_LITERAL_DQ", child);
-        assertCstPosition(child);
+        assertCstPosition(child, 0, 7); // "\"hello\"" positions 0-7
         assertEquals("Double-quoted string value should be parsed correctly", "hello", child.value);
 
         result = parseList("'world'");
         child = result.children.get(0);
         assertCstType("STRING_LITERAL_SQ", child);
-        assertCstPosition(child);
+        assertCstPosition(child, 0, 7); // "'world'" positions 0-7
         assertEquals("Single-quoted string value should be parsed correctly", "world", child.value);
 
         // Any literal
         result = parseList("identifier");
         child = result.children.get(0);
         assertCstType("ANY_LITERAL", child);
-        assertCstPosition(child);
+        assertCstPosition(child, 0, 10); // "identifier" positions 0-10
         assertEquals("Identifier value should be parsed correctly", "identifier", child.value);
 
         // Operator
         result = parseList("+");
         child = result.children.get(0);
         assertCstType("ANY_OPERATOR", child);
-        assertCstPosition(child);
+        assertCstPosition(child, 0, 1); // "+" positions 0-1
         assertEquals("Operator value should be parsed correctly", "+", child.value);
     }
 
@@ -99,17 +99,25 @@ public class TestYadsCstParser {
         assertCstType("ANY_LITERAL", result.children.get(1));
         assertCstType("STRING_LITERAL_DQ", result.children.get(2));
 
-        // Verify all children have valid positions
-        for (YadsCst child : result.children) {
-            assertCstPosition(child);
-        }
+        // Verify all children have exact positions
+        assertCstPosition(result.children.get(0), 0, 2);   // "42" positions 0-2
+        assertCstPosition(result.children.get(1), 3, 8);   // "hello" positions 3-8
+        assertCstPosition(result.children.get(2), 9, 16);  // "\"world\"" positions 9-16
     }
 
     @Test
     public void testUnnamedClass() {
-        YadsCst clazz = parseClass("(hello world)");
+        String input = "(hello world)";
+        YadsCst clazz = parseClass(input);
+
+
+        System.out.println(new YadsPrinter()
+            .setMaxWidth(200)
+            .print(new YadsJavaSerializer().setAllClassesAvailable(true).serialize(clazz)));
+
+
         assertCstType("UNNAMED_CLASS", clazz);
-        assertCstPosition(clazz);
+        assertCstPosition(clazz, 0, 13); // entire "(hello world)" 
         
         // Check class structure: left paren + body + right paren
         assertEquals("Class should have 3 children", 3, clazz.children.size());
@@ -121,7 +129,9 @@ public class TestYadsCstParser {
         YadsCst body = clazz.children.get(1);
         assertEquals("Body should have 2 children", 2, body.children.size());
         assertCstType("ANY_LITERAL", body.children.get(0));
+        assertCstPosition(body.children.get(0), 1, 6); // "hello"
         assertCstType("ANY_LITERAL", body.children.get(1));
+        assertCstPosition(body.children.get(1), 7, 12); // "world"
         
         // Test field map for unnamed class
         assertEquals("Should have 1 field", 1, clazz.childByField.size());
@@ -136,13 +146,15 @@ public class TestYadsCstParser {
 
     @Test
     public void testNamedClass() {
-        YadsCst clazz = parseClass("Vec2(x y)");
+        String input = "Vec2(x y)";
+        YadsCst clazz = parseClass(input);
         assertCstType("NAMED_CLASS", clazz);
-        assertCstPosition(clazz);
+        assertCstPosition(clazz, 0, 9); // entire "Vec2(x y)"
 
         // Check class structure: name + left paren + body + right paren
         assertEquals("Class should have 4 children", 4, clazz.children.size());
         assertCstType("ANY_LITERAL", clazz.children.get(0));
+        assertCstPosition(clazz.children.get(0), 0, 4); // "Vec2"
         assertCstType("LEFT_PAREN", clazz.children.get(1));
         assertCstType("LIST_BODY", clazz.children.get(2));
         assertCstType("RIGHT_PAREN", clazz.children.get(3));
@@ -151,7 +163,9 @@ public class TestYadsCstParser {
         YadsCst body = clazz.children.get(2);
         assertEquals("Body should have 2 children", 2, body.children.size());
         assertCstType("ANY_LITERAL", body.children.get(0));
+        assertCstPosition(body.children.get(0), 5, 6); // "x"
         assertCstType("ANY_LITERAL", body.children.get(1));
+        assertCstPosition(body.children.get(1), 7, 8); // "y"
         
         // Test field map for named class
         assertEquals("Should have 2 fields", 2, clazz.childByField.size());
@@ -176,6 +190,7 @@ public class TestYadsCstParser {
     public void testNestedClasses() {
         YadsCst outerClass = parseClass("outer(inner(value))");
         assertCstType("NAMED_CLASS", outerClass);
+        assertCstPosition(outerClass, 0, 19); // "outer(inner(value))" positions 0-19
         
         YadsCst outerBody = outerClass.children.get(2);
         assertCstType("LIST_BODY", outerBody);
@@ -183,11 +198,13 @@ public class TestYadsCstParser {
         
         YadsCst innerClass = outerBody.children.get(0);
         assertCstType("NAMED_CLASS", innerClass);
+        assertCstPosition(innerClass, 6, 18); // "inner(value)" positions 6-18
         
         YadsCst innerBody = innerClass.children.get(2);
         assertCstType("LIST_BODY", innerBody);
         assertEquals("Inner body should have one child", 1, innerBody.children.size());
         assertCstType("ANY_LITERAL", innerBody.children.get(0));
+        assertCstPosition(innerBody.children.get(0), 12, 17); // "value" positions 12-17
         
         // Test field maps for nested classes
         // Outer class fields
@@ -216,23 +233,26 @@ public class TestYadsCstParser {
         // Single line comment
         YadsCst result = parseList("//this is a comment");
         assertCstType("LIST_BODY", result);
+        assertCstPosition(result, 0, 19); // "//this is a comment" positions 0-19
         assertEquals("Should have one child", 1, result.children.size());
         
         YadsCst comment = result.children.get(0);
         assertCstType("COMMENT_SINGLE_LINE", comment);
-        assertCstPosition(comment);
+        assertCstPosition(comment, 0, 19); // "//this is a comment" positions 0-19
 
         // Multi-line comment
         result = parseList("/*multi line comment*/");
         comment = result.children.get(0);
         assertCstType("COMMENT_MULTI_LINE", comment);
-        assertCstPosition(comment);
+        assertCstPosition(comment, 0, 22); // "/*multi line comment*/" positions 0-22
 
         // Comment with other elements
         result = parseList("value //comment");
         assertEquals("Should have two children", 2, result.children.size());
         assertCstType("ANY_LITERAL", result.children.get(0));
+        assertCstPosition(result.children.get(0), 0, 5); // "value" positions 0-5
         assertCstType("COMMENT_SINGLE_LINE", result.children.get(1));
+        assertCstPosition(result.children.get(1), 6, 15); // "//comment" positions 6-15
     }
 
     @Test
@@ -241,56 +261,56 @@ public class TestYadsCstParser {
         YadsCst result = parseList("42");
         YadsCst child = result.children.get(0);
         assertCstType("INTEGER_LITERAL", child);
-        assertCstPosition(child);
+        assertCstPosition(child, 0, 2); // "42" positions 0-2
         assertEquals("Integer without suffix should be Integer", 42, child.value);
 
         // Long with suffix (should be Long)
         result = parseList("42L");
         child = result.children.get(0);
         assertCstType("INTEGER_LITERAL", child);
-        assertCstPosition(child);
+        assertCstPosition(child, 0, 3); // "42L" positions 0-3
         assertEquals("Integer with L suffix should be Long", 42L, child.value);
 
         // Float without suffix (should be Float)
         result = parseList("3.14");
         child = result.children.get(0);
         assertCstType("FLOATING_POINT_LITERAL", child);
-        assertCstPosition(child);
+        assertCstPosition(child, 0, 4); // "3.14" positions 0-4
         assertEquals("Floating point without suffix should be Float", 3.14f, (Float)child.value, 0.001f);
 
         // Float with F suffix (should be Float)
         result = parseList("3.14F");
         child = result.children.get(0);
         assertCstType("FLOATING_POINT_LITERAL", child);
-        assertCstPosition(child);
+        assertCstPosition(child, 0, 5); // "3.14F" positions 0-5
         assertEquals("Floating point with F suffix should be Float", 3.14f, (Float)child.value, 0.001f);
 
         // Double with D suffix (should be Double)
         result = parseList("3.14D");
         child = result.children.get(0);
         assertCstType("FLOATING_POINT_LITERAL", child);
-        assertCstPosition(child);
+        assertCstPosition(child, 0, 5); // "3.14D" positions 0-5
         assertEquals("Floating point with D suffix should be Double", 3.14, (Double)child.value, 0.001);
 
         // Negative integers
         result = parseList("-42");
         child = result.children.get(0);
         assertCstType("INTEGER_LITERAL", child);
-        assertCstPosition(child);
+        assertCstPosition(child, 0, 3); // "-42" positions 0-3
         assertEquals("Negative integer should be parsed correctly", -42, child.value);
 
         // Negative floats
         result = parseList("-3.14");
         child = result.children.get(0);
         assertCstType("FLOATING_POINT_LITERAL", child);
-        assertCstPosition(child);
+        assertCstPosition(child, 0, 5); // "-3.14" positions 0-5
         assertEquals("Negative float should be parsed correctly", -3.14f, (Float)child.value, 0.001f);
 
         // Scientific notation
         result = parseList("1.5e10");
         child = result.children.get(0);
         assertCstType("FLOATING_POINT_LITERAL", child);
-        assertCstPosition(child);
+        assertCstPosition(child, 0, 6); // "1.5e10" positions 0-6
         assertEquals("Scientific notation should be parsed correctly", 1.5e10f, (Float)child.value, 1000f);
     }
 
@@ -300,12 +320,14 @@ public class TestYadsCstParser {
         assertCstType("LIST_BODY", result);
         assertEquals("Should have 10 operators", 10, result.children.size());
         
-        // Test each operator value
+        // Test each operator value with exact positions
         String[] expectedOperators = {"+", "-", "*", "/", "==", "<", ">", "!", "&", "|"};
+        int[] startPositions = {0, 2, 4, 6, 8, 11, 13, 15, 17, 19};
+        int[] endPositions = {1, 3, 5, 7, 10, 12, 14, 16, 18, 20};
         for (int i = 0; i < expectedOperators.length; i++) {
             YadsCst child = result.children.get(i);
             assertCstType("ANY_OPERATOR", child);
-            assertCstPosition(child);
+            assertCstPosition(child, startPositions[i], endPositions[i]);
             assertEquals("Operator " + i + " should have correct value", expectedOperators[i], child.value);
         }
     }
@@ -317,14 +339,14 @@ public class TestYadsCstParser {
         YadsCst result = parseList("\"hello\\nworld\"");
         YadsCst child = result.children.get(0);
         assertCstType("STRING_LITERAL_DQ", child);
-        assertCstPosition(child);
+        assertCstPosition(child, 0, 14); // "\"hello\\nworld\"" positions 0-14
         assertEquals("hello\nworld", child.value); // Should be unescaped
 
         // Single quoted with escapes
         result = parseList("'hello\\tworld'");
         child = result.children.get(0);
         assertCstType("STRING_LITERAL_SQ", child);
-        assertCstPosition(child);
+        assertCstPosition(child, 0, 14); // "'hello\\tworld'" positions 0-14
         assertEquals("hello\tworld", child.value); // Should be unescaped
 
         // Double quoted with quote escape
@@ -385,7 +407,7 @@ public class TestYadsCstParser {
         
         YadsCst child = result.children.get(0);
         assertCstType("ANY_LITERAL", child);
-        assertCstPosition(child);
+        assertCstPosition(child, 1, 5); // "true" after newline, positions 1-5
         assertEquals(Boolean.TRUE, child.value);
         
         // Test multiple whitespace types including newlines
@@ -460,11 +482,14 @@ public class TestYadsCstParser {
     @Test
     public void testComplexValueParsing() {
         // Test a complex example with various value types in a named class
-        YadsCst clazz = parseClass("MyClass(42 \"hello\" world)");
+        String input = "MyClass(42 \"hello\" world)";
+        YadsCst clazz = parseClass(input);
         assertCstType("NAMED_CLASS", clazz);
+        assertCstPosition(clazz, 0, 25); // entire "MyClass(42 \"hello\" world)" (length 25)
         
         // Test class name value
         assertEquals("Class name should be parsed correctly", "MyClass", clazz.childByField.get("name").value);
+        assertCstPosition(clazz.childByField.get("name"), 0, 7); // "MyClass"
         
         // Test body values
         YadsCst body = clazz.childByField.get("body");
@@ -473,16 +498,19 @@ public class TestYadsCstParser {
         // Test integer value
         YadsCst intNode = body.children.get(0);
         assertCstType("INTEGER_LITERAL", intNode);
+        assertCstPosition(intNode, 8, 10); // "42"
         assertEquals("Integer value should be parsed correctly", 42, intNode.value);
         
         // Test string value
         YadsCst stringNode = body.children.get(1);
         assertCstType("STRING_LITERAL_DQ", stringNode);
+        assertCstPosition(stringNode, 11, 18); // "\"hello\""
         assertEquals("String value should be parsed correctly", "hello", stringNode.value);
         
         // Test identifier value
         YadsCst identifierNode = body.children.get(2);
         assertCstType("ANY_LITERAL", identifierNode);
+        assertCstPosition(identifierNode, 19, 24); // "world" (positions 19-23, but end is exclusive so 24)
         assertEquals("Identifier value should be parsed correctly", "world", identifierNode.value);
     }
 

@@ -3,6 +3,7 @@ package yk.lang.yads;
 import junit.framework.TestCase;
 import org.junit.Test;
 import yk.lang.yads.congocc.YadsCstParser;
+import yk.lang.yads.utils.Caret;
 import yk.ycollections.Tuple;
 import yk.ycollections.YList;
 
@@ -102,6 +103,22 @@ public class TestYadsEntitySerialization {
     public static YadsEntity entity(String name, Object... values) {
         return new YadsEntity(name, al(values));
     }
+    
+    /**
+     * Helper method to assert all caret fields with exact values
+     */
+    private void assertCaret(String description, Caret caret, 
+                           int expectedBeginOffset, int expectedEndOffset,
+                           int expectedBeginLine, int expectedBeginColumn,
+                           int expectedEndLine, int expectedEndColumn) {
+        assertNotNull(description + " should have caret", caret);
+        assertEquals(description + " beginOffset", expectedBeginOffset, caret.beginOffset);
+        assertEquals(description + " endOffset", expectedEndOffset, caret.endOffset);
+        assertEquals(description + " beginLine", expectedBeginLine, caret.beginLine);
+        assertEquals(description + " beginColumn", expectedBeginColumn, caret.beginColumn);
+        assertEquals(description + " endLine", expectedEndLine, caret.endLine);
+        assertEquals(description + " endColumn", expectedEndColumn, caret.endColumn);
+    }
 
     @Test
     public void testSimpleLiterals() throws Exception {
@@ -148,6 +165,12 @@ public class TestYadsEntitySerialization {
         TestCase.assertEquals(2, person.children.size());
         TestCase.assertEquals("John", person.children.get(0));
         TestCase.assertEquals(25, person.children.get(1));
+        
+        assertCaret("Person entity", person.caret, 0, 17, 1, 1, 1, 17);
+        assertNotNull("Person entity should have childrenCarets", person.childrenCarets);
+        assertEquals(2, person.childrenCarets.size());
+        assertCaret("First child (\"John\")", person.childrenCarets.get(0), 7, 13, 1, 8, 1, 13);
+        assertCaret("Second child (25)", person.childrenCarets.get(1), 14, 16, 1, 15, 1, 16);
     }
 
     @Test
@@ -164,6 +187,12 @@ public class TestYadsEntitySerialization {
         assertEquals(2, unnamed.children.size());
         assertEquals("data", unnamed.children.get(0));
         assertEquals(123, unnamed.children.get(1));
+        
+        assertCaret("Unnamed entity", unnamed.caret, 0, 12, 1, 1, 1, 12);
+        assertNotNull("Unnamed entity should have childrenCarets", unnamed.childrenCarets);
+        assertEquals(2, unnamed.childrenCarets.size());
+        assertCaret("First child (\"data\")", unnamed.childrenCarets.get(0), 1, 7, 1, 2, 1, 7);
+        assertCaret("Second child (123)", unnamed.childrenCarets.get(1), 8, 11, 1, 9, 1, 11);
     }
 
     @Test
@@ -183,8 +212,8 @@ public class TestYadsEntitySerialization {
 
     @Test
     public void testComplexExample() throws Exception {
-        // Test a complex structure with tuples and nested classes
-        YadsCstParser parser = new YadsCstParser("Person(name = \"John\" age = 25 address = Address(\"123 Main St\"))");
+        // Test a complex structure with tuples and nested classes - multiline to test line tracking
+        YadsCstParser parser = new YadsCstParser("Person(name = \"John\"\nage = 25\naddress = Address(\"123 Main St\"))");
         YadsCst result = parser.parseListBody();
         YList<Object> resolved = YadsEntityDeserializer.resolveKeyValues(result.children);
         assertEquals(1, resolved.size());
@@ -194,6 +223,24 @@ public class TestYadsEntitySerialization {
         YadsEntity person = (YadsEntity) entity;
         assertEquals("Person", person.name);
         assertEquals(3, person.children.size());
+        
+        // Check caret positions for multiline "Person(name = \"John\"\nage = 25\naddress = Address(\"123 Main St\"))"
+        assertNotNull("Person entity should have caret", person.caret);
+        assertEquals(0, person.caret.beginOffset);
+        assertEquals(63, person.caret.endOffset); // full string length with \n characters
+        
+        // Check children carets - multiline with line number verification
+        assertNotNull("Person entity should have childrenCarets", person.childrenCarets);
+        assertEquals(3, person.childrenCarets.size());
+        
+        // name = "John" tuple spans positions 7-20 (line 1, name to "John")
+        assertCaret("First child (name tuple)", person.childrenCarets.get(0), 7, 20, 1, 8, 1, 20);
+        
+        // age = 25 tuple spans positions 21-29 (line 2, age to 25) 
+        assertCaret("Second child (age tuple)", person.childrenCarets.get(1), 21, 29, 2, 1, 2, 8);
+        
+        // address = Address(...) tuple spans positions 30-62 (line 3, address to Address(...))
+        assertCaret("Third child (address tuple)", person.childrenCarets.get(2), 30, 62, 3, 1, 3, 32);
 
         // Check name tuple
         Tuple<?, ?> nameTuple = (Tuple<?, ?>) person.children.get(0);

@@ -15,6 +15,10 @@ public class YadsCst {
 
     public Object value;
 
+    public YadsCst() {
+        this(null, null, null, null, null);
+    }
+
     public YadsCst(String type, Caret caret, Object value, YList<YadsCst> children, YMap<String, YadsCst> childByField) {
         this.type = type;
         this.caret = caret;

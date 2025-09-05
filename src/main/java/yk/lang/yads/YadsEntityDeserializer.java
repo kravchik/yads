@@ -1,6 +1,7 @@
 package yk.lang.yads;
 
 import yk.lang.yads.utils.BadException;
+import yk.lang.yads.utils.Caret;
 import yk.ycollections.YList;
 
 import static yk.lang.yads.utils.BadException.die;
@@ -25,8 +26,10 @@ public class YadsEntityDeserializer {
                 return resolveKeyValues(node.children);
                 
             case "NAMED_CLASS":
-                return new YadsEntity(node.childByField.get("name").value.toString(),
-                                      resolveKeyValues(node.childByField.get("body").children));
+                return resolveKeyValuesWithCaretsFromNodes(
+                    node.childByField.get("body").children,
+                    node.childByField.get("name").value.toString(),
+                    node.caret);
                 
             case "UNNAMED_CLASS":
                 YList<YadsCst> bodyChildren = node.childByField.get("body").children;
@@ -34,7 +37,10 @@ public class YadsEntityDeserializer {
                 if (bodyChildren.size() == 1 && isDelimiter(bodyChildren.get(0))) {
                     return hm(); // Return empty YHashMap directly
                 }
-                return new YadsEntity(null, resolveKeyValues(bodyChildren));
+                return resolveKeyValuesWithCaretsFromNodes(
+                    bodyChildren,
+                    null,
+                    node.caret);
                 
             case "COMMENT_SINGLE_LINE":
                 // Convert to YadsComment - remove "//" prefix
@@ -60,14 +66,37 @@ public class YadsEntityDeserializer {
     }
 
     /**
-     * Converts a list of YadsCst nodes, handling the special case of 'a = b' -> Tuple conversion
+     * Converts a list of YadsCst nodes, handling the special case of 'a = b' -> Tuple conversion.
      */
     public static YList<Object> resolveKeyValues(YList<YadsCst> nodes) {
-        if (nodes == null) return al();
+        return resolveKeyValuesWithCaretsFromNodes(nodes, null, null).children;
+    }
+
+    /**
+     * Converts a YadsCst LIST_BODY node to a YadsEntity with position information.
+     * Extracts child nodes and their carets, then processes them with key-value logic.
+     */
+    public static YadsEntity resolveKeyValuesWithCarets(YadsCst listBodyNode) {
+        if (listBodyNode == null || !"LIST_BODY".equals(listBodyNode.type)) {
+            throw new IllegalArgumentException("Expected LIST_BODY node, got: " + 
+                (listBodyNode == null ? "null" : listBodyNode.type));
+        }
+        return resolveKeyValuesWithCaretsFromNodes(listBodyNode.children, null, null);
+    }
+
+    /**
+     * Converts a list of YadsCst nodes, collecting both resolved objects and their carets.
+     * This is the primary implementation that handles the full 'a = b' -> Tuple conversion logic
+     * while also collecting caret positions for each resolved element.
+     * Returns a YadsEntity with the specified name, caret, and children with their carets.
+     */
+    private static YadsEntity resolveKeyValuesWithCaretsFromNodes(YList<YadsCst> nodes, String name, Caret caret) {
+        if (nodes == null) return new YadsEntity(name, al(), caret, al());
         
         Object left = null;
         YadsCst leftNode = null;
         YList<Object> result = al();
+        YList<Caret> carets = al();
         
         for (int i = 0; i < nodes.size(); i++) {
             YadsCst node = nodes.get(i);
@@ -86,6 +115,11 @@ public class YadsEntityDeserializer {
                 
                 // Replace left element from result (it was the key)
                 result.set(result.size() - 1, tuple(left, resolve(rightNode)));
+                // For tuples, use the caret that spans from key to value
+                Caret tupleCaret = leftNode.caret != null && rightNode.caret != null 
+                    ? Caret.startEnd(leftNode.caret, rightNode.caret) 
+                    : leftNode.caret; // fallback to key caret
+                carets.set(carets.size() - 1, tupleCaret);
                 
                 leftNode = null;
                 left = null;
@@ -94,10 +128,11 @@ public class YadsEntityDeserializer {
                 leftNode = node;
                 left = resolve(node);
                 result.add(left);
+                carets.add(node.caret);
             }
         }
         
-        return result;
+        return new YadsEntity(name, result, caret, carets);
     }
 
     private static boolean isDelimiter(YadsCst node) {

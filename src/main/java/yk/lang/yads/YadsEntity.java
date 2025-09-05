@@ -1,5 +1,6 @@
 package yk.lang.yads;
 
+import yk.lang.yads.utils.Caret;
 import yk.ycollections.Tuple;
 import yk.ycollections.YList;
 
@@ -16,23 +17,32 @@ import static yk.ycollections.Tuple.tuple;
 //  Thing, Thingy
 //  Piece
 public class YadsEntity {
-    //can be null
     public String name;
-    //TODO Caret caret;
-    //TODO YList<Caret> childrenCarets;
-    /**
-     *
-     * <pre>{@code
-     * Tuple<String, Object> - field
-     * Object - child
-     * YadsComment - comment
-     * }
-     */
+    // Can contain primitives, strings, tuples, or other YadsEntity
     public YList children;
+    public Caret caret;
+    // Contains carets corresponding to children (because not all child classes can contain them)
+    public YList<Caret> childrenCarets;
 
     public YadsEntity(String name, YList children) {
         this.name = name;
         this.children = children;
+        this.caret = null;
+        this.childrenCarets = null;
+    }
+
+    public YadsEntity(String name, YList children, Caret caret) {
+        this.name = name;
+        this.children = children;
+        this.caret = caret;
+        this.childrenCarets = null;
+    }
+
+    public YadsEntity(String name, YList children, Caret caret, YList<Caret> childrenCarets) {
+        this.name = name;
+        this.children = children;
+        this.caret = caret;
+        this.childrenCarets = childrenCarets;
     }
 
     public boolean containsKey(Object k) {
@@ -52,7 +62,9 @@ public class YadsEntity {
     public YadsEntity withReplace(String key, Object value) {
         if (key == null) throw new RuntimeException("key is null");
         return new YadsEntity(name,
-            children.map(c -> c instanceof Tuple && key.equals(((Tuple) c).a) ? tuple(key, value) : c));
+            children.map(c -> c instanceof Tuple && key.equals(((Tuple) c).a) ? tuple(key, value) : c),
+            caret,
+            childrenCarets);
     }
 
     public static class YadsComment {

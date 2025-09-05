@@ -13,14 +13,14 @@ public class TestYads {
     public static class Point {
         public int x;
         public int y;
-        
+
         public Point() {}
-        
+
         public Point(int x, int y) {
             this.x = x;
             this.y = y;
         }
-        
+
         @Override
         public boolean equals(Object obj) {
             if (!(obj instanceof Point)) return false;
@@ -58,11 +58,11 @@ public class TestYads {
         assertEquals("Point(x = 10 y = 20)", serialized);
         assertEquals(point, Yads.readJava(Point.class, serialized));
 
-        serialized = Yads.printJava(al(point), Point.class);
+        serialized = Yads.printJava(al(point));
         assertEquals("(Point(x = 10 y = 20))", serialized);
         assertEquals(al(point), Yads.readJava(YList.class, serialized, Point.class));
 
-        serialized = Yads.printJava(hm("a", point), Point.class);
+        serialized = Yads.printJava(hm("a", point));
         assertEquals("(a = Point(x = 10 y = 20))", serialized);
         assertEquals(hm("a", point), Yads.readJava(YMap.class, serialized, Point.class));
     }
@@ -70,16 +70,16 @@ public class TestYads {
     @Test
     public void testJavaBody() {
         Point point = new Point(5, 15);
-        
+
         String bodyText = Yads.printJavaBody(point);
         assertEquals("x = 5 y = 15", bodyText);
         assertEquals(point, Yads.readJavaBody(Point.class, bodyText));
 
-        bodyText = Yads.printJavaBody(al(point, point), Point.class);
+        bodyText = Yads.printJavaBody(al(point, point));
         assertEquals("ref(1 Point(x = 5 y = 15)) ref(1)", bodyText);
         assertEquals(al(point, point), Yads.readJavaBody(YList.class, bodyText, Point.class));
 
-        bodyText = Yads.printJavaBody(hm("a", point), Point.class);
+        bodyText = Yads.printJavaBody(hm("a", point));
         assertEquals("a = Point(x = 5 y = 15)", bodyText);
         assertEquals(hm("a", point), Yads.readJavaBody(YMap.class, bodyText, Point.class));
     }

@@ -15,7 +15,7 @@ import static yk.ycollections.YArrayList.al;
 
 public class YadsPrinter {
     public int maxWidth = 100;
-    public int maxLocalWidth = 100;
+    public int maxLocalWidth = Integer.MAX_VALUE;
     public String tab = "  ";
     public int compactFromLevel = 0;
 
