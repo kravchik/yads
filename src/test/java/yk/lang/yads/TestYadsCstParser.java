@@ -15,12 +15,7 @@ public class TestYadsCstParser {
     }
 
     private YadsCst parseClass(String input) {
-        try {
-            YadsCstParser parser = new YadsCstParser(input);
-            return parser.parseClass();
-        } catch (Exception e) {
-            throw new RuntimeException("Failed to parse: " + input, e);
-        }
+        return new YadsCstParser(input).parseClass();
     }
 
     private void assertCstType(String expectedType, YadsCst cst) {
@@ -330,6 +325,32 @@ public class TestYadsCstParser {
             assertCstPosition(child, startPositions[i], endPositions[i]);
             assertEquals("Operator " + i + " should have correct value", expectedOperators[i], child.value);
         }
+    }
+
+    @Test
+    public void testSeparators() {
+        assertEquals(3, parseList("(a , b)").children.first().childByField.get("body").children.size());
+        assertEquals(3, parseList("(a,b)").children.first().childByField.get("body").children.size());
+        assertEquals(3, parseList("(a, b)").children.first().childByField.get("body").children.size());
+        assertEquals(3, parseList("(a ,b)").children.first().childByField.get("body").children.size());
+        assertEquals(3, parseList("(a , +)").children.first().childByField.get("body").children.size());
+        assertEquals(3, parseList("(a,+)").children.first().childByField.get("body").children.size());
+        assertEquals(3, parseList("(a, +)").children.first().childByField.get("body").children.size());
+        assertEquals(3, parseList("(a ,+)").children.first().childByField.get("body").children.size());
+
+        assertEquals(3, parseList("(a ; b)").children.first().childByField.get("body").children.size());
+        assertEquals(3, parseList("(a;b)").children.first().childByField.get("body").children.size());
+        assertEquals(3, parseList("(a; b)").children.first().childByField.get("body").children.size());
+        assertEquals(3, parseList("(a ;b)").children.first().childByField.get("body").children.size());
+        assertEquals(3, parseList("(a ; +)").children.first().childByField.get("body").children.size());
+        assertEquals(3, parseList("(a;+)").children.first().childByField.get("body").children.size());
+        assertEquals(3, parseList("(a; +)").children.first().childByField.get("body").children.size());
+        assertEquals(3, parseList("(a ;+)").children.first().childByField.get("body").children.size());
+
+        assertEquals(4, parseList("(a,;+)").children.first().childByField.get("body").children.size());
+
+        assertEquals("ANY_SEPARATOR", parseList("(a,+)").children.first().childByField.get("body").children.get(1).type);
+        assertEquals(",", parseList("(a,+)").children.first().childByField.get("body").children.get(1).value);
     }
 
     //c-style escapes

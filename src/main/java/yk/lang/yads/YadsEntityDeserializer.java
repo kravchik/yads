@@ -57,6 +57,7 @@ public class YadsEntityDeserializer {
             case "STRING_LITERAL_SQ":
             case "ANY_LITERAL":
             case "ANY_OPERATOR":
+            case "ANY_SEPARATOR":
                 // Return the parsed value directly
                 return node.value;
                 

@@ -313,6 +313,14 @@ public class TestYadsEntitySerialization {
 
         assertEquals("YadsEntity{name='name', children=[]}", getYadsList("name()"));
         assertEquals("YadsEntity{name='name', children=[a]}", getYadsList("name(a)"));
+
+        assertEquals("YadsEntity{children=[a, ,, b]}", getYadsList("(a,b)"));
+        assertEquals("YadsEntity{children=[a, ,, b]}", getYadsList("(a, b)"));
+        assertEquals("YadsEntity{children=[a, ,, +]}", getYadsList("(a,+)"));
+
+        assertEquals("YadsEntity{children=[a, ;, b]}", getYadsList("(a;b)"));
+        assertEquals("YadsEntity{children=[a, ;, b]}", getYadsList("(a; b)"));
+        assertEquals("YadsEntity{children=[a, ;, +]}", getYadsList("(a;+)"));
     }
 
     @Test

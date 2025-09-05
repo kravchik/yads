@@ -104,6 +104,7 @@ TOKEN :
   | <#EXPONENT: ("-")?(["e","E"] (["+","-"])? (["0"-"9"])+)>
   | <ANY_LITERAL: (["a"-"z","A"-"Z","0"-"9",".","_","$"])+>
   | <ANY_OPERATOR: ((["+","-","/", "*","%","!","=","^","&","|", "<", ">", "?"])+)>
+  | <ANY_SEPARATOR: (([",",";"]))>
   | <STRING_LITERAL_DQ: "\""
       (   (~["\"","\\"])
         | ("\\" ~[])
@@ -185,7 +186,11 @@ YadsCst parseElement() #void :
         return new YadsCst("ANY_OPERATOR", createCaret(t), t.toString()); 
     }
   |
-    t = <STRING_LITERAL_DQ> { 
+    t = <ANY_SEPARATOR> {
+        return new YadsCst("ANY_SEPARATOR", createCaret(t), t.toString());
+    }
+  |
+    t = <STRING_LITERAL_DQ> {
         return new YadsCst("STRING_LITERAL_DQ", createCaret(t), 
             YadsUtils.unescapeDoubleQuotes(t.toString())); 
     }

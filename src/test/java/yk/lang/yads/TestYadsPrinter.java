@@ -145,6 +145,12 @@ public class TestYadsPrinter {
         
         // Mixed content
         assertEquals("(1 (2 3) 4)", output.print(al(1, al(2, 3), 4)).trim());
+
+        assertEquals("(1 (hello , 3) 4)", output.print(al(1, al("hello", ",", 3), 4)).trim());
+        assertEquals("(1 (hello , +) 4)", output.print(al(1, al("hello", ",", "+"), 4)).trim());
+
+        assertEquals("(1 (hello ; 3) 4)", output.print(al(1, al("hello", ";", 3), 4)).trim());
+        assertEquals("(1 (hello ; +) 4)", output.print(al(1, al("hello", ";", "+"), 4)).trim());
     }
 
     @Test
