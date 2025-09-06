@@ -29,8 +29,9 @@ INJECT YadsCstParser :
      * @param s the string to parse
      * @return the parsed YadsCst
      */
-    //NOTE ! Should be preserveLineEndings == true
     public static YadsCst parse(String s) {
+        //NOTE ! Should use special constructor with preserveLineEndings == true to properly handle \r
+        //  (we are getting rid of \r instead of converting it to \n)
         YadsCstParser parser = new YadsCstParser(new YadsCstLexer("input", s, YadsCstLexer.LexicalState.DEFAULT, 1, 1, true));
         return parser.parseListBody();
     }
@@ -123,6 +124,17 @@ TOKEN :
 // Main API method - parses list body (sequence of elements)
 YadsCst parseListBody() #void :
 {
+    YList<YadsCst> list;
+    beginCaret();
+}
+    list = parseList()
+    {
+      return new YadsCst("LIST_BODY", finishCaret(), list);
+    }
+;
+
+YList parseList() #void :
+{
     YList<YadsCst> list = al();
     YadsCst value;
 }
@@ -136,9 +148,7 @@ YadsCst parseListBody() #void :
         [ <WHITE_SPACE> ]
       )*
     ]
-    {
-      return new YadsCst("LIST_BODY", finishCaret(), list);
-    }
+    { return list; }
 ;
 
 // Helper method - parses any element (literal, class, comment, etc.)

@@ -255,9 +255,9 @@ public class TestYadsPrinter {
                        "'00000000-0000-0000-0000-000000000000' " + 
                        "'FFFFFFFF-FFFF-FFFF-FFFF-FFFFFFFFFFFF'" +
                        ") = npc(name = Foo))";
-        
+
         YadsCst parsed = YadsCstParser.parse(input);
-        Object resolved = YadsEntityDeserializer.resolveKeyValues(parsed.children).get(0);
+        Object resolved = YadsEntityFromCst.translate(parsed.children).get(0);
         
         YadsPrinter output = new YadsPrinter();
         output.maxWidth = 8;

@@ -108,7 +108,7 @@ public class TestYadsCstParser {
 
         System.out.println(new YadsPrinter()
             .setMaxWidth(200)
-            .print(new YadsJavaSerializer().setAllClassesAvailable(true).serialize(clazz)));
+            .print(new YadsJavaToEntity().setAllClassesAvailable(true).serialize(clazz)));
 
 
         assertCstType("UNNAMED_CLASS", clazz);

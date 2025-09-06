@@ -3,13 +3,13 @@
 #### Internal API scheme for deserialization to anything
 
 * _text_ -> **YadsCstParser** -> _YadsCst_
-* _YadsCst_ -> **YadsEntityDeseralizer** -> _primitives, YadsEntity_
-* _primitives, YadsEntity_ -> **YadsJavaDeserializer** -> _Java types_
+* _YadsCst_ -> **YadsEntityFromCst** -> _primitives, YadsEntity_
+* _primitives, YadsEntity_ -> **YadsJavaFromEntity** -> _Java types_
 
 #### Internal API scheme for serialization of anything
 
-* _text_ <- **YadsCstPrinter** <- _primitives, YadsCst, YadsEntity_
-* _primitives, YadsCst, YadsEntity_ <- **YadsJavaSerializer** <- _any type_
+* _text_ <- **YadsPrinter** <- _primitives, YadsCst, YadsEntity_
+* _primitives, YadsCst, YadsEntity_ <- **YadsJavaToEntity** <- _any type_
 
 
 ##### top-level structure

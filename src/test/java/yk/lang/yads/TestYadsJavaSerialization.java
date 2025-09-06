@@ -13,7 +13,7 @@ import static yk.ycollections.YArrayList.al;
 import static yk.ycollections.YHashMap.hm;
 
 /**
- * Tests for YadsJavaSerializer and YadsJavaDeserializer.
+ * Tests for YadsJavaToEntity and YadsJavaFromEntity.
  * 
  * All tests follow the round-trip pattern:
  * originalData → serialize → YadsEntity → print → text → parse → resolve → YadsEntity → deserialize → restoredData
@@ -30,8 +30,8 @@ public class TestYadsJavaSerialization {
      */
     private void roundTripAssert(Object original, String expectedSerialized, Class<?>... availableClasses) {
         // Create serializer and deserializer instances
-        YadsJavaSerializer serializer = new YadsJavaSerializer(availableClasses);
-        YadsJavaDeserializer deserializer = new YadsJavaDeserializer(availableClasses);
+        YadsJavaToEntity serializer = new YadsJavaToEntity(availableClasses);
+        YadsJavaFromEntity deserializer = new YadsJavaFromEntity(availableClasses);
         
         // Step 1: Serialize Java object to YadsEntity
         Object serialized = serializer.serialize(original);
@@ -44,7 +44,7 @@ public class TestYadsJavaSerialization {
         YadsCst parsed = YadsCstParser.parse(text);
         
         // Step 4: Resolve YadsCst to YadsEntity using existing infrastructure
-        Object resolved = YadsEntityDeserializer.resolveKeyValues(parsed.children).get(0);
+        Object resolved = YadsEntityFromCst.translate(parsed.children).get(0);
         
         // Step 5: Deserialize YadsEntity back to Java object
         Object deserialized = deserializer.deserialize(resolved);
@@ -76,20 +76,20 @@ public class TestYadsJavaSerialization {
         roundTripAssert(false, "false");
         
         // Character becomes string (known limitation) - test manually
-        YadsJavaSerializer serializer = new YadsJavaSerializer();
-        YadsJavaDeserializer deserializer = new YadsJavaDeserializer();
+        YadsJavaToEntity serializer = new YadsJavaToEntity();
+        YadsJavaFromEntity deserializer = new YadsJavaFromEntity();
         
         Object serialized = serializer.serialize('a');
         String text = new YadsPrinter().print(serialized);
         YadsCst parsed = YadsCstParser.parse(text);
-        Object resolved = YadsEntityDeserializer.resolveKeyValues(parsed.children).get(0);
+        Object resolved = YadsEntityFromCst.translate(parsed.children).get(0);
         Object charResult = deserializer.deserialize(resolved);
         assertEquals("Character should become string", "a", charResult);
         
         serialized = serializer.serialize(' ');
         text = new YadsPrinter().print(serialized);
         parsed = YadsCstParser.parse(text);
-        resolved = YadsEntityDeserializer.resolveKeyValues(parsed.children).get(0);
+        resolved = YadsEntityFromCst.translate(parsed.children).get(0);
         charResult = deserializer.deserialize(resolved);
         assertEquals("Space character should become string", " ", charResult);
     }
@@ -163,7 +163,7 @@ public class TestYadsJavaSerialization {
     public void testUnsupportedSerializationType() {
         // Test that unsupported types throw exceptions during serialization
         Object unsupported = new java.util.Date();
-        YadsJavaSerializer serializer = new YadsJavaSerializer(); // no Date.class allowed
+        YadsJavaToEntity serializer = new YadsJavaToEntity().setAllClassesAvailable(false); // no Date.class allowed
         
         try {
             serializer.serialize(unsupported);
@@ -179,7 +179,7 @@ public class TestYadsJavaSerialization {
         // Test that unsupported entity types throw exceptions during deserialization
         YadsEntity unsupportedEntity = new YadsEntity("com.unknown.Class", 
                                                         al("data"));
-        YadsJavaDeserializer deserializer = new YadsJavaDeserializer(); // no unknown classes allowed
+        YadsJavaFromEntity deserializer = new YadsJavaFromEntity(); // no unknown classes allowed
         
         try {
             deserializer.deserialize(unsupportedEntity);
@@ -197,7 +197,7 @@ public class TestYadsJavaSerialization {
         YadsEntity invalidMapEntity = new YadsEntity(null, 
                                                       al(tuple("key", "value"), "invalid_string_in_map"));
         
-        YadsJavaDeserializer deserializer = new YadsJavaDeserializer(); // no classes needed for map test
+        YadsJavaFromEntity deserializer = new YadsJavaFromEntity(); // no classes needed for map test
         
         try {
             deserializer.deserialize(invalidMapEntity);
@@ -298,8 +298,8 @@ public class TestYadsJavaSerialization {
         List<Person> people = Arrays.asList(person1, person2);
         
         // Serialize and deserialize
-        YadsJavaSerializer serializer = new YadsJavaSerializer(Person.class, Address.class);
-        YadsJavaDeserializer deserializer = new YadsJavaDeserializer(Person.class, Address.class);
+        YadsJavaToEntity serializer = new YadsJavaToEntity(Person.class, Address.class);
+        YadsJavaFromEntity deserializer = new YadsJavaFromEntity(Person.class, Address.class);
         
         Object serialized = serializer.serialize(people);
         String text = new YadsPrinter().print(serialized);
@@ -309,7 +309,7 @@ public class TestYadsJavaSerialization {
         
         // Parse and deserialize
         YadsCst parsed = YadsCstParser.parse(text);
-        Object resolved = YadsEntityDeserializer.resolveKeyValues(parsed.children).get(0);
+        Object resolved = YadsEntityFromCst.translate(parsed.children).get(0);
         @SuppressWarnings("unchecked")
         List<Person> result = (List<Person>) deserializer.deserialize(resolved);
         
@@ -348,17 +348,17 @@ public class TestYadsJavaSerialization {
         List<Address> addresses = Arrays.asList(address1, address2, address1); // address1 appears twice
         
         // Test round-trip
-        YadsJavaSerializer serializer = new YadsJavaSerializer(Address.class);
-        YadsJavaDeserializer deserializer = new YadsJavaDeserializer(Address.class);
+        YadsJavaToEntity serializer = new YadsJavaToEntity(Address.class);
+        YadsJavaFromEntity deserializer = new YadsJavaFromEntity(Address.class);
         
         Object serialized = serializer.serialize(addresses);
         String text = new YadsPrinter().print(serialized);
         
         // Should contain references for duplicate address1
         assertTrue("Should contain reference for duplicate object", text.contains("ref("));
-        
+
         YadsCst parsed = YadsCstParser.parse(text);
-        Object resolved = YadsEntityDeserializer.resolveKeyValues(parsed.children).get(0);
+        Object resolved = YadsEntityFromCst.translate(parsed.children).get(0);
         @SuppressWarnings("unchecked")
         List<Address> result = (List<Address>) deserializer.deserialize(resolved);
         
@@ -378,8 +378,8 @@ public class TestYadsJavaSerialization {
         person.friend = person; // Circular reference to self!
         
         // Test round-trip serialization
-        YadsJavaSerializer serializer = new YadsJavaSerializer(Person.class);
-        YadsJavaDeserializer deserializer = new YadsJavaDeserializer(Person.class);
+        YadsJavaToEntity serializer = new YadsJavaToEntity(Person.class);
+        YadsJavaFromEntity deserializer = new YadsJavaFromEntity(Person.class);
         
         Object serialized = serializer.serialize(person);
         String text = new YadsPrinter().print(serialized);
@@ -389,7 +389,7 @@ public class TestYadsJavaSerialization {
         
         // Parse and deserialize
         YadsCst parsed = YadsCstParser.parse(text);
-        Object resolved = YadsEntityDeserializer.resolveKeyValues(parsed.children).get(0);
+        Object resolved = YadsEntityFromCst.translate(parsed.children).get(0);
         Person result = (Person) deserializer.deserialize(resolved);
         
         // Verify that the circular reference is preserved
@@ -417,8 +417,8 @@ public class TestYadsJavaSerialization {
         List<Person> friends = Arrays.asList(alice, bob);
         
         // Test round-trip serialization
-        YadsJavaSerializer serializer = new YadsJavaSerializer(Person.class);
-        YadsJavaDeserializer deserializer = new YadsJavaDeserializer(Person.class);
+        YadsJavaToEntity serializer = new YadsJavaToEntity(Person.class);
+        YadsJavaFromEntity deserializer = new YadsJavaFromEntity(Person.class);
         
         Object serialized = serializer.serialize(friends);
         String text = new YadsPrinter().print(serialized);
@@ -428,7 +428,7 @@ public class TestYadsJavaSerialization {
         
         // Parse and deserialize
         YadsCst parsed = YadsCstParser.parse(text);
-        Object resolved = YadsEntityDeserializer.resolveKeyValues(parsed.children).get(0);
+        Object resolved = YadsEntityFromCst.translate(parsed.children).get(0);
         @SuppressWarnings("unchecked")
         List<Person> result = (List<Person>) deserializer.deserialize(resolved);
         
@@ -453,12 +453,12 @@ public class TestYadsJavaSerialization {
         // age = 0 (default), address = null (default), friend = null (default)
         
         // Test with skipDefaultValues = true (default behavior)
-        YadsJavaSerializer serializerSkip = new YadsJavaSerializer(Person.class);
+        YadsJavaToEntity serializerSkip = new YadsJavaToEntity(Person.class);
         Object serializedSkip = serializerSkip.serialize(person);
         String textSkip = new YadsPrinter().print(serializedSkip);
         
         // Test with skipDefaultValues = false
-        YadsJavaSerializer serializerNoSkip = new YadsJavaSerializer(Person.class).setSkipDefaultValues(false);
+        YadsJavaToEntity serializerNoSkip = new YadsJavaToEntity(Person.class).setSkipDefaultValues(false);
         Object serializedNoSkip = serializerNoSkip.serialize(person);
         String textNoSkip = new YadsPrinter().print(serializedNoSkip);
         
@@ -469,14 +469,14 @@ public class TestYadsJavaSerialization {
         assertEquals("With skipDefaultValues=false", "Person(name = Charlie age = 0 address = null friend = null)", textNoSkip);
         
         // Both should deserialize to the same result
-        YadsJavaDeserializer deserializer = new YadsJavaDeserializer(Person.class);
-        
+        YadsJavaFromEntity deserializer = new YadsJavaFromEntity(Person.class);
+
         YadsCst parsedSkip = YadsCstParser.parse(textSkip);
-        Object resolvedSkip = YadsEntityDeserializer.resolveKeyValues(parsedSkip.children).get(0);
+        Object resolvedSkip = YadsEntityFromCst.translate(parsedSkip.children).get(0);
         Person resultSkip = (Person) deserializer.deserialize(resolvedSkip);
-        
+
         YadsCst parsedNoSkip = YadsCstParser.parse(textNoSkip);
-        Object resolvedNoSkip = YadsEntityDeserializer.resolveKeyValues(parsedNoSkip.children).get(0);
+        Object resolvedNoSkip = YadsEntityFromCst.translate(parsedNoSkip.children).get(0);
         Person resultNoSkip = (Person) deserializer.deserialize(resolvedNoSkip);
         
         // Both results should be equivalent

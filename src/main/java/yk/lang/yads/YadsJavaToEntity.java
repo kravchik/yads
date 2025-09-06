@@ -18,7 +18,7 @@ import static yk.ycollections.YArrayList.al;
  * Serializes Java objects to YadsEntity representation.
  * 
  * Converts Java objects to YadsEntity objects that can be printed by YadsPrinter
- * and deserialized back by YadsJavaDeserializer.
+ * and deserialized back by YadsJavaFromEntity.
  * 
  * Current support:
  * - String: passes through unchanged
@@ -27,26 +27,24 @@ import static yk.ycollections.YArrayList.al;
  * - Map: converts to YadsEntity without name, all elements as Tuple
  * - Objects: converts to YadsEntity with class simple name and field tuples (only for explicitly allowed classes)
  */
-public class YadsJavaSerializer {
+public class YadsJavaToEntity {
     
     private final YMap<Class<?>, String> availableClasses;
     private IdentityHashMap<Object, Tuple<YadsEntity, Integer>> identity = new IdentityHashMap<>();
     private int nextRefId = 1;
     public boolean skipDefaultValues = true;
-    //TODO test
-    //TODO true by default
-    public boolean allClassesAvailable = false;
+    public boolean allClassesAvailable = true;
     
     /**
      * Constructor that specifies which classes are allowed for object serialization.
      *
      * @param classes classes that can be serialized as objects
      */
-    public YadsJavaSerializer(Class<?>... classes) {
+    public YadsJavaToEntity(Class<?>... classes) {
         this.availableClasses = al(classes).toMap(v -> v, v -> v.getSimpleName());
     }
 
-    public YadsJavaSerializer addImport(Class<?> clazz) {
+    public YadsJavaToEntity addImport(Class<?> clazz) {
         availableClasses.put(clazz, clazz.getSimpleName());
         return this;
     }
@@ -228,12 +226,12 @@ public class YadsJavaSerializer {
         }
     }
 
-    public YadsJavaSerializer setSkipDefaultValues(boolean skipDefaultValues) {
+    public YadsJavaToEntity setSkipDefaultValues(boolean skipDefaultValues) {
         this.skipDefaultValues = skipDefaultValues;
         return this;
     }
 
-    public YadsJavaSerializer setAllClassesAvailable(boolean allClassesAvailable) {
+    public YadsJavaToEntity setAllClassesAvailable(boolean allClassesAvailable) {
         this.allClassesAvailable = allClassesAvailable;
         return this;
     }

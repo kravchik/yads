@@ -125,28 +125,28 @@ public class TestYadsEntitySerialization {
         // Test integer
         YadsCstParser parser = new YadsCstParser("42");
         YadsCst result = parser.parseListBody();
-        YList<Object> resolved = YadsEntityDeserializer.resolveKeyValues(result.children);
+        YList<Object> resolved = YadsEntityFromCst.translate(result.children);
         TestCase.assertEquals(1, resolved.size());
         TestCase.assertEquals(42, resolved.get(0));
 
         // Test float
         parser = new YadsCstParser("3.14f");
         result = parser.parseListBody();
-        resolved = YadsEntityDeserializer.resolveKeyValues(result.children);
+        resolved = YadsEntityFromCst.translate(result.children);
         TestCase.assertEquals(1, resolved.size());
         TestCase.assertEquals(3.14f, (Float) resolved.get(0), 0.001f);
 
         // Test double
         parser = new YadsCstParser("2.71d");
         result = parser.parseListBody();
-        resolved = YadsEntityDeserializer.resolveKeyValues(result.children);
+        resolved = YadsEntityFromCst.translate(result.children);
         TestCase.assertEquals(1, resolved.size());
         TestCase.assertEquals(2.71d, (Double) resolved.get(0), 0.001d);
 
         // Test string
         parser = new YadsCstParser("\"hello world\"");
         result = parser.parseListBody();
-        resolved = YadsEntityDeserializer.resolveKeyValues(result.children);
+        resolved = YadsEntityFromCst.translate(result.children);
         TestCase.assertEquals(1, resolved.size());
         TestCase.assertEquals("hello world", resolved.get(0));
     }
@@ -155,7 +155,7 @@ public class TestYadsEntitySerialization {
     public void testNamedClass() throws Exception {
         YadsCstParser parser = new YadsCstParser("Person(\"John\" 25)");
         YadsCst result = parser.parseListBody();
-        YList<Object> resolved = YadsEntityDeserializer.resolveKeyValues(result.children);
+        YList<Object> resolved = YadsEntityFromCst.translate(result.children);
         TestCase.assertEquals(1, resolved.size());
 
         Object entity = resolved.get(0);
@@ -177,7 +177,7 @@ public class TestYadsEntitySerialization {
     public void testUnnamedClass() throws Exception {
         YadsCstParser parser = new YadsCstParser("(\"data\" 123)");
         YadsCst result = parser.parseListBody();
-        YList<Object> resolved = YadsEntityDeserializer.resolveKeyValues(result.children);
+        YList<Object> resolved = YadsEntityFromCst.translate(result.children);
         TestCase.assertEquals(1, resolved.size());
 
         Object entity = resolved.get(0);
@@ -200,7 +200,7 @@ public class TestYadsEntitySerialization {
         // Test simple key=value
         YadsCstParser parser = new YadsCstParser("name = \"John\"");
         YadsCst result = parser.parseListBody();
-        YList<Object> resolved = YadsEntityDeserializer.resolveKeyValues(result.children);
+        YList<Object> resolved = YadsEntityFromCst.translate(result.children);
         assertEquals(1, resolved.size());
 
         Object tuple = resolved.get(0);
@@ -215,7 +215,7 @@ public class TestYadsEntitySerialization {
         // Test a complex structure with tuples and nested classes - multiline to test line tracking
         YadsCstParser parser = new YadsCstParser("Person(name = \"John\"\nage = 25\naddress = Address(\"123 Main St\"))");
         YadsCst result = parser.parseListBody();
-        YList<Object> resolved = YadsEntityDeserializer.resolveKeyValues(result.children);
+        YList<Object> resolved = YadsEntityFromCst.translate(result.children);
         assertEquals(1, resolved.size());
 
         Object entity = resolved.get(0);
@@ -267,7 +267,7 @@ public class TestYadsEntitySerialization {
         // Test mix of comments, literals, and classes
         YadsCstParser parser = new YadsCstParser("//header comment\nPerson(\"John\") 42 //inline comment");
         YadsCst result = parser.parseListBody();
-        YList<Object> resolved = YadsEntityDeserializer.resolveKeyValues(result.children);
+        YList<Object> resolved = YadsEntityFromCst.translate(result.children);
         assertEquals(4, resolved.size());
 
         // Header comment
@@ -328,7 +328,7 @@ public class TestYadsEntitySerialization {
         // Test single line comment
         YadsCstParser parser = new YadsCstParser("//this is a comment");
         YadsCst result = parser.parseListBody();
-        YList<Object> resolved = YadsEntityDeserializer.resolveKeyValues(result.children);
+        YList<Object> resolved = YadsEntityFromCst.translate(result.children);
         assertEquals(1, resolved.size());
 
         Object comment = resolved.get(0);
@@ -340,7 +340,7 @@ public class TestYadsEntitySerialization {
         // Test multi-line comment
         parser = new YadsCstParser("/*multi\nline\ncomment*/");
         result = parser.parseListBody();
-        resolved = YadsEntityDeserializer.resolveKeyValues(result.children);
+        resolved = YadsEntityFromCst.translate(result.children);
         assertEquals(1, resolved.size());
 
         comment = resolved.get(0);
@@ -403,7 +403,7 @@ public class TestYadsEntitySerialization {
     }
 
     private static String getYadsList(String s) {
-        return YadsEntityDeserializer.resolve(YadsCstParser.parse(s).children.first()).toString();
+        return YadsEntityFromCst.resolve(YadsCstParser.parse(s).children.first()).toString();
     }
 
 }

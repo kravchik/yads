@@ -12,7 +12,7 @@ import static yk.ycollections.YHashMap.hm;
 /**
  * Deserializer that converts YadsCst back to YadsEntity, String, Number, Boolean
  */
-public class YadsEntityDeserializer {
+public class YadsEntityFromCst {
     public static final String DELIMITER = "=";
 
     /**
@@ -23,7 +23,7 @@ public class YadsEntityDeserializer {
         
         switch (node.type) {
             case "LIST_BODY":
-                return resolveKeyValues(node.children);
+                return translate(node.children);
                 
             case "NAMED_CLASS":
                 return resolveKeyValuesWithCaretsFromNodes(
@@ -69,7 +69,7 @@ public class YadsEntityDeserializer {
     /**
      * Converts a list of YadsCst nodes, handling the special case of 'a = b' -> Tuple conversion.
      */
-    public static YList<Object> resolveKeyValues(YList<YadsCst> nodes) {
+    public static YList<Object> translate(YList<YadsCst> nodes) {
         return resolveKeyValuesWithCaretsFromNodes(nodes, null, null).children;
     }
 
