@@ -1,3 +1,16 @@
+# TODO update
+
+#### Internal API scheme for deserialization to anything
+
+* _text_ -> **YadsCstParser** -> _YadsCst_
+* _YadsCst_ -> **YadsEntityDeseralizer** -> _primitives, YadsEntity_
+* _primitives, YadsEntity_ -> **YadsJavaDeserializer** -> _Java types_
+
+#### Internal API scheme for serialization of anything
+
+* _text_ <- **YadsCstPrinter** <- _primitives, YadsCst, YadsEntity_
+* _primitives, YadsCst, YadsEntity_ <- **YadsJavaSerializer** <- _any type_
+
 
 ##### top-level structure
 If you are using ```YadsParser```, then you are getting just an AST which will just represent data as it is. But if you are using ```Yads``` class, then you can serialize/deserialize directly from/to Java classes and you need to choose between two styles of YADS data.

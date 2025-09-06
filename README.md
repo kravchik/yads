@@ -3,116 +3,84 @@ YADS
 
 **Y**ads **A**bstract **D**ata **S**yntax
 
-Mark-up language (like JSON/YAML), but with optional quotes, no commas, and multi-line strings.
+Mark-up language (like JSON, YAML), but much more convenient.
 
-TODO simple example
-                   
-TODO updated scheme
-   
-```
-text 
-  -> YadsCstParser -> (YadsCst) 
-    -> YadsEntityDeseralizer -> (YadsEntity and other types) 
-      -> YadsJavaDeserializer -> (pure java types) 
+* no commas
+* no white-space indentation or mandatory new lines
+* quotes are optional everywhere
+* can use `""`  and `''` interchangeably
+* can use new-lines in `""` or `''` strings
+* comments `//` and `/* */` and are accessible in data
 
-text 
-  <- YadsCstPrinter <- (YadsCst, YadsEntity and other types)
-    <- YadsJavaSerializer <- (pure java types) 
-```
+### Data Syntax examples
 
-
-With this library, you can parse YADS data into Abstract Syntax Tree, or you can use Yads class to serialize/deserialize data directly from/to Java classes.
-
-Yads is the next step after JSON and YAML (which were good steps after XML). It simplifies the syntax even further.
-* No commas are needed in any lists (like in Lisp)! So you no more bothering when adding or removing list elements.
-* No mandatory quotes. And you can use any of `""` or `''` if needed and escape escaping (especially cool when you need to write something like ```String expected = "('some' 'expected' 'strings')";```)
-* Newlines in strings (YAML supports it, but JSON is not)
-* No mandatory white-spacing  (JSON has no it, YAML has)
-* Comments both `//` and `/* */` (JSON has no comments at all, YAML supports only one-line comments)
-
-### Syntax examples
-
-*Some UI definition*
 ```Java
+// Some hierarchical UI definition
 HBox(
-  pos=(100 200)
+  pos = (100 200)
   VBox(
-    Input(hint='...input here')
-    Button(text='Send')
+    Input(hint = '...input here')
+    Button(text = Send)
   )
 )
 ```
-*Some config*
+
 ```Java
+// Some config
 serverType = node
 port = 8080
 //port = 80
 data = (info = "Awesome super server" author = "John Doe")
 services = (AuthService() AdminService())
 ```
-*Some properties*
-```Java
-greeting = 'Hello traveller!'
-signature = 'Have a nice day,
-travaller'
-```
-### Syntax
 
-##### syntax
+```Java
+// Some properties
+greeting = 'Hello traveller!'
+
+signature = '
+Have a nice day,
+travaller!
+'
+```
+
+### Java implementation specifics
+
+* reading text to data
+* printing plus formatting
+* comments are also read/printed (except for Java serialization)
+* Java serializing/deserializing (focus on readability) 
+
+```Java
+    //serialize some abstract data
+    String serialized = Yads.printYadsEntity(yourInstance);
+    Object y = Yads.readYadsEntity("YourClass(field1=value1 field2=value2)");
+    
+    //serialize some abstract data without top-level class
+    String serialized = Yads.printYadsEntities(yourInstance);
+    YList<Object> y = Yads.readYadsEntities("'someString' field1=value1 field2=value2");
+    
+    //serialize some Java instance
+    String serialized = Yads.printJava(yourInstance);
+    YourClass y = (YourClass)Yads.readJava(YourClass.class, "YourClass(field1=value1 field2=value2)");
+
+    //serialize body of some Java class
+    String serialized = Yads.printJavaBody(yourInstance);
+    YourClass y = Yads.readJavaBody(YourClass.class, "field1=value1 field2=value2");
+```
+
+### Syntax overview
+
 * `()` - empty list
 * `(a b)` - list with two elements
 * `(=)` - empty map
-* `(k1=v1 k2=v2)` - map with several keys and values
+* `(a b k1=v1 k2=v2)` - keys/values and simple values can be together
 * `1 1f 1.0 1d 1l null true false` - numbers and other types
-* `'some string'` - string
-* `"some string"` - string
-* `some string` - two string elements (`some` and `string`)
-* `someString` - string or field name or class name
-* `some-string` - three elements: `some`, `minus`, `string`
-* `Vec2(1 2)` - instantiation of class `Vec2` via constructor
-* `Vec2(x=1 y=2)` - instantiation of class `Vec2` via explicit fields setting
-
-##### feautes
-* no white-space indentation or mandatory new lines
-* no commas or semicolon
-* no mandatory `""` or `'''`
-* can use `""`  and `''` interchangeably
-* can use new-lines in `""` or `''` strings
-* comments `//` and `/* */`  
-
-### API
-```Java
-    //serialize some instance
-    String serialized = Yads.serialize(yourInstance);
-    YourClass y = (YourClass)Yads.deserialize("import=your.package.YourClass YourClass(field1=value1 field2=value2)");
-    //or with default imports:
-    YourClass y = (YourClass)Yads.deserialize(
-            al("import=your.package.YourClass"), 
-            "YourClass(field1=value1 field2=value2)");
-
-    //serialize body of a map
-    String serialized = Yads.serializeBody(someMap);
-    Map deserialized = (Map)Yads.deserializeBody("hello=world");
-
-    //serialize body of some class
-    String serialized = Yads.serializeBody(yourInstance);
-    YourClass y = Yads.deserializeBody(YourClass.class, "field1=value1 field2=value2");
-```
-
-### TODO
-
-* security (restrict via API classes possible to load)
-* streaming
-* all Java types serialization
-* custom serialization
-* multiline string indentation
-* typed array/map
-
-  *Parsing, serialization, deserialization - currently available in Java only. I am open to collaboration for other languages.*
-
-[Serialization](serialization.md)
-
-[Why yet another syntax?](why-another.md)
+* `someString` - unquoted string, no new lines, limited character set
+* `'some string' or "some string"` - quoted strings of any characters, new lines permitted
+* `'hello \r\n world \b'` - several escape types
+* `one-two,three` - list of five elements, operators and commas are parsed as separate elements
+* `Vec2(x=1 y=2)` - 'class' with data
 
 ## mvn artifact
 ```xml
@@ -124,8 +92,8 @@ travaller'
 <dependency>
     <groupId>yk</groupId>
     <artifactId>yads</artifactId>
-    <version>0.03</version>
+    <version>0.3</version>
 </dependency>
 ```
-(current dev version is 0.02-SNAPSHOT)
+(current dev version is 0.4-SNAPSHOT)
 
