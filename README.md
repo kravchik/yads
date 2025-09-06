@@ -84,16 +84,18 @@ travaller!
 
 ## mvn artifact
 ```xml
-<repository>
-   <id>yk.jcommon</id>
-   <url>https://github.com/kravchik/mvn-repo/raw/master</url>
-</repository>
+<!--no artifact for the latest version currently -->
+<!--<repository>-->
+<!--   <id>yk.jcommon</id>-->
+<!--   <url>https://github.com/kravchik/mvn-repo/raw/master</url>-->
+<!--</repository>-->
 
 <dependency>
     <groupId>yk</groupId>
     <artifactId>yads</artifactId>
-    <version>0.3</version>
+<!-- NO ARTIFACT ! SHOULD CHECK-OUT AND BUILD LOCALLY   -->
+    <version>0.3-SNAPSHOT</version>
 </dependency>
 ```
-(current dev version is 0.4-SNAPSHOT)
+(current dev version is 0.3-SNAPSHOT)
 
