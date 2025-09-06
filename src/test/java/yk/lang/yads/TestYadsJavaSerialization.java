@@ -5,6 +5,7 @@ import yk.lang.yads.congocc.YadsCstParser;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 
 import static org.junit.Assert.*;
@@ -18,6 +19,7 @@ import static yk.ycollections.YHashMap.hm;
  * All tests follow the round-trip pattern:
  * originalData → serialize → YadsEntity → print → text → parse → resolve → YadsEntity → deserialize → restoredData
  */
+@SuppressWarnings("deprecation")
 public class TestYadsJavaSerialization {
 
     
@@ -489,5 +491,21 @@ public class TestYadsJavaSerialization {
         assertEquals("Results should be equal", resultSkip.age, resultNoSkip.age);
         assertEquals("Results should be equal", resultSkip.address, resultNoSkip.address);
         assertEquals("Results should be equal", resultSkip.friend, resultNoSkip.friend);
+    }
+
+    @Test
+    public void testSpecificConverters() {
+        assertEquals("hello!", new YadsJavaToEntity()
+                .addByClassConverter(String.class, s -> s + "!")
+                .serialize("hello"));
+
+        assertEquals(al(2000, 3, 3), new YadsJavaToEntity()
+                .addByClassConverter(Date.class, d -> al(d.getYear(), d.getMonth(), d.getDay()))
+                .serialize(new Date(2000, 3, 4)));
+
+        assertEquals("(2000 3 3)", Yads.printYadsEntity(new YadsJavaToEntity()
+                .addByClassConverter(Date.class, d -> al(d.getYear(), d.getMonth(), d.getDay()))
+                .serialize(new Date(2000, 3, 4))));
+
     }
 }

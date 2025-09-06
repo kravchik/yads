@@ -10,9 +10,11 @@ import java.lang.reflect.Modifier;
 import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
 
 import static yk.ycollections.Tuple.tuple;
 import static yk.ycollections.YArrayList.al;
+import static yk.ycollections.YHashMap.hm;
 
 /**
  * Serializes Java objects to YadsEntity representation.
@@ -32,8 +34,10 @@ public class YadsJavaToEntity {
     private final YMap<Class<?>, String> availableClasses;
     private IdentityHashMap<Object, Tuple<YadsEntity, Integer>> identity = new IdentityHashMap<>();
     private int nextRefId = 1;
-    public boolean skipDefaultValues = true;
-    public boolean allClassesAvailable = true;
+    private boolean skipDefaultValues = true;
+    private boolean allClassesAvailable = true;
+
+    private YMap<Class, Function> byClassConverters = hm();
     
     /**
      * Constructor that specifies which classes are allowed for object serialization.
@@ -46,6 +50,11 @@ public class YadsJavaToEntity {
 
     public YadsJavaToEntity addImport(Class<?> clazz) {
         availableClasses.put(clazz, clazz.getSimpleName());
+        return this;
+    }
+
+    public <T> YadsJavaToEntity addByClassConverter(Class<T> c, Function<T, Object> converter) {
+        byClassConverters.put(c, converter);
         return this;
     }
     
@@ -78,7 +87,11 @@ public class YadsJavaToEntity {
         if (obj == null) {
             return null;
         }
-        
+
+        if (byClassConverters.containsKey(obj.getClass())) {
+            return byClassConverters.get(obj.getClass()).apply(obj);
+        }
+
         if (obj instanceof String) {
             // Strings pass through unchanged
             return obj;
@@ -89,7 +102,7 @@ public class YadsJavaToEntity {
             obj instanceof Double || obj instanceof Boolean || obj instanceof Character) {
             return obj;
         }
-        
+
         // For reference-tracked objects (Lists, Maps, Objects), check if already serialized
         if (obj instanceof List || obj instanceof Map || availableClasses.containsKey(obj.getClass()) || allClassesAvailable) {
             if (identity.containsKey(obj)) {
