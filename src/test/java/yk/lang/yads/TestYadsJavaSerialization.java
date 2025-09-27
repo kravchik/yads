@@ -2,6 +2,7 @@ package yk.lang.yads;
 
 import org.junit.Test;
 import yk.lang.yads.congocc.YadsCstParser;
+import yk.ycollections.YList;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -507,12 +508,26 @@ public class TestYadsJavaSerialization {
 
     @Test
     public void testDeserializerByName() {
-        YadsJavaFromEntity converter = new YadsJavaFromEntity().addDeserializerByName("Date", yadsEntity -> LocalDate.of(
-            (Integer) yadsEntity.children.get(0),
-            (Integer) yadsEntity.children.get(1),
-            (Integer) yadsEntity.children.get(2)));
 
-        assertEquals(LocalDate.of(2025, 11, 1), converter.deserialize(Yads.readYadsEntity("Date(2025 11 1)")));
+        assertEquals(LocalDate.of(2025, 11, 1), new YadsJavaFromEntity()
+            .addDeserializerByName("Date", (ref, yadsEntity) -> LocalDate.of(
+                (Integer) yadsEntity.children.get(0),
+                (Integer) yadsEntity.children.get(1),
+                (Integer) yadsEntity.children.get(2))).deserialize(Yads.readYadsEntity("Date(2025 11 1)")));
+
+
+        YadsJavaFromEntity deserializer = new YadsJavaFromEntity();
+        deserializer.addDeserializerByName("SomeObject", (ref, yadsEntity) -> {
+                YList result = al();
+                // store this newly created object BEFORE parsing it deeper (to be able to handle cycles)
+                if (ref != null) deserializer.putRef(ref, result);
+                result.add(deserializer.deserializeImpl(null, yadsEntity.children.get(0)));
+                // in this test, this will be self-reference
+                // careful to call 'deserializeImpl', not 'deserialize'
+                result.add(deserializer.deserializeImpl(null, yadsEntity.children.get(1)));
+                return result;
+            });
+        assertEquals("[x, (this Collection)]", deserializer.deserialize(Yads.readYadsEntity("ref(1 SomeObject(x ref(1)))")).toString());
 
     }
 }

@@ -9,7 +9,7 @@ import java.lang.reflect.Field;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.function.Function;
+import java.util.function.BiFunction;
 
 import static yk.ycollections.YArrayList.al;
 import static yk.ycollections.YHashMap.hm;
@@ -32,7 +32,7 @@ public class YadsJavaFromEntity {
     private final Map<String, Class<?>> classByName;
     private Map<Integer, Object> refs = new HashMap<>();
 
-    private YMap<String, Function<YadsEntity, Object>> deserializerByName = hm();
+    private YMap<String, BiFunction<Integer, YadsEntity, Object>> deserializerByName = hm();
     
     /**
      * Constructor that specifies which classes are allowed for object deserialization.
@@ -54,9 +54,13 @@ public class YadsJavaFromEntity {
         return this;
     }
 
-    public YadsJavaFromEntity addDeserializerByName(String name, Function<YadsEntity, Object> converter) {
+    public YadsJavaFromEntity addDeserializerByName(String name, BiFunction<Integer, YadsEntity, Object> converter) {
         deserializerByName.put(name, converter);
         return this;
+    }
+
+    public void putRef(int refId, Object value) {
+        refs.put(refId, value);
     }
 
     /**
@@ -70,7 +74,7 @@ public class YadsJavaFromEntity {
         return deserializeImpl(null, obj);
     }
     
-    private Object deserializeImpl(Integer refId, Object obj) {
+    public Object deserializeImpl(Integer refId, Object obj) {
         if (obj == null) return null;
         if (obj instanceof List) return deserializeList(refId, (List) obj);
         if (obj instanceof Map) return obj;//special case, empty map returned as a map, not YadsEntity
@@ -90,7 +94,7 @@ public class YadsJavaFromEntity {
                 }
 
                 if (deserializerByName.containsKey(entity.name)) {
-                    return deserializerByName.get(entity.name).apply(entity);
+                    return deserializerByName.get(entity.name).apply(refId, entity);
                 }
 
                 // Check if this is a known class
