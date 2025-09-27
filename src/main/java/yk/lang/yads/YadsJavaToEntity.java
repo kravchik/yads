@@ -37,7 +37,7 @@ public class YadsJavaToEntity {
     private boolean skipDefaultValues = true;
     private boolean allClassesAvailable = true;
 
-    private YMap<Class, Function> byClassConverters = hm();
+    private YMap<Class, Function> serializerByClass = hm();
     
     /**
      * Constructor that specifies which classes are allowed for object serialization.
@@ -53,8 +53,8 @@ public class YadsJavaToEntity {
         return this;
     }
 
-    public <T> YadsJavaToEntity addByClassConverter(Class<T> c, Function<T, Object> converter) {
-        byClassConverters.put(c, converter);
+    public <T> YadsJavaToEntity addSerializerByClass(Class<T> c, Function<T, Object> converter) {
+        serializerByClass.put(c, converter);
         return this;
     }
     
@@ -88,8 +88,8 @@ public class YadsJavaToEntity {
             return null;
         }
 
-        if (byClassConverters.containsKey(obj.getClass())) {
-            return byClassConverters.get(obj.getClass()).apply(obj);
+        if (serializerByClass.containsKey(obj.getClass())) {
+            return serializerByClass.get(obj.getClass()).apply(obj);
         }
 
         if (obj instanceof String) {
@@ -99,7 +99,7 @@ public class YadsJavaToEntity {
         
         // Primitive types pass through unchanged
         if (obj instanceof Integer || obj instanceof Long || obj instanceof Float || 
-            obj instanceof Double || obj instanceof Boolean || obj instanceof Character) {
+            obj instanceof Double || obj instanceof Boolean || obj instanceof Character || obj instanceof Short) {
             return obj;
         }
 
@@ -211,7 +211,7 @@ public class YadsJavaToEntity {
                 if (value == defaultValue) continue; // Same reference (both null, etc.)
                 if (value != null && value.equals(defaultValue)) continue; // Equal values
             }
-            
+
             Object serializedValue = serializeImpl(value); // recursive serialization
             children.add(tuple(field.getName(), serializedValue));
         }

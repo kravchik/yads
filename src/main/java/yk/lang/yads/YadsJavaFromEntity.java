@@ -3,11 +3,13 @@ package yk.lang.yads;
 import yk.lang.yads.utils.Reflector;
 import yk.ycollections.Tuple;
 import yk.ycollections.YList;
+import yk.ycollections.YMap;
 
 import java.lang.reflect.Field;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
 
 import static yk.ycollections.YArrayList.al;
 import static yk.ycollections.YHashMap.hm;
@@ -29,6 +31,8 @@ public class YadsJavaFromEntity {
     
     private final Map<String, Class<?>> classByName;
     private Map<Integer, Object> refs = new HashMap<>();
+
+    private YMap<String, Function<YadsEntity, Object>> deserializerByName = hm();
     
     /**
      * Constructor that specifies which classes are allowed for object deserialization.
@@ -47,6 +51,11 @@ public class YadsJavaFromEntity {
 
     public YadsJavaFromEntity addImport(Class<?>... cc) {
         for (Class<?> c : cc) classByName.put(c.getSimpleName(), c);
+        return this;
+    }
+
+    public YadsJavaFromEntity addDeserializerByName(String name, Function<YadsEntity, Object> converter) {
+        deserializerByName.put(name, converter);
         return this;
     }
 
@@ -79,7 +88,11 @@ public class YadsJavaFromEntity {
                     if (refId != null) throw new RuntimeException("Ref inside a ref");
                     return handleReference(entity);
                 }
-                
+
+                if (deserializerByName.containsKey(entity.name)) {
+                    return deserializerByName.get(entity.name).apply(entity);
+                }
+
                 // Check if this is a known class
                 if (classByName.containsKey(entity.name)) {
                     Class<?> clazz = classByName.get(entity.name);

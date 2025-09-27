@@ -3,6 +3,7 @@ package yk.lang.yads;
 import org.junit.Test;
 import yk.lang.yads.congocc.YadsCstParser;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -484,18 +485,34 @@ public class TestYadsJavaSerialization {
     }
 
     @Test
-    public void testSpecificConverters() {
+    public void testSerializerByClass() {
         assertEquals("hello!", new YadsJavaToEntity()
-                .addByClassConverter(String.class, s -> s + "!")
+                .addSerializerByClass(String.class, s -> s + "!")
                 .serialize("hello"));
 
         assertEquals(al(2000, 3, 3), new YadsJavaToEntity()
-                .addByClassConverter(Date.class, d -> al(d.getYear(), d.getMonth(), d.getDay()))
+                .addSerializerByClass(Date.class, d -> al(d.getYear(), d.getMonth(), d.getDay()))
                 .serialize(new Date(2000, 3, 4)));
 
         assertEquals("(2000 3 3)", Yads.printYadsEntity(new YadsJavaToEntity()
-                .addByClassConverter(Date.class, d -> al(d.getYear(), d.getMonth(), d.getDay()))
+                .addSerializerByClass(Date.class, d -> al(d.getYear(), d.getMonth(), d.getDay()))
                 .serialize(new Date(2000, 3, 4))));
+
+        assertEquals("Date(2000 3 4)", Yads.printYadsEntity(new YadsJavaToEntity()
+                .addSerializerByClass(LocalDate.class, d -> new YadsEntity(
+                    "Date", al(d.getYear(), d.getMonthValue(), d.getDayOfMonth())))
+                .serialize(LocalDate.of(2000, 3, 4))));
+
+    }
+
+    @Test
+    public void testDeserializerByName() {
+        YadsJavaFromEntity converter = new YadsJavaFromEntity().addDeserializerByName("Date", yadsEntity -> LocalDate.of(
+            (Integer) yadsEntity.children.get(0),
+            (Integer) yadsEntity.children.get(1),
+            (Integer) yadsEntity.children.get(2)));
+
+        assertEquals(LocalDate.of(2025, 11, 1), converter.deserialize(Yads.readYadsEntity("Date(2025 11 1)")));
 
     }
 }
