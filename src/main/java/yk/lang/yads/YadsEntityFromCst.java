@@ -94,7 +94,6 @@ public class YadsEntityFromCst {
     private static YadsEntity resolveKeyValuesWithCaretsFromNodes(YList<YadsCst> nodes, String name, Caret caret) {
         if (nodes == null) return new YadsEntity(name, al(), caret, al());
         
-        Object left = null;
         YadsCst leftNode = null;
         YList<Object> result = al();
         YList<Caret> carets = al();
@@ -115,7 +114,7 @@ public class YadsEntityFromCst {
                 if (isDelimiter(rightNode)) die("Expected value at " + rightNode.caret);
                 
                 // Replace left element from result (it was the key)
-                result.set(result.size() - 1, tuple(left, resolve(rightNode)));
+                result.set(result.size() - 1, tuple(result.last(), resolve(rightNode)));
                 // For tuples, use the caret that spans from key to value
                 Caret tupleCaret = leftNode.caret != null && rightNode.caret != null 
                     ? Caret.startEnd(leftNode.caret, rightNode.caret) 
@@ -123,12 +122,10 @@ public class YadsEntityFromCst {
                 carets.set(carets.size() - 1, tupleCaret);
                 
                 leftNode = null;
-                left = null;
             } else {
                 // Regular element - resolve and add to result
                 leftNode = node;
-                left = resolve(node);
-                result.add(left);
+                result.add(resolve(node));
                 carets.add(node.caret);
             }
         }
@@ -137,7 +134,7 @@ public class YadsEntityFromCst {
     }
 
     private static boolean isDelimiter(YadsCst node) {
-        return "ANY_OPERATOR".equals(node.type) && DELIMITER.equals(node.value.toString());
+        return "ANY_OPERATOR".equals(node.type) && DELIMITER.equals(node.value);
     }
 
     private static boolean isComment(YadsCst node) {

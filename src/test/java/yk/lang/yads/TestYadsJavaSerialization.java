@@ -455,15 +455,12 @@ public class TestYadsJavaSerialization {
         // age = 0 (default), address = null (default), friend = null (default)
         
         // Test with skipDefaultValues = true (default behavior)
-        YadsJavaToEntity serializerSkip = new YadsJavaToEntity(Person.class);
-        Object serializedSkip = serializerSkip.serialize(person);
-        String textSkip = new YadsPrinter().print(serializedSkip);
-        
+        String textSkip = new YadsPrinter().print(new YadsJavaToEntity(Person.class).serialize(person));
+
         // Test with skipDefaultValues = false
-        YadsJavaToEntity serializerNoSkip = new YadsJavaToEntity(Person.class).setSkipDefaultValues(false);
-        Object serializedNoSkip = serializerNoSkip.serialize(person);
-        String textNoSkip = new YadsPrinter().print(serializedNoSkip);
-        
+        String textNoSkip = new YadsPrinter().print(new YadsJavaToEntity(Person.class)
+            .setSkipDefaultValues(false).serialize(person));
+
         // With skipDefaultValues = true, should only show non-default fields
         assertEquals("With skipDefaultValues=true", "Person(name = Charlie)", textSkip);
         
@@ -471,26 +468,19 @@ public class TestYadsJavaSerialization {
         assertEquals("With skipDefaultValues=false", "Person(name = Charlie age = 0 address = null friend = null)", textNoSkip);
         
         // Both should deserialize to the same result
-        YadsJavaFromEntity deserializer = new YadsJavaFromEntity(Person.class);
+        Person resultSkip = Yads.readJava(Person.class, textSkip);
+        Person resultNoSkip = Yads.readJava(Person.class, textNoSkip);
 
-        YadsCst parsedSkip = YadsCstParser.parse(textSkip);
-        Object resolvedSkip = YadsEntityFromCst.translate(parsedSkip.children).get(0);
-        Person resultSkip = (Person) deserializer.deserialize(resolvedSkip);
-
-        YadsCst parsedNoSkip = YadsCstParser.parse(textNoSkip);
-        Object resolvedNoSkip = YadsEntityFromCst.translate(parsedNoSkip.children).get(0);
-        Person resultNoSkip = (Person) deserializer.deserialize(resolvedNoSkip);
-        
         // Both results should be equivalent
-        assertEquals("Both should have same name", "Charlie", resultSkip.name);
-        assertEquals("Both should have same age", 0, resultSkip.age);
-        assertNull("Both should have null address", resultSkip.address);
-        assertNull("Both should have null friend", resultSkip.friend);
+        assertEquals("Charlie", resultSkip.name);
+        assertEquals(0, resultSkip.age);
+        assertNull(resultSkip.address);
+        assertNull(resultSkip.friend);
         
-        assertEquals("Results should be equal", resultSkip.name, resultNoSkip.name);
-        assertEquals("Results should be equal", resultSkip.age, resultNoSkip.age);
-        assertEquals("Results should be equal", resultSkip.address, resultNoSkip.address);
-        assertEquals("Results should be equal", resultSkip.friend, resultNoSkip.friend);
+        assertEquals(resultSkip.name, resultNoSkip.name);
+        assertEquals(resultSkip.age, resultNoSkip.age);
+        assertEquals(resultSkip.address, resultNoSkip.address);
+        assertEquals(resultSkip.friend, resultNoSkip.friend);
     }
 
     @Test

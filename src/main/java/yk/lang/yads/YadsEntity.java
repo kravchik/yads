@@ -59,6 +59,10 @@ public class YadsEntity {
         return result == null ? or : ((Tuple)result).b;
     }
 
+    public YList<Tuple> filterFields() {
+        return children.filter(o -> o instanceof Tuple);
+    }
+
     public YadsEntity withReplace(String key, Object value) {
         if (key == null) throw new RuntimeException("key is null");
         return new YadsEntity(name,
