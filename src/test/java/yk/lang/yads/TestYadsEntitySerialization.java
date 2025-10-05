@@ -353,11 +353,11 @@ public class TestYadsEntitySerialization {
         testComment("YadsComment{isOneLine=true, text=''}", "//\n");
         testComment("YadsComment{isOneLine=false, text=' '}", "/* */");
 
-        assertException("(a//\n = b)", "Comment instead of key at Caret{beginLine=1, beginColumn=3, endLine=1, endColumn=4, beginOffset=2, endOffset=4}");
-        assertException("(a = //\nb)", "Comment instead of value at Caret{beginLine=1, beginColumn=6, endLine=1, endColumn=7, beginOffset=5, endOffset=7}");
+        assertException("(a//\n = b)", "Comment instead of key at 1:3");
+        assertException("(a = //\nb)", "Comment instead of value at 1:6");
 
-        assertException("(a/**/ = b)", "Comment instead of key at Caret{beginLine=1, beginColumn=3, endLine=1, endColumn=6, beginOffset=2, endOffset=6}");
-        assertException("(a = /**/b)", "Comment instead of value at Caret{beginLine=1, beginColumn=6, endLine=1, endColumn=9, beginOffset=5, endOffset=9}");
+        assertException("(a/**/ = b)", "Comment instead of key at 1:3");
+        assertException("(a = /**/b)", "Comment instead of value at 1:6");
 
         testObj(new YadsEntity.YadsComment(false, "comment"), "/*comment*/");
         Object oneLine = new YadsEntity.YadsComment(true, "comment");
@@ -378,19 +378,13 @@ public class TestYadsEntitySerialization {
     }
 
     @Test
-    public void testErrors() {
-        assertException("(= a)",
-            "Expected key before '=' at Caret{beginLine=1, beginColumn=2, endLine=1, endColumn=2, beginOffset=1, endOffset=2}");
-        assertException("(a =)",
-            "Expected value after '=' at Caret{beginLine=1, beginColumn=4, endLine=1, endColumn=4, beginOffset=3, endOffset=4}");
-        assertException("(= =)",
-            "Expected key before '=' at Caret{beginLine=1, beginColumn=2, endLine=1, endColumn=2, beginOffset=1, endOffset=2}");
-        assertException("(a = =)",
-            "Expected value at Caret{beginLine=1, beginColumn=6, endLine=1, endColumn=6, beginOffset=5, endOffset=6}");
-        assertException("(a = b = c)",
-            "Expected key before '=' at Caret{beginLine=1, beginColumn=8, endLine=1, endColumn=8, beginOffset=7, endOffset=8}");
-        assertException("(a = b =)",
-            "Expected key before '=' at Caret{beginLine=1, beginColumn=8, endLine=1, endColumn=8, beginOffset=7, endOffset=8}");
+    public void testKeyValueErrors() {
+        assertException("(= a)", "Expected key before '=' at 1:2");
+        assertException("(a =)", "Expected value after '=' at 1:4");
+        assertException("(= =)", "Expected key before '=' at 1:2");
+        assertException("(a = =)", "Expected value at 1:6");
+        assertException("(a = b = c)", "Expected key before '=' at 1:8");
+        assertException("(a = b =)", "Expected key before '=' at 1:8");
     }
 
     public static void assertException(String src, String errorText) {

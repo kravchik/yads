@@ -19,7 +19,7 @@ INJECT YadsCstParser : {
     import yk.lang.yads.utils.Caret;
     import yk.lang.yads.YadsCst;
     import yk.ycollections.YMap;
-    import yk.lang.yads.utils.YadsUtils;
+    import yk.lang.yads.utils.YadsEscapeUtils;
 }
 
 INJECT YadsCstParser :
@@ -202,12 +202,12 @@ YadsCst parseElement() #void :
   |
     t = <STRING_LITERAL_DQ> {
         return new YadsCst("STRING_LITERAL_DQ", createCaret(t), 
-            YadsUtils.unescapeDoubleQuotes(t.toString())); 
+            YadsEscapeUtils.unescapeDoubleQuotes(t.toString()));
     }
   |
     t = <STRING_LITERAL_SQ> { 
         return new YadsCst("STRING_LITERAL_SQ", createCaret(t), 
-            YadsUtils.unescapeSingleQuotes(t.toString())); 
+            YadsEscapeUtils.unescapeSingleQuotes(t.toString()));
     }
 ;
 

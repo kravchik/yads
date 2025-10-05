@@ -103,15 +103,15 @@ public class YadsEntityFromCst {
             
             if (isDelimiter(node)) {
                 // Found '=' delimiter - convert previous element and next element to Tuple
-                if (leftNode == null) die("Expected key before '=' at " + node.caret);
-                if (isComment(leftNode)) die("Comment instead of key at " + leftNode.caret);
+                if (leftNode == null) die("Expected key before '=' at " + node.caret.toStringBegin());
+                if (isComment(leftNode)) die("Comment instead of key at " + leftNode.caret.toStringBegin());
 
                 i++; // Move to next element (the value)
-                if (i >= nodes.size()) die("Expected value after '=' at " + node.caret);
+                if (i >= nodes.size()) die("Expected value after '=' at " + node.caret.toStringBegin());
                 
                 YadsCst rightNode = nodes.get(i);
-                if (isComment(rightNode)) die("Comment instead of value at " + rightNode.caret);
-                if (isDelimiter(rightNode)) die("Expected value at " + rightNode.caret);
+                if (isComment(rightNode)) die("Comment instead of value at " + rightNode.caret.toStringBegin());
+                if (isDelimiter(rightNode)) die("Expected value at " + rightNode.caret.toStringBegin());
                 
                 // Replace left element from result (it was the key)
                 result.set(result.size() - 1, tuple(result.last(), resolve(rightNode)));

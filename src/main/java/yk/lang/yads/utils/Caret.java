@@ -26,6 +26,10 @@ public class Caret {
         );
     }
 
+    public String toStringBegin() {
+        return String.format("%s:%s", beginLine, beginColumn);
+    }
+
     @Override
     public String toString() {
         return String.format("%s:%s .. %s:%s [%s-%s]", beginLine, beginColumn, endLine, endColumn, beginOffset, endOffset);
