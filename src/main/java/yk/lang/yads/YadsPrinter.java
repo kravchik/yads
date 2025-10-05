@@ -3,7 +3,7 @@ package yk.lang.yads;
 import yk.lang.yads.congocc.YadsCstLexer;
 import yk.lang.yads.congocc.YadsCstParser;
 import yk.lang.yads.utils.BadException;
-import yk.lang.yads.utils.YadsUtils;
+import yk.lang.yads.utils.YadsEscapeUtils;
 import yk.ycollections.Tuple;
 import yk.ycollections.YList;
 
@@ -28,8 +28,8 @@ public class YadsPrinter {
             value1 = valObj.toString();
             boolean woQuotes = withoutQuotes(value1);
             if (!woQuotes) {
-                if (value1.contains("'")) value1 = "\"" + YadsUtils.escapeDoubleQuotes(value1) + "\"";
-                else value1 = "'" + YadsUtils.escapeSingleQuotes(value1) + "'";
+                if (value1.contains("'")) value1 = "\"" + YadsEscapeUtils.escapeDoubleQuotes(value1) + "\"";
+                else value1 = "'" + YadsEscapeUtils.escapeSingleQuotes(value1) + "'";
             }
             value = value1;
         } else if (valObj instanceof Number) {
@@ -219,10 +219,10 @@ public class YadsPrinter {
                     return formatFloatingPoint(cst.value);
                     
                 case "STRING_LITERAL_DQ":
-                    return "\"" + YadsUtils.escapeDoubleQuotes(cst.value.toString()) + "\"";
+                    return "\"" + YadsEscapeUtils.escapeDoubleQuotes(cst.value.toString()) + "\"";
                     
                 case "STRING_LITERAL_SQ":
-                    return "'" + YadsUtils.escapeSingleQuotes(cst.value.toString()) + "'";
+                    return "'" + YadsEscapeUtils.escapeSingleQuotes(cst.value.toString()) + "'";
                     
                 case "ANY_LITERAL":
                 case "ANY_OPERATOR":

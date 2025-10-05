@@ -6,7 +6,7 @@ import java.io.StringWriter;
 
 import static yk.ycollections.YHashMap.hm;
 
-public class YadsUtils {
+public class YadsEscapeUtils {
     private static final YMap<Character, Character> ESCAPES = hm('\t', 't', '\b', 'b', '\r', 'r', '\f', 'f', '\\', '\\');
     public static final YMap<Character, Character> ESCAPES_SQ = ESCAPES.with('\'', '\'');
     public static final YMap<Character, Character> ESCAPES_DQ = ESCAPES.with('\"', '\"');
