@@ -9,19 +9,6 @@ public class Caret {
     public int beginOffset;
     public int endOffset;
 
-    public static Caret begin(int beginLine, int beginColumn) {
-        return new Caret(beginLine, beginColumn, 0, 0);
-    }
-
-    public Caret(int beginLine, int beginColumn, int endLine, int endColumn) {
-        this.beginLine = beginLine == 0 ? 1 : beginLine;
-        this.beginColumn = beginColumn == 0 ? 1 : beginColumn;
-        this.endLine = endLine;
-        this.endColumn = endColumn;
-        this.beginOffset = -1; // Not available for JavaCC
-        this.endOffset = -1;
-    }
-
     public Caret(int beginLine, int beginColumn, int endLine, int endColumn, int beginOffset, int endOffset) {
         this.beginLine = beginLine == 0 ? 1 : beginLine;
         this.beginColumn = beginColumn == 0 ? 1 : beginColumn;
@@ -39,24 +26,9 @@ public class Caret {
         );
     }
 
-    public String toStringInside() {
-        return String.format("%s:%s .. %s:%s [%s-%s]", beginLine, beginColumn, endLine, endColumn, beginOffset, endOffset);
-    }
-
-    public String toStringBegin() {
-        return String.format("%s:%s", beginLine, beginColumn);
-    }
-
     @Override
     public String toString() {
-        return "Caret{" +
-                "beginLine=" + beginLine +
-                ", beginColumn=" + beginColumn +
-                ", endLine=" + endLine +
-                ", endColumn=" + endColumn +
-                ", beginOffset=" + beginOffset +
-                ", endOffset=" + endOffset +
-                '}';
+        return String.format("%s:%s .. %s:%s [%s-%s]", beginLine, beginColumn, endLine, endColumn, beginOffset, endOffset);
     }
 
     @Override
